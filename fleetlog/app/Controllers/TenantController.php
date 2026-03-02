@@ -247,5 +247,28 @@ class TenantController extends BaseController
                 'error' => 'Failed to update driver.'
             ]);
         }
+    public function quickStatusVehicle(int $id, string $status): void
+    {
+        if (!in_array($status, ['active', 'inactive', 'service'])) {
+            $this->redirect('/tenant/vehicles');
+        }
+
+        $repo = new \FleetLog\App\Repositories\VehicleRepository();
+        $vehicle = $repo->find($id);
+
+        if ($vehicle) {
+            $repo->update($id, [
+                'license_plate' => $vehicle['license_plate'],
+                'make' => $vehicle['make'],
+                'model' => $vehicle['model'],
+                'expiry_rca' => $vehicle['expiry_rca'],
+                'expiry_itp' => $vehicle['expiry_itp'],
+                'expiry_rovigneta' => $vehicle['expiry_rovigneta'],
+                'current_odometer' => $vehicle['current_odometer'],
+                'status' => $status
+            ]);
+        }
+
+        $this->redirect('/tenant/vehicles?success=status_updated');
     }
 }

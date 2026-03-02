@@ -19,7 +19,7 @@
         </thead>
         <tbody class="bg-white divide-y divide-slate-200">
             <?php foreach ($vehicles as $vehicle): ?>
-                <tr class="hover:bg-slate-50">
+                <tr class="hover:bg-slate-50 group transition-colors">
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="text-sm font-medium text-slate-900"><?php echo $vehicle['make'] . ' ' . $vehicle['model']; ?></div>
                     </td>
