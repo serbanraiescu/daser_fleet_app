@@ -15,6 +15,16 @@ class TripRepository extends BaseRepository
         return (bool) DB::fetch($sql, [$driverId]);
     }
 
+    public function getOpenTrip(int $driverId): ?array
+    {
+        $sql = "SELECT t.*, v.license_plate 
+                FROM trips t 
+                JOIN vehicles v ON t.vehicle_id = v.id 
+                WHERE t.driver_id = ? AND t.status = 'open' 
+                LIMIT 1";
+        return DB::fetch($sql, [$driverId]);
+    }
+
     public function startTrip(array $data): int|false
     {
         if ($this->hasOpenTrip($data['driver_id'])) {

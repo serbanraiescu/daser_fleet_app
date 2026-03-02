@@ -15,12 +15,13 @@ class DriverController extends BaseController
         $vehicleRepo = new VehicleRepository();
         
         $driverId = Auth::user()['id'];
-        $hasOpenTrip = $tripRepo->hasOpenTrip($driverId);
+        $activeTrip = $tripRepo->getOpenTrip($driverId);
         $vehicles = $vehicleRepo->all();
 
         $this->render('driver/dashboard', [
             'title' => 'Driver Dashboard',
-            'hasOpenTrip' => $hasOpenTrip,
+            'hasOpenTrip' => (bool)$activeTrip,
+            'activeTrip' => $activeTrip,
             'vehicles' => $vehicles
         ]);
     }
