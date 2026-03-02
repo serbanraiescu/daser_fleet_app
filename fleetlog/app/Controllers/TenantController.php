@@ -39,4 +39,24 @@ class TenantController extends BaseController
         Auth::impersonate($id);
         $this->redirect('/tenant/dashboard');
     }
+
+    public function vehicles(): void
+    {
+        $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
+        $vehicles = $vehicleRepo->all();
+        $this->render('tenant/vehicles/index', [
+            'title' => 'Manage Vehicles',
+            'vehicles' => $vehicles
+        ]);
+    }
+
+    public function trips(): void
+    {
+        $tripRepo = new \FleetLog\App\Repositories\TripRepository();
+        $trips = $tripRepo->all();
+        $this->render('tenant/trips/index', [
+            'title' => 'Fleet Trip Logs',
+            'trips' => $trips
+        ]);
+    }
 }
