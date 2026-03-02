@@ -58,4 +58,7 @@ $router->add('POST', '/driver/fueling', 'FuelingController@store', [\FleetLog\Ap
 $router->add('GET', '/driver/report-damage', 'DamageController@showReport', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('POST', '/driver/report-damage', 'DamageController@store', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 
+// QR Generation
+$router->add('GET', '/qr/generate', 'QrController@generate');
+
 $router->add('GET', '/', 'HomeController@index');

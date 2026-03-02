@@ -32,7 +32,7 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                         <div class="flex items-center space-x-3">
                             <?php 
-                                $qrUrl = "https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=" . urlencode("https://" . ($_SERVER['HTTP_HOST'] ?? 'fleet.daserdesign.ro') . "/driver/start-trip?qr=" . $vehicle['qr_code']);
+                                $qrUrl = "/qr/generate?sf=4&d=" . urlencode("https://" . ($_SERVER['HTTP_HOST'] ?? 'fleet.daserdesign.ro') . "/driver/start-trip?qr=" . $vehicle['qr_code']);
                             ?>
                             <a href="<?php echo $qrUrl; ?>" target="_blank" class="hover:scale-105 transition-transform inline-block group/qr" title="Click to view large QR code">
                                 <div class="relative">

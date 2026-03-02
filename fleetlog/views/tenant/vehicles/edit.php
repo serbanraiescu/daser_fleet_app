@@ -36,7 +36,7 @@
                 <div class="flex items-center space-x-3">
                     <input type="text" name="qr_code" readonly value="<?php echo $vehicle['qr_code']; ?>" class="w-full px-3 py-2 border border-slate-200 bg-slate-50 rounded-md text-slate-500 font-mono">
                     <?php 
-                        $qrUrl = "https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=" . urlencode("https://" . ($_SERVER['HTTP_HOST'] ?? 'fleet.daserdesign.ro') . "/driver/start-trip?qr=" . $vehicle['qr_code']);
+                        $qrUrl = "/qr/generate?sf=8&d=" . urlencode("https://" . ($_SERVER['HTTP_HOST'] ?? 'fleet.daserdesign.ro') . "/driver/start-trip?qr=" . $vehicle['qr_code']);
                     ?>
                     <a href="<?php echo $qrUrl; ?>" target="_blank" title="View Large QR" class="flex-shrink-0">
                         <img src="<?php echo $qrUrl; ?>" alt="QR" class="w-10 h-10 border border-slate-300 rounded shadow-sm">
