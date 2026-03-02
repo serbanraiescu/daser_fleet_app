@@ -411,21 +411,25 @@ class TenantController extends BaseController
 
         $expenseRepo = new \FleetLog\App\Repositories\ExpenseRepository();
         
-        $expenseRepo->create([
-            'vehicle_id' => $vehicleId,
-            'expense_type' => $_POST['expense_type'],
-            'name' => $_POST['name'],
-            'cost' => $_POST['cost'],
-            'odometer_at_expense' => $_POST['odometer_at_expense'] ?: null,
-            'expense_date' => $_POST['expense_date'],
-            'notes' => trim($_POST['notes'])
-        ]);
+        try {
+            $expenseRepo->create([
+                'vehicle_id' => $vehicleId,
+                'expense_type' => $_POST['expense_type'],
+                'name' => $_POST['name'],
+                'cost' => $_POST['cost'],
+                'odometer_at_expense' => $_POST['odometer_at_expense'] !== '' ? $_POST['odometer_at_expense'] : null,
+                'expense_date' => $_POST['expense_date'],
+                'notes' => trim($_POST['notes'])
+            ]);
 
-        if (!empty($_POST['next_service_km'])) {
-            $expenseRepo->updateNextServiceKm($vehicleId, (int)$_POST['next_service_km']);
+            if (!empty($_POST['next_service_km'])) {
+                $expenseRepo->updateNextServiceKm($vehicleId, (int)$_POST['next_service_km']);
+            }
+
+            $this->redirect('/tenant/expenses?success=expense_added');
+        } catch (\Exception $e) {
+            die("Error saving expense: " . $e->getMessage());
         }
-
-        $this->redirect('/tenant/expenses?success=expense_added');
     }
 
     public function showAddExpense(int $id): void
@@ -454,21 +458,25 @@ class TenantController extends BaseController
 
         $expenseRepo = new \FleetLog\App\Repositories\ExpenseRepository();
         
-        $expenseRepo->create([
-            'vehicle_id' => $id,
-            'expense_type' => $_POST['expense_type'],
-            'name' => $_POST['name'],
-            'cost' => $_POST['cost'],
-            'odometer_at_expense' => $_POST['odometer_at_expense'] ?: null,
-            'expense_date' => $_POST['expense_date'],
-            'notes' => trim($_POST['notes'])
-        ]);
+        try {
+            $expenseRepo->create([
+                'vehicle_id' => $id,
+                'expense_type' => $_POST['expense_type'],
+                'name' => $_POST['name'],
+                'cost' => $_POST['cost'],
+                'odometer_at_expense' => $_POST['odometer_at_expense'] !== '' ? $_POST['odometer_at_expense'] : null,
+                'expense_date' => $_POST['expense_date'],
+                'notes' => trim($_POST['notes'])
+            ]);
 
-        // If a next_service_km was provided, update the vehicle
-        if (!empty($_POST['next_service_km'])) {
-            $expenseRepo->updateNextServiceKm($id, (int)$_POST['next_service_km']);
+            // If a next_service_km was provided, update the vehicle
+            if (!empty($_POST['next_service_km'])) {
+                $expenseRepo->updateNextServiceKm($id, (int)$_POST['next_service_km']);
+            }
+
+            $this->redirect('/tenant/expenses?success=expense_added');
+        } catch (\Exception $e) {
+            die("Error saving expense: " . $e->getMessage());
         }
-
-        $this->redirect('/tenant/expenses?success=expense_added');
     }
 }
