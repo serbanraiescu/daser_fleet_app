@@ -70,6 +70,18 @@ $archivedVehicles = $archivedVehicles ?? [];
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                             <?php echo number_format($vehicle['current_odometer']); ?> KM
+                            <?php 
+                            if (!empty($vehicle['next_service_km']) && $vehicle['next_service_km'] > 0) {
+                                $kmLeft = $vehicle['next_service_km'] - $vehicle['current_odometer'];
+                                if ($kmLeft <= 0) {
+                                    echo '<div class="mt-1 flex items-center text-xs font-bold text-red-600"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Service Past Due</div>';
+                                } elseif ($kmLeft <= 1000) {
+                                    echo '<div class="mt-1 flex items-center text-xs font-bold text-amber-600"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Service Due: ' . number_format($kmLeft) . ' KM</div>';
+                                } else {
+                                    echo '<div class="mt-1 text-xs text-slate-400">Next Service: ' . number_format($vehicle['next_service_km']) . ' KM</div>';
+                                }
+                            }
+                            ?>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-500">
                             <div>RCA: <?php echo $vehicle['expiry_rca'] ?: 'N/A'; ?></div>
@@ -110,12 +122,20 @@ $archivedVehicles = $archivedVehicles ?? [];
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <div class="flex items-center justify-end space-x-3 w-full">
-                                <a href="/tenant/vehicles/edit/<?php echo $vehicle['id']; ?>" class="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1.5 rounded border border-blue-100 hover:bg-blue-100 transition-colors">Edit</a>
-                                <a href="/tenant/vehicles/archive/<?php echo $vehicle['id']; ?>" class="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1.5 rounded border border-red-100 hover:bg-red-100 transition-colors" title="Write-off / Archive">
-                                    <svg class="w-4 h-4 inline-block -mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                    Archive
-                                </a>
+                            <div class="flex flex-col items-end space-y-2 w-full">
+                                <div class="flex items-center space-x-2">
+                                    <a href="/tenant/expenses/add/<?php echo $vehicle['id']; ?>" class="text-green-700 hover:text-green-900 bg-green-50 px-3 py-1.5 rounded border border-green-200 hover:bg-green-100 transition-colors shadow-sm flex items-center" title="Add Expense/Service">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                        Expense
+                                    </a>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <a href="/tenant/vehicles/edit/<?php echo $vehicle['id']; ?>" class="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1.5 rounded border border-blue-100 hover:bg-blue-100 transition-colors">Edit</a>
+                                    <a href="/tenant/vehicles/archive/<?php echo $vehicle['id']; ?>" class="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1.5 rounded border border-red-100 hover:bg-red-100 transition-colors" title="Write-off / Archive">
+                                        <svg class="w-4 h-4 inline-block -mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        Archive
+                                    </a>
+                                </div>
                             </div>
                         </td>
                     </tr>

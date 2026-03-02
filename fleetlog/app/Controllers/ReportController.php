@@ -32,7 +32,8 @@ class ReportController extends BaseController
                 (SELECT SUM(total_price) FROM fuelings WHERE vehicle_id = v.id AND tenant_id = ? AND created_at >= ? AND created_at < ?) as total_fuel_cost,
                 (SELECT COUNT(*) FROM trips WHERE vehicle_id = v.id AND tenant_id = ? AND start_time >= ? AND start_time < ?) as trip_count,
                 (SELECT COUNT(*) FROM damage_reports WHERE vehicle_id = v.id AND tenant_id = ? AND datetime >= ? AND datetime < ?) as damage_count,
-                (SELECT SUM(repair_cost) FROM damage_reports WHERE vehicle_id = v.id AND tenant_id = ? AND datetime >= ? AND datetime < ?) as total_repair_cost
+                (SELECT SUM(repair_cost) FROM damage_reports WHERE vehicle_id = v.id AND tenant_id = ? AND datetime >= ? AND datetime < ?) as total_repair_cost,
+                (SELECT SUM(cost) FROM vehicle_expenses WHERE vehicle_id = v.id AND tenant_id = ? AND expense_date >= ? AND expense_date < ?) as total_other_expenses
             FROM vehicles v
             WHERE v.tenant_id = ?
         ", [
@@ -43,6 +44,7 @@ class ReportController extends BaseController
             $tenantId, $dateFilter, $endDate, 
             $tenantId, $dateFilter, $endDate, 
             $tenantId, $dateFilter, $endDate, 
+            $tenantId, $dateFilter, $endDate,
             $tenantId
         ]);
 

@@ -371,4 +371,63 @@ class TenantController extends BaseController
 
         $this->redirect('/tenant/damages?success=damage_updated');
     }
+
+    public function expenses(): void
+    {
+        $tenantId = Auth::tenantId();
+        $expenseRepo = new \FleetLog\App\Repositories\ExpenseRepository();
+        
+        $expenses = $expenseRepo->getByTenant($tenantId);
+        $serviceDue = $expenseRepo->getServiceDueVehicles($tenantId, 1000); // vehicles within 1000km of service or past due
+
+        $this->render('tenant/expenses/index', [
+            'title' => 'Vehicle Expenses & Maintenance',
+            'expenses' => $expenses,
+            'serviceDue' => $serviceDue
+        ]);
+    }
+
+    public function showAddExpense(int $vehicleId): void
+    {
+        $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
+        $vehicle = $vehicleRepo->find($vehicleId);
+
+        if (!$vehicle || $vehicle['tenant_id'] !== Auth::tenantId()) {
+            $this->redirect('/tenant/vehicles');
+        }
+
+        $this->render('tenant/expenses/add', [
+            'title' => 'Add Vehicle Expense',
+            'vehicle' => $vehicle
+        ]);
+    }
+
+    public function storeExpense(int $vehicleId): void
+    {
+        $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
+        $vehicle = $vehicleRepo->find($vehicleId);
+
+        if (!$vehicle || $vehicle['tenant_id'] !== Auth::tenantId()) {
+            $this->redirect('/tenant/vehicles');
+        }
+
+        $expenseRepo = new \FleetLog\App\Repositories\ExpenseRepository();
+        
+        $expenseRepo->create([
+            'vehicle_id' => $vehicleId,
+            'expense_type' => $_POST['expense_type'],
+            'name' => $_POST['name'],
+            'cost' => $_POST['cost'],
+            'odometer_at_expense' => $_POST['odometer_at_expense'] ?: null,
+            'expense_date' => $_POST['expense_date'],
+            'notes' => trim($_POST['notes'])
+        ]);
+
+        // If a next_service_km was provided, update the vehicle
+        if (!empty($_POST['next_service_km'])) {
+            $expenseRepo->updateNextServiceKm($vehicleId, (int)$_POST['next_service_km']);
+        }
+
+        $this->redirect('/tenant/expenses?success=expense_added');
+    }
 }
