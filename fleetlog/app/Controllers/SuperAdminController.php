@@ -32,4 +32,31 @@ class SuperAdminController extends BaseController
         Auth::stopImpersonating();
         $this->redirect('/admin/tenants');
     }
+
+    public function showEditTenant(int $id): void
+    {
+        $tenant = DB::fetch("SELECT * FROM tenants WHERE id = ?", [$id]);
+        if (!$tenant) {
+            $this->redirect('/admin/tenants');
+        }
+
+        $this->render('admin/tenants/edit', [
+            'title' => 'Edit Tenant',
+            'tenant' => $tenant
+        ]);
+    }
+
+    public function updateTenant(int $id): void
+    {
+        $name = $_POST['name'];
+        $email = $_POST['email'];
+        $cui = $_POST['cui'];
+        $status = $_POST['status'];
+
+        DB::query("UPDATE tenants SET name = ?, email = ?, cui = ?, status = ? WHERE id = ?", [
+            $name, $email, $cui, $status, $id
+        ]);
+
+        $this->redirect('/admin/tenants?success=tenant_updated');
+    }
 }

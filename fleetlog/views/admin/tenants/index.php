@@ -35,7 +35,7 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <a href="/admin/tenants/impersonate/<?php echo $tenant['id']; ?>" class="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded inline-block mr-2">Impersonate</a>
-                        <a href="#" class="text-slate-600 hover:text-slate-900">Edit</a>
+                        <a href="/admin/tenants/edit/<?php echo $tenant['id']; ?>" class="text-slate-600 hover:text-slate-900 font-bold">Edit</a>
                     </td>
                 </tr>
                 <?php endforeach; ?>
