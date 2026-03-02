@@ -90,9 +90,10 @@ class DamageController extends BaseController
         $tenantId = Auth::tenantId();
         // Path relative to the public directory
         $publicRelativePath = "uploads/tenants/{$tenantId}/damages/" . date('Y-m');
-        // Absolute absolute path on server. 
-        // __DIR__ is App/Controllers. dirname x3 is daser_fleet_app
-        $uploadDir = dirname(dirname(dirname(__DIR__))) . '/fleetlog/public/' . $publicRelativePath;
+        
+        // Use DOCUMENT_ROOT to ensure we hit the actual public folder (public_html on cPanel)
+        $docRoot = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\');
+        $uploadDir = $docRoot . '/' . $publicRelativePath;
         
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
