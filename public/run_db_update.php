@@ -10,12 +10,12 @@ error_reporting(E_ALL);
 echo "<h1>Running Database Migrations...</h1>";
 echo "<pre style='background:#f4f4f4; padding:20px; border:1px solid #ccc; border-radius:5px;'>";
 
-// Determine the path to the app root (assumes this file is in public_html)
-$appRoot = dirname(__DIR__) . '/fleetlog'; 
+// Determine the path to the app root
+$appRoot = __DIR__ . '/fleetlog'; 
 
 if (!is_dir($appRoot)) {
-    // Try the local structure where public is inside the main folder
-    $appRoot = dirname(__DIR__);
+    // Fallback just in case
+    $appRoot = dirname(__DIR__) . '/fleetlog';
 }
 
 $migrationScript = $appRoot . '/cron/run_migrations.php';
