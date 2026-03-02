@@ -273,4 +273,15 @@ class TenantController extends BaseController
 
         $this->redirect('/tenant/vehicles?success=status_updated');
     }
+
+    public function fuelings(): void
+    {
+        $fuelingRepo = new \FleetLog\App\Repositories\FuelingRepository();
+        $fuelings = $fuelingRepo->getByTenant(Auth::tenantId());
+
+        $this->render('tenant/fuelings/index', [
+            'title' => 'Fueling Logs',
+            'fuelings' => $fuelings
+        ]);
+    }
 }
