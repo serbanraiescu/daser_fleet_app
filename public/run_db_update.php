@@ -10,12 +10,15 @@ error_reporting(E_ALL);
 echo "<h1>Running Database Migrations...</h1>";
 echo "<pre style='background:#f4f4f4; padding:20px; border:1px solid #ccc; border-radius:5px;'>";
 
-// Determine the path to the app root
-$appRoot = __DIR__ . '/fleetlog'; 
+// Hardcoded accurate paths based on your cPanel structure
+$appRoot = '/home/qqgbtymm/daser_fleet_app/fleetlog';
 
 if (!is_dir($appRoot)) {
-    // Fallback just in case
-    $appRoot = dirname(__DIR__) . '/fleetlog';
+    // Fallback to relative if the hardcoded one is slightly wrong
+    $appRoot = __DIR__ . '/fleetlog';
+    if (!is_dir($appRoot)) {
+        $appRoot = dirname(__DIR__) . '/fleetlog';
+    }
 }
 
 $migrationScript = $appRoot . '/cron/run_migrations.php';
