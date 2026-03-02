@@ -11,6 +11,8 @@ $router->add('GET', '/admin/stop-impersonation', 'AuthController@stopImpersonati
 
 // Super Admin Routes
 $router->add('GET', '/admin/tenants', 'SuperAdminController@tenants', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
+$router->add('GET', '/admin/tenants/add', 'SuperAdminController@showAddTenant', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
+$router->add('POST', '/admin/tenants/add', 'SuperAdminController@storeTenant', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('GET', '/admin/tenants/edit/{id}', 'SuperAdminController@showEditTenant', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('POST', '/admin/tenants/edit/{id}', 'SuperAdminController@updateTenant', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('GET', '/admin/tenants/impersonate/{id}', 'SuperAdminController@impersonate', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);

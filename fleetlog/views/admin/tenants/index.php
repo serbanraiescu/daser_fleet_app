@@ -1,7 +1,7 @@
 <div class="space-y-6">
     <div class="flex justify-between items-center">
         <h1 class="text-2xl font-bold text-slate-800">System Tenants</h1>
-        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Add New Tenant</button>
+        <a href="/admin/tenants/add" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-bold shadow-sm">Add New Tenant</a>
     </div>
 
     <div class="bg-white shadow-sm rounded-xl border border-slate-200 overflow-hidden">

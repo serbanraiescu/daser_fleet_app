@@ -59,4 +59,39 @@ class SuperAdminController extends BaseController
 
         $this->redirect('/admin/tenants?success=tenant_updated');
     }
+
+    public function showAddTenant(): void
+    {
+        $this->render('admin/tenants/add', [
+            'title' => 'Add New Tenant'
+        ]);
+    }
+
+    public function storeTenant(): void
+    {
+        $name = $_POST['name'];
+        $email = $_POST['email'];
+        $cui = $_POST['cui'];
+        $adminName = $_POST['admin_name'];
+        $password = $_POST['password'];
+
+        // 1. Create Tenant
+        DB::query("INSERT INTO tenants (name, email, cui, status) VALUES (?, ?, ?, 'active')", [
+            $name, $email, $cui
+        ]);
+        $tenantId = (int)DB::lastInsertId();
+
+        // 2. Create Admin User for this tenant
+        $userRepo = new \FleetLog\App\Repositories\UserRepository();
+        $userRepo->create([
+            'tenant_id' => $tenantId,
+            'name' => $adminName,
+            'email' => $email, // Using same email as tenant contact by default
+            'password' => $password,
+            'role' => 'tenant_admin',
+            'active' => 1
+        ]);
+
+        $this->redirect('/admin/tenants?success=tenant_added');
+    }
 }
