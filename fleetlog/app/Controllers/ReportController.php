@@ -30,10 +30,14 @@ class ReportController extends BaseController
                 (SELECT MAX(end_km) FROM trips WHERE vehicle_id = v.id AND tenant_id = ? AND end_time >= ? AND end_time < ?) as end_km,
                 (SELECT SUM(liters) FROM fuelings WHERE vehicle_id = v.id AND tenant_id = ? AND created_at >= ? AND created_at < ?) as total_liters,
                 (SELECT SUM(total_price) FROM fuelings WHERE vehicle_id = v.id AND tenant_id = ? AND created_at >= ? AND created_at < ?) as total_fuel_cost,
-                (SELECT COUNT(*) FROM trips WHERE vehicle_id = v.id AND tenant_id = ? AND start_time >= ? AND start_time < ?) as trip_count
+                (SELECT COUNT(*) FROM trips WHERE vehicle_id = v.id AND tenant_id = ? AND start_time >= ? AND start_time < ?) as trip_count,
+                (SELECT COUNT(*) FROM damage_reports WHERE vehicle_id = v.id AND tenant_id = ? AND datetime >= ? AND datetime < ?) as damage_count,
+                (SELECT SUM(repair_cost) FROM damage_reports WHERE vehicle_id = v.id AND tenant_id = ? AND datetime >= ? AND datetime < ?) as total_repair_cost
             FROM vehicles v
             WHERE v.tenant_id = ?
         ", [
+            $tenantId, $dateFilter, $endDate, 
+            $tenantId, $dateFilter, $endDate, 
             $tenantId, $dateFilter, $endDate, 
             $tenantId, $dateFilter, $endDate, 
             $tenantId, $dateFilter, $endDate, 
@@ -66,10 +70,12 @@ class ReportController extends BaseController
                 u.id, u.name,
                 (SELECT SUM(end_km - start_km) FROM trips WHERE driver_id = u.id AND tenant_id = ? AND start_time >= ? AND start_time < ? AND status = 'closed') as total_km,
                 (SELECT COUNT(*) FROM trips WHERE driver_id = u.id AND tenant_id = ? AND start_time >= ? AND start_time < ?) as trip_count,
-                (SELECT COUNT(DISTINCT vehicle_id) FROM trips WHERE driver_id = u.id AND tenant_id = ? AND start_time >= ? AND start_time < ?) as vehicle_count
+                (SELECT COUNT(DISTINCT vehicle_id) FROM trips WHERE driver_id = u.id AND tenant_id = ? AND start_time >= ? AND start_time < ?) as vehicle_count,
+                (SELECT COUNT(*) FROM damage_reports WHERE driver_id = u.id AND tenant_id = ? AND datetime >= ? AND datetime < ?) as damage_count
             FROM users u
             WHERE u.tenant_id = ? AND u.role = 'driver'
         ", [
+            $tenantId, $dateFilter, $endDate, 
             $tenantId, $dateFilter, $endDate, 
             $tenantId, $dateFilter, $endDate, 
             $tenantId, $dateFilter, $endDate, 

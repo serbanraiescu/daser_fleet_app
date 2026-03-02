@@ -47,10 +47,12 @@
         $totalKm = 0;
         $totalCost = 0;
         $totalTrips = 0;
+        $totalRepairCost = 0;
         foreach ($vehicles as $v) {
             if ($v['start_km'] && $v['end_km']) $totalKm += ($v['end_km'] - $v['start_km']);
             $totalCost += ($v['total_fuel_cost'] ?? 0);
             $totalTrips += $v['trip_count'];
+            $totalRepairCost += ($v['total_repair_cost'] ?? 0);
         }
     ?>
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
@@ -62,8 +64,8 @@
         <div class="text-3xl font-black text-blue-600"><?php echo number_format($totalCost, 2); ?> <span class="text-lg font-normal text-slate-400">RON</span></div>
     </div>
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-        <div class="text-slate-500 text-sm font-bold uppercase tracking-wider mb-2">Curse Totale</div>
-        <div class="text-3xl font-black text-slate-900"><?php echo $totalTrips; ?></div>
+        <div class="text-slate-500 text-sm font-bold uppercase tracking-wider mb-2">Cost Reparații</div>
+        <div class="text-3xl font-black text-red-600"><?php echo number_format($totalRepairCost, 2); ?> <span class="text-lg font-normal text-slate-400">RON</span></div>
     </div>
 </div>
 
@@ -74,8 +76,8 @@
                 <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Vehicul</th>
                 <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">KM Parcurși</th>
                 <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Curse</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Alimentat</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Cost Comb.</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Daune (Cost)</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Fuel Cost</th>
                 <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase">Consum Mediu</th>
             </tr>
         </thead>
@@ -96,8 +98,9 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                         <?php echo $v['trip_count']; ?> curse
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
-                        <?php echo number_format($v['total_liters'] ?? 0, 2); ?> L
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <span class="font-bold text-slate-700"><?php echo $v['damage_count']; ?></span>
+                        <span class="text-xs text-red-500 font-bold">(<?php echo number_format($v['total_repair_cost'] ?? 0, 2); ?> RON)</span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-600">
                         <?php echo number_format($v['total_fuel_cost'] ?? 0, 2); ?> RON

@@ -48,7 +48,8 @@
             <tr>
                 <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Șofer</th>
                 <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Distanță Condusă</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Curse Efectuate</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Curse</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Daune Raportate</th>
                 <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase">Vehicule Diferite</th>
             </tr>
         </thead>
@@ -69,6 +70,9 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                         <?php echo $d['trip_count']; ?> curse
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold <?php echo $d['damage_count'] > 0 ? 'text-red-600' : 'text-slate-400'; ?>">
+                        <?php echo $d['damage_count']; ?> daune
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right">
                         <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full font-bold text-xs">
