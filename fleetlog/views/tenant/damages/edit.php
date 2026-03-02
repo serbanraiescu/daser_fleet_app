@@ -53,15 +53,77 @@
             <?php if (empty($photos)): ?>
                 <p class="text-slate-500 italic">No photos were uploaded for this report.</p>
             <?php else: ?>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <?php foreach ($photos as $photo): ?>
-                        <a href="/<?php echo $photo['path']; ?>" target="_blank" class="group relative block rounded-xl overflow-hidden border border-slate-200 hover:border-blue-400 transition-all">
-                            <img src="/<?php echo $photo['path']; ?>" alt="Damage" class="w-full h-48 object-cover group-hover:scale-105 transition-transform">
-                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 flex items-center justify-center transition-all text-white opacity-0 group-hover:opacity-100 font-bold">
-                                View Full Size
+                <div x-data="{
+                        isOpen: false,
+                        currentIndex: 0,
+                        photos: <?php echo htmlspecialchars(json_encode(array_column($photos, 'path')), ENT_QUOTES, 'UTF-8'); ?>,
+                        openGallery(index) {
+                            this.currentIndex = index;
+                            this.isOpen = true;
+                            document.body.style.overflow = 'hidden';
+                        },
+                        closeGallery() {
+                            this.isOpen = false;
+                            document.body.style.overflow = 'auto';
+                        },
+                        next() {
+                            this.currentIndex = (this.currentIndex + 1) % this.photos.length;
+                        },
+                        prev() {
+                            this.currentIndex = (this.currentIndex - 1 + this.photos.length) % this.photos.length;
+                        }
+                    }"
+                    @keydown.window.escape="closeGallery()"
+                    @keydown.window.right="if(isOpen) next()"
+                    @keydown.window.left="if(isOpen) prev()">
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <?php foreach ($photos as $index => $photo): ?>
+                            <button @click="openGallery(<?php echo $index; ?>)" type="button" class="group relative block rounded-xl overflow-hidden border border-slate-200 hover:border-blue-400 transition-all focus:outline-none focus:ring-4 focus:ring-blue-200">
+                                <img src="/<?php echo $photo['path']; ?>" alt="Damage thumbnail" class="w-full h-48 object-cover group-hover:scale-105 transition-transform">
+                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 flex items-center justify-center transition-all text-white opacity-0 group-hover:opacity-100 font-bold">
+                                    <svg class="w-8 h-8 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+                                </div>
+                            </button>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <!-- Fullscreen Modal -->
+                    <div x-show="isOpen" 
+                         x-transition.opacity.duration.300ms
+                         class="fixed inset-0 z-[200] flex items-center justify-center bg-black bg-opacity-95 backdrop-blur-sm p-4"
+                         style="display: none;">
+                        
+                        <!-- Close Header -->
+                        <div class="absolute top-0 right-0 p-4 z-10 flex justify-end w-full bg-gradient-to-b from-black/50 to-transparent">
+                            <div class="text-white text-sm font-bold opacity-75 mr-4 mt-2" x-text="(currentIndex + 1) + ' / ' + photos.length"></div>
+                            <button @click="closeGallery()" class="text-white hover:text-slate-300 transition-colors p-2 rounded-full hover:bg-white/10" aria-label="Close Gallery">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+
+                        <!-- Main Image -->
+                        <div class="relative w-full max-w-5xl max-h-[90vh] flex items-center justify-center group">
+                            <img :src="'/' + photos[currentIndex]" alt="Full size damage photo" class="max-w-full max-h-[85vh] object-contain rounded-sm shadow-2xl transition-opacity duration-300" @click.stop="">
+                        </div>
+
+                        <!-- Navigation Buttons -->
+                        <template x-if="photos.length > 1">
+                            <div>
+                                <button @click.stop="prev()" class="absolute left-4 top-1/2 transform -translate-y-1/2 p-3 text-white bg-black/30 hover:bg-black/70 rounded-full backdrop-blur-sm transition-all shadow-lg hidden md:block" aria-label="Previous image">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                                </button>
+                                
+                                <button @click.stop="next()" class="absolute right-4 top-1/2 transform -translate-y-1/2 p-3 text-white bg-black/30 hover:bg-black/70 rounded-full backdrop-blur-sm transition-all shadow-lg hidden md:block" aria-label="Next image">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </button>
+                                
+                                <!-- Mobile Tap Zones -->
+                                <div class="absolute inset-y-0 left-0 w-1/3 md:hidden" @click="prev()"></div>
+                                <div class="absolute inset-y-0 right-0 w-1/3 md:hidden" @click="next()"></div>
                             </div>
-                        </a>
-                    <?php endforeach; ?>
+                        </template>
+                    </div>
                 </div>
             <?php endif; ?>
         </div>
