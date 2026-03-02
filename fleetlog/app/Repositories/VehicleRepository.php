@@ -1,0 +1,37 @@
+<?php
+
+namespace FleetLog\App\Repositories;
+
+use FleetLog\Core\DB;
+use FleetLog\Core\Auth;
+
+class VehicleRepository extends BaseRepository
+{
+    protected string $table = 'vehicles';
+
+    public function create(array $data): bool
+    {
+        $data = $this->prepareData($data);
+        $sql = "INSERT INTO vehicles (tenant_id, license_plate, make, model, expiry_rca, expiry_itp, expiry_rovigneta, is_active, current_odometer) 
+                VALUES (:tenant_id, :license_plate, :make, :model, :expiry_rca, :expiry_itp, :expiry_rovigneta, :is_active, :current_odometer)";
+        
+        return DB::query($sql, $data)->rowCount() > 0;
+    }
+
+    public function updateOdometer(int $vehicleId, int $newOdometer): bool
+    {
+        $tenantId = Auth::tenantId();
+        $sql = "UPDATE vehicles SET current_odometer = :odometer WHERE id = :id AND tenant_id = :tenant_id";
+        return DB::query($sql, [
+            'odometer' => $newOdometer,
+            'id' => $vehicleId,
+            'tenant_id' => $tenantId
+        ])->rowCount() > 0;
+    }
+
+    public function findByLicensePlate(string $plate): ?array
+    {
+        $tenantId = Auth::tenantId();
+        return DB::fetch("SELECT * FROM vehicles WHERE license_plate = ? AND tenant_id = ?", [$plate, $tenantId]);
+    }
+}
