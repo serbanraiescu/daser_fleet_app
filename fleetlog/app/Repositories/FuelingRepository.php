@@ -6,10 +6,7 @@ use FleetLog\Core\DB;
 
 class FuelingRepository extends BaseRepository
 {
-    public function __construct()
-    {
-        parent::__construct('fuelings');
-    }
+    protected string $table = 'fuelings';
 
     public function create(array $data): bool
     {
