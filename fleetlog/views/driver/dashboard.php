@@ -14,9 +14,9 @@
                 <span class="text-lg font-bold">Start New Trip</span>
             </a>
             
-            <a href="/driver/handover" class="flex flex-col items-center justify-center p-8 bg-slate-800 text-white rounded-2xl shadow-lg hover:bg-slate-900 transition-all active:scale-95">
-                <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-                <span class="text-lg font-bold">Vehicle Handover</span>
+            <a href="/driver/fueling" class="flex flex-col items-center justify-center p-8 bg-indigo-600 text-white rounded-2xl shadow-lg hover:bg-indigo-700 transition-all active:scale-95">
+                <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                <span class="text-lg font-bold">Log Fueling</span>
             </a>
         <?php else: ?>
             <a href="/driver/end-trip" class="flex flex-col items-center justify-center p-8 bg-red-600 text-white rounded-2xl shadow-lg hover:bg-red-700 transition-all active:scale-95">
