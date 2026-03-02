@@ -40,10 +40,15 @@ class MigrationRunner
     private function execute(string $file): void
     {
         $filePath = dirname(__DIR__) . '/migrations/' . $file;
-        $sql = require $filePath;
         
         try {
-            DB::query($sql);
+            $result = require $filePath;
+            
+            if (is_string($result)) {
+                DB::query($result);
+            }
+            
+            // If it returns true or a string, we consider it successful
             DB::query("INSERT INTO migrations (migration) VALUES (?)", [$file]);
             echo "Executed: $file\n";
         } catch (\Exception $e) {
