@@ -247,6 +247,8 @@ class TenantController extends BaseController
                 'error' => 'Failed to update driver.'
             ]);
         }
+    }
+
     public function quickStatusVehicle(int $id, string $status): void
     {
         if (!in_array($status, ['active', 'inactive', 'service'])) {
