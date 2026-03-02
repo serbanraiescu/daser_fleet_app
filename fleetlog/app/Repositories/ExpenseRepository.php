@@ -22,9 +22,9 @@ class ExpenseRepository extends BaseRepository
             'expense_type' => $data['expense_type'],
             'name' => $data['name'],
             'cost' => $data['cost'],
-            'odometer_at_expense' => $data['odometer_at_expense'] ?? null,
+            'odometer_at_expense' => $data['odometer_at_expense'] !== '' ? $data['odometer_at_expense'] : null,
             'expense_date' => $data['expense_date'],
-            'notes' => $data['notes'] ?? null
+            'notes' => $data['notes'] ?: null
         ])->rowCount() > 0;
     }
 
@@ -50,9 +50,9 @@ class ExpenseRepository extends BaseRepository
             'expense_type' => $data['expense_type'],
             'name' => $data['name'],
             'cost' => $data['cost'],
-            'odometer_at_expense' => $data['odometer_at_expense'] ?? null,
+            'odometer_at_expense' => $data['odometer_at_expense'] !== '' ? $data['odometer_at_expense'] : null,
             'expense_date' => $data['expense_date'],
-            'notes' => $data['notes'] ?? null
+            'notes' => $data['notes'] ?: null
         ])->rowCount() > 0;
     }
 
