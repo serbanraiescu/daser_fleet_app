@@ -48,11 +48,47 @@ class TenantController extends BaseController
     public function vehicles(): void
     {
         $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
-        $vehicles = $vehicleRepo->all();
+        $activeVehicles = $vehicleRepo->getAllNonArchivedByTenant(Auth::tenantId());
+        $archivedVehicles = $vehicleRepo->getArchivedByTenant(Auth::tenantId());
+
         $this->render('tenant/vehicles/index', [
             'title' => 'Manage Vehicles',
-            'vehicles' => $vehicles
+            'vehicles' => $activeVehicles,
+            'archivedVehicles' => $archivedVehicles
         ]);
+    }
+
+    public function showArchiveVehicle(int $id): void
+    {
+        $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
+        $vehicle = $vehicleRepo->find($id);
+
+        if (!$vehicle || $vehicle['tenant_id'] !== Auth::tenantId()) {
+            $this->redirect('/tenant/vehicles');
+        }
+
+        $this->render('tenant/vehicles/archive', [
+            'title' => 'Archive / Write-off Vehicle',
+            'vehicle' => $vehicle
+        ]);
+    }
+
+    public function archiveVehicle(int $id): void
+    {
+        $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
+        $vehicle = $vehicleRepo->find($id);
+
+        if (!$vehicle || $vehicle['tenant_id'] !== Auth::tenantId()) {
+            $this->redirect('/tenant/vehicles');
+        }
+
+        $notes = trim($_POST['archive_notes'] ?? '');
+
+        if ($vehicleRepo->archiveVehicle($id, $notes)) {
+            $this->redirect('/tenant/vehicles?success=vehicle_archived');
+        } else {
+            $this->redirect("/tenant/vehicles/archive/{$id}?error=archiving_failed");
+        }
     }
 
     public function trips(): void
