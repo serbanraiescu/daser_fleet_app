@@ -26,16 +26,15 @@ Autoloader::register();
 EnvLoader::load(__DIR__ . '/fleetlog/.env');
 
 // Auto-run Migrations
+$migrationRunner = new MigrationRunner();
+$migrationRunner->run();
+
 $appEnv = $_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? 'production';
-if ($appEnv === 'local' || !file_exists(__DIR__ . '/fleetlog/storage/installed.lock')) {
-    $migrationRunner = new MigrationRunner();
-    $migrationRunner->run();
-    if ($appEnv !== 'local') {
-        if (!is_dir(__DIR__ . '/fleetlog/storage')) {
-            mkdir(__DIR__ . '/fleetlog/storage', 0755, true);
-        }
-        file_put_contents(__DIR__ . '/fleetlog/storage/installed.lock', date('Y-m-d H:i:s'));
+if ($appEnv !== 'local' && !file_exists(__DIR__ . '/fleetlog/storage/installed.lock')) {
+    if (!is_dir(__DIR__ . '/fleetlog/storage')) {
+        mkdir(__DIR__ . '/fleetlog/storage', 0755, true);
     }
+    file_put_contents(__DIR__ . '/fleetlog/storage/installed.lock', date('Y-m-d H:i:s'));
 }
 
 // Initialize Router
