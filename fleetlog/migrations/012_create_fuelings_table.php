@@ -8,6 +8,7 @@ return "CREATE TABLE IF NOT EXISTS fuelings (
     odometer INT NOT NULL,
     liters DECIMAL(10, 2) NOT NULL,
     total_price DECIMAL(10, 2) NOT NULL,
+    is_full BOOLEAN DEFAULT FALSE,
     receipt_photo VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX (tenant_id),

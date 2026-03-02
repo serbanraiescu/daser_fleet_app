@@ -13,8 +13,8 @@ class FuelingRepository extends BaseRepository
 
     public function create(array $data): bool
     {
-        $sql = "INSERT INTO fuelings (tenant_id, vehicle_id, user_id, odometer, liters, total_price, receipt_photo) 
-                VALUES (:tenant_id, :vehicle_id, :user_id, :odometer, :liters, :total_price, :receipt_photo)";
+        $sql = "INSERT INTO fuelings (tenant_id, vehicle_id, user_id, odometer, liters, total_price, is_full, receipt_photo) 
+                VALUES (:tenant_id, :vehicle_id, :user_id, :odometer, :liters, :total_price, :is_full, :receipt_photo)";
         
         return DB::query($sql, $data)->rowCount() > 0;
     }

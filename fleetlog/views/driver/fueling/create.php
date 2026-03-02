@@ -37,6 +37,11 @@
                 </div>
             </div>
 
+            <div class="flex items-center space-x-3 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                <input type="checkbox" name="is_full" id="is_full" value="1" class="w-6 h-6 text-blue-600 border-slate-300 rounded focus:ring-blue-500 transition-all">
+                <label for="is_full" class="text-sm font-bold text-blue-800">S-a făcut plinul? (Full Tank)</label>
+            </div>
+
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-1">Receipt Photo (Optional)</label>
                 <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-xl hover:border-blue-400 transition-colors cursor-pointer relative">

@@ -31,6 +31,7 @@ class FuelingController extends BaseController
             'odometer' => (int)$_POST['odometer'],
             'liters' => (float)$_POST['liters'],
             'total_price' => (float)$_POST['total_price'],
+            'is_full' => isset($_POST['is_full']) ? 1 : 0,
             'receipt_photo' => null
         ];
 
