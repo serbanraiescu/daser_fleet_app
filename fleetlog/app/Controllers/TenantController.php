@@ -313,7 +313,8 @@ class TenantController extends BaseController
                 'expiry_itp' => $vehicle['expiry_itp'],
                 'expiry_rovigneta' => $vehicle['expiry_rovigneta'],
                 'current_odometer' => $vehicle['current_odometer'],
-                'status' => $status
+                'status' => $status,
+                'qr_code' => $vehicle['qr_code']
             ]);
         }
 
@@ -322,6 +323,7 @@ class TenantController extends BaseController
 
     public function fuelings(): void
     {
+
         $fuelingRepo = new \FleetLog\App\Repositories\FuelingRepository();
         $fuelings = $fuelingRepo->getByTenant(Auth::tenantId());
 
