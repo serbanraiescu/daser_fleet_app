@@ -59,8 +59,18 @@ class TripController extends BaseController
         $notes = $_POST['notes'] ?? '';
 
         $vehicle = $this->vehicleRepo->find($vehicleId);
+        
+        if (!$vehicle) {
+            $this->redirect('/driver/start-trip?error=invalid_vehicle');
+        }
+
+        // Strict validation: cannot start with fewer KM than the vehicle currently has
+        if ($startKm < $vehicle['current_odometer']) {
+            $this->redirect('/driver/start-trip?error=invalid_km&min=' . $vehicle['current_odometer']);
+        }
+
         $needsReview = false;
-        if ($vehicle && abs($vehicle['current_odometer'] - $startKm) > 5) {
+        if (abs($vehicle['current_odometer'] - $startKm) > 5) {
             $needsReview = true;
         }
 
