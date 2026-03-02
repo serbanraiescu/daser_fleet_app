@@ -88,7 +88,10 @@ class DamageController extends BaseController
     private function handlePhotoUploads(int $reportId, array $files): void
     {
         $tenantId = Auth::tenantId();
-        $uploadDir = dirname(dirname(dirname(__DIR__))) . "/fleetlog/storage/tenants/{$tenantId}/damages/" . date('Y-m');
+        // Path relative to the public directory
+        $publicRelativePath = "uploads/tenants/{$tenantId}/damages/" . date('Y-m');
+        // Absolute absolute path on server
+        $uploadDir = dirname(dirname(dirname(__DIR__))) . '/public/' . $publicRelativePath;
         
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
@@ -102,7 +105,7 @@ class DamageController extends BaseController
                     $targetPath = $uploadDir . '/' . $filename;
                     
                     if (move_uploaded_file($tmpName, $targetPath)) {
-                        $dbPath = "tenants/{$tenantId}/damages/" . date('Y-m') . '/' . $filename;
+                        $dbPath = $publicRelativePath . '/' . $filename;
                         $this->damageRepo->addPhoto($reportId, $dbPath);
                     }
                 }
