@@ -9,10 +9,64 @@
     <!-- Quick Actions -->
     <div class="grid grid-cols-1 gap-4">
         <?php if (!$hasOpenTrip): ?>
-            <a href="/driver/start-trip" class="flex flex-col items-center justify-center p-8 bg-blue-600 text-white rounded-2xl shadow-lg hover:bg-blue-700 transition-all active:scale-95">
-                <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                <span class="text-lg font-bold">Start New Trip</span>
-            </a>
+            <div x-data="{ 
+                scannerOpen: false, 
+                html5QrCode: null,
+                startScanner() {
+                    this.scannerOpen = true;
+                    this.$nextTick(() => {
+                        this.html5QrCode = new Html5Qrcode('reader');
+                        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+                        this.html5QrCode.start({ facingMode: 'environment' }, config, (decodedText) => {
+                            // URL format: https://.../driver/start-trip?qr=ABC12345
+                            if (decodedText.includes('qr=')) {
+                                window.location.href = decodedText;
+                            } else {
+                                // Fallback for raw codes
+                                window.location.href = '/driver/start-trip?qr=' + decodedText;
+                            }
+                            this.stopScanner();
+                        });
+                    });
+                },
+                stopScanner() {
+                    if (this.html5QrCode) {
+                        this.html5QrCode.stop().then(() => {
+                            this.html5QrCode.clear();
+                            this.scannerOpen = false;
+                        }).catch(err => {
+                            this.scannerOpen = false;
+                        });
+                    } else {
+                        this.scannerOpen = false;
+                    }
+                }
+            }">
+                <button @click="startScanner()" class="w-full flex flex-col items-center justify-center p-8 bg-blue-600 text-white rounded-2xl shadow-lg hover:bg-blue-700 transition-all active:scale-95 mb-4">
+                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v-4m6 0h-2m-6 0H4m0 4v2m0 4v4m0-4h2m16-4v-2m0-4V4m0 4h-2M4 4h2"></path></svg>
+                    <span class="text-lg font-bold">Scan QR to Start Trip</span>
+                </button>
+
+                <!-- Scanner Modal -->
+                <div x-show="scannerOpen" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-90 p-4">
+                    <div class="w-full max-w-sm bg-white rounded-2xl overflow-hidden shadow-2xl">
+                        <div class="p-4 border-b border-slate-100 flex justify-between items-center">
+                            <h3 class="font-bold text-slate-800">Scan Vehicle QR</h3>
+                            <button @click="stopScanner()" class="text-slate-400 hover:text-slate-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+                        <div id="reader" class="w-full aspect-square bg-black"></div>
+                        <div class="p-4 bg-slate-50 text-center text-sm text-slate-500">
+                            Point camera at the vehicle QR code
+                        </div>
+                    </div>
+                </div>
+
+                <a href="/driver/start-trip" class="w-full flex items-center justify-center p-4 bg-white text-blue-600 border-2 border-blue-600 rounded-xl font-bold hover:bg-blue-50 transition-all active:scale-95">
+                    Select Manual
+                </a>
+            </div>
             
             <a href="/driver/fueling" class="flex flex-col items-center justify-center p-8 bg-indigo-600 text-white rounded-2xl shadow-lg hover:bg-indigo-700 transition-all active:scale-95">
                 <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
