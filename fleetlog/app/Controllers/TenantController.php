@@ -67,6 +67,9 @@ class TenantController extends BaseController
         $this->render('tenant/trips/index', [
             'title' => 'Fleet Trip Logs',
             'trips' => $trips
+        ]);
+    }
+
     public function showAddVehicle(): void
     {
         $this->render('tenant/vehicles/create', ['title' => 'Add New Vehicle']);
