@@ -22,17 +22,27 @@ class Router
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $method = $_SERVER['REQUEST_METHOD'];
 
-        // Robust base path handling for cPanel (subfolders or root)
+        // Robust URI cleaning
         $scriptName = $_SERVER['SCRIPT_NAME'];
-        $baseDir = str_replace('\\', '/', dirname($scriptName));
+        $scriptDir = str_replace('\\', '/', dirname($scriptName));
         
-        if ($baseDir !== '/') {
-            $uri = substr($uri, strlen($baseDir));
+        // Remove script directory from URI if present
+        if ($scriptDir !== '/' && strpos($uri, $scriptDir) === 0) {
+            $uri = substr($uri, strlen($scriptDir));
         }
         
+        // Remove index.php from URI if present
+        if (strpos($uri, '/index.php') === 0) {
+            $uri = substr($uri, 10);
+        }
+
         $uri = ($uri === '' || $uri === false) ? '/' : $uri;
         if (strpos($uri, '/') !== 0) {
             $uri = '/' . $uri;
+        }
+
+        if (getenv('APP_DEBUG') === 'true' && isset($_GET['debug_router'])) {
+            echo "<!-- Router Debug: Method=$method, URI=$uri -->\n";
         }
 
         foreach ($this->routes as $route) {
@@ -44,7 +54,11 @@ class Router
         }
 
         http_response_code(404);
-        echo "404 Not Found";
+        if (getenv('APP_DEBUG') === 'true') {
+            echo "404 Not Found (Requested: $uri)";
+        } else {
+            echo "404 Not Found";
+        }
     }
 
     private function matchUri(string $routeUri, string $requestUri, &$params): bool
