@@ -30,16 +30,25 @@
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
-                        <div class="flex items-center space-x-2">
+                        <div class="flex items-center space-x-3">
                             <?php 
-                                $qrUrl = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=" . urlencode("https://" . ($_SERVER['HTTP_HOST'] ?? 'fleet.daserdesign.ro') . "/driver/start-trip?qr=" . $vehicle['qr_code']);
+                                $qrUrl = "https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=" . urlencode("https://" . ($_SERVER['HTTP_HOST'] ?? 'fleet.daserdesign.ro') . "/driver/start-trip?qr=" . $vehicle['qr_code']);
                             ?>
-                            <a href="<?php echo $qrUrl; ?>" target="_blank" class="hover:scale-110 transition-transform" title="View/Download QR Code">
-                                <img src="<?php echo $qrUrl; ?>" alt="QR" class="w-8 h-8 rounded border border-slate-200 shadow-sm">
+                            <a href="<?php echo $qrUrl; ?>" target="_blank" class="hover:scale-105 transition-transform inline-block group/qr" title="Click to view large QR code">
+                                <div class="relative">
+                                    <img src="<?php echo $qrUrl; ?>" alt="QR" class="w-12 h-12 rounded border border-slate-200 shadow-sm bg-white p-0.5">
+                                    <div class="absolute inset-0 bg-blue-600/0 group-hover/qr:bg-blue-600/10 rounded transition-colors flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-blue-600 opacity-0 group-hover/qr:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                    </div>
+                                </div>
                             </a>
-                            <span class="font-mono text-xs text-slate-400"><?php echo $vehicle['qr_code']; ?></span>
+                            <div class="flex flex-col">
+                                <span class="font-mono text-[10px] text-slate-400 font-bold uppercase"><?php echo $vehicle['qr_code']; ?></span>
+                                <span class="text-[9px] text-slate-300">Scan to Start</span>
+                            </div>
                         </div>
                     </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                         <?php echo number_format($vehicle['current_odometer']); ?> KM
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-500">
