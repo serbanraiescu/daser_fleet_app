@@ -21,8 +21,11 @@ abstract class BaseController
         $newDamagesCount = 0;
 
         if ($currentUser && (\FleetLog\Core\RBAC::isTenantAdmin() || \FleetLog\Core\RBAC::isSuperAdmin())) {
-            $damageRepo = new \FleetLog\App\Repositories\DamageReportRepository();
-            $newDamagesCount = $damageRepo->getNewCount(\FleetLog\Core\Auth::tenantId());
+            $tenantId = \FleetLog\Core\Auth::tenantId();
+            if ($tenantId !== null) {
+                $damageRepo = new \FleetLog\App\Repositories\DamageReportRepository();
+                $newDamagesCount = $damageRepo->getNewCount($tenantId);
+            }
         }
         
         // Render content to buffer
