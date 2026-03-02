@@ -11,27 +11,25 @@ echo "<pre style='background:#f4f4f4; padding:20px; border:1px solid #ccc; borde
 
 // The path to fleetlog is right here
 $appRoot = __DIR__ . '/fleetlog';
-$migrationScript = $appRoot . '/cron/run_migrations.php';
 
-if (!file_exists($migrationScript)) {
-    echo "Error: Cannot find migration script at {$migrationScript}\n";
-} else {
-    echo "Found migration script. Executing...\n\n";
-    
-    ob_start();
-    try {
-        chdir($appRoot);
-        require $migrationScript;
-        
-        $output = ob_get_clean();
-        echo htmlspecialchars($output);
-        echo "\n\n<strong style='color:green;'>Migrations completed successfully!</strong>";
-        
-    } catch (Exception $e) {
-        $output = ob_get_clean();
-        echo htmlspecialchars($output);
-        echo "\n\n<strong style='color:red;'>Error running migrations:</strong> " . $e->getMessage();
-    }
+require_once $appRoot . '/core/Autoloader.php';
+require_once $appRoot . '/core/EnvLoader.php';
+
+use FleetLog\Core\Autoloader;
+use FleetLog\Core\EnvLoader;
+use FleetLog\Core\MigrationRunner;
+use FleetLog\Core\DB;
+
+Autoloader::register();
+EnvLoader::load($appRoot . '/.env');
+
+try {
+    echo "Starting Migration Runner...\n";
+    $runner = new MigrationRunner();
+    $runner->run();
+    echo "\n<strong style='color:green;'>Migrations completed successfully!</strong>";
+} catch (Exception $e) {
+    echo "\n<strong style='color:red;'>Error running migrations:</strong> " . $e->getMessage();
 }
 
 echo "</pre>";
@@ -39,3 +37,4 @@ echo "<div style='margin-top:20px; padding:15px; background:#fff3cd; color:#8564
 echo "<strong>Security Warning:</strong> For security reasons, please delete this file (<code>run_db_update.php</code>) from your server immediately after use.";
 echo "</div>";
 echo "<br><a href='/' style='display:inline-block; padding:10px 15px; background:#007bff; color:white; text-decoration:none; border-radius:5px;'>Go back to App</a>";
+
