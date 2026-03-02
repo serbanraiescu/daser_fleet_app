@@ -1,0 +1,6 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Redirect all traffic to the public folder
+    RewriteRule ^$ public_html/fleet/ [L]
+    RewriteRule ^((?!public_html/fleet/).*)$ public_html/fleet/$1 [L]
+</IfModule>
