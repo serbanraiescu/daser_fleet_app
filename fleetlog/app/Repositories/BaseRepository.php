@@ -41,7 +41,7 @@ abstract class BaseRepository
     // Helper to enforce tenant_id on insert
     protected function prepareData(array $data): array
     {
-        if (!RBAC::isSuperAdmin()) {
+        if (!isset($data['tenant_id'])) {
             $data['tenant_id'] = Auth::tenantId();
         }
         return $data;

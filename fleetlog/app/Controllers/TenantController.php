@@ -82,9 +82,9 @@ class TenantController extends BaseController
             'license_plate' => strtoupper($_POST['license_plate'] ?? ''),
             'make' => $_POST['make'] ?? '',
             'model' => $_POST['model'] ?? '',
-            'expiry_rca' => $_POST['expiry_rca'] ?? null,
-            'expiry_itp' => $_POST['expiry_itp'] ?? null,
-            'expiry_rovigneta' => $_POST['expiry_rovigneta'] ?? null,
+            'expiry_rca' => !empty($_POST['expiry_rca']) ? $_POST['expiry_rca'] : null,
+            'expiry_itp' => !empty($_POST['expiry_itp']) ? $_POST['expiry_itp'] : null,
+            'expiry_rovigneta' => !empty($_POST['expiry_rovigneta']) ? $_POST['expiry_rovigneta'] : null,
             'current_odometer' => (int)($_POST['current_odometer'] ?? 0),
             'is_active' => 1
         ];
