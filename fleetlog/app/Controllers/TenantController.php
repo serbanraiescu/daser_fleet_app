@@ -166,8 +166,9 @@ class TenantController extends BaseController
     {
         $tenantId = Auth::tenantId();
         $timezone = $_POST['timezone'] ?? 'Europe/Bucharest';
+        $tripTypes = $_POST['trip_types'] ?? '';
         
-        DB::query("UPDATE tenants SET timezone = ? WHERE id = ?", [$timezone, $tenantId]);
+        DB::query("UPDATE tenants SET timezone = ?, trip_types = ? WHERE id = ?", [$timezone, $tripTypes, $tenantId]);
         
         $this->redirect('/tenant/settings?success=1');
     }

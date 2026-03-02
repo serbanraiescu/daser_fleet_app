@@ -23,6 +23,12 @@
             <p class="mt-1 text-xs text-slate-500 italic">All reports and logs will use this timezone.</p>
         </div>
 
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Custom Trip Types</label>
+            <textarea name="trip_types" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="CURSE, NAVETA, SERVICE, ALTE"><?php echo \htmlspecialchars($tenant['trip_types'] ?? ''); ?></textarea>
+            <p class="mt-1 text-xs text-slate-500 italic">Separate types with commas (e.g., CURSE, NAVETA, SERVICE). If empty, defaults will be used.</p>
+        </div>
+
         <div class="pt-4 border-t border-slate-100 flex justify-end">
             <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors">
                 Save Settings

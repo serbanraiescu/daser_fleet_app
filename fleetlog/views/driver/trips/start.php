@@ -24,11 +24,9 @@
         <div>
             <label class="block text-sm font-semibold text-slate-700 mb-2">Trip Type</label>
             <select name="type" class="w-full p-4 bg-white border border-slate-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
-                <option value="CURSE">CURSE</option>
-                <option value="NAVETA">NAVETA</option>
-                <option value="LIVRARE_SPECIALA">LIVRARE SPECIALĂ</option>
-                <option value="SERVICE">SERVICE</option>
-                <option value="ALTE">ALTE</option>
+                <?php foreach ($tripTypes as $type): ?>
+                    <option value="<?php echo \htmlspecialchars($type); ?>"><?php echo \htmlspecialchars($type); ?></option>
+                <?php endforeach; ?>
             </select>
         </div>
 

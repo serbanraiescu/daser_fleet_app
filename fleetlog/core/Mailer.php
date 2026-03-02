@@ -72,13 +72,14 @@ class Mailer
     <meta charset='UTF-8'>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #334155; margin: 0; padding: 0; background-color: #f8fafc; }
-        .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 16px; overflow: hidden; shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border: 1px solid #e2e8f0; }
+        .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .header { background: #2563eb; padding: 30px; text-align: center; }
-        .header h1 { color: #ffffff; margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.025em; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 24px; font-weight: 700; }
         .content { padding: 40px; }
-        .content p { margin-bottom: 20px; font-size: 16px; }
-        .footer { background: #f1f5f9; padding: 20px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; }
-        .btn { display: inline-block; padding: 12px 24px; background-color: #2563eb; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; margin-top: 10px; }
+        .content h2 { color: #1e293b; margin-top: 0; font-size: 20px; }
+        .content p { margin-bottom: 20px; font-size: 16px; color: #475569; }
+        .footer { background: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9; }
+        .btn { display: inline-block; padding: 12px 28px; background-color: #2563eb; color: #ffffff !important; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 14px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -87,14 +88,15 @@ class Mailer
             <h1>FleetLog Alerts</h1>
         </div>
         <div class='content'>
-            <h2 style='color: #1e293b; margin-top: 0;'>$title</h2>
+            <h2>$title</h2>
             <p>$body</p>
-            <div style='margin-top: 30px; border-top: 1px solid #f1f5f9; padding-top: 20px;'>
-                <a href='https://fleet.daserdesign.ro' class='btn'>Go to Dashboard</a>
+            <div style='margin-top: 30px; border-top: 1px solid #f1f5f9; padding-top: 25px;'>
+                <a href='https://fleet.daserdesign.ro' class='btn'>Connect to Dashboard</a>
             </div>
         </div>
         <div class='footer'>
-            &copy; " . \date('Y') . " FleetLog Management System. All rights reserved.
+            &copy; " . \date('Y') . " FleetLog Management System.
+            <br>This is an automated notification. Please do not reply.
         </div>
     </div>
 </body>
@@ -125,7 +127,10 @@ class Mailer
         }
 
         $socket = @\fsockopen($socketHost, $port, $errno, $errstr, $timeout);
-        if (!$socket) return false;
+        if (!$socket) {
+            \error_log("SMTP Connection Error: $errstr ($errno)");
+            return false;
+        }
 
         $getResponse = function($socket) {
             $response = "";
@@ -144,23 +149,35 @@ class Mailer
         $getResponse($socket);
         $sendCommand($socket, "EHLO " . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
 
-        if ($port === 587 || $encryption === 'tls') {
+        if (($port === 587 || $encryption === 'tls') && ($encryption !== 'ssl')) {
             $res = $sendCommand($socket, "STARTTLS");
             if (\strpos($res, '220') === 0) {
-                if (!\stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) return false;
+                if (!\stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
+                    \error_log("SMTP STARTTLS failed");
+                    return false;
+                }
                 $sendCommand($socket, "EHLO " . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
             }
         }
 
         if (!empty($user) && !empty($pass)) {
-            $sendCommand($socket, "AUTH LOGIN");
+            $res = $sendCommand($socket, "AUTH LOGIN");
             $sendCommand($socket, \base64_encode($user));
-            $sendCommand($socket, \base64_encode($pass));
+            $res = $sendCommand($socket, \base64_encode($pass));
+            if (\strpos($res, '235') !== 0) {
+                \error_log("SMTP Auth Failed: $res");
+                return false;
+            }
         }
 
         $sendCommand($socket, "MAIL FROM:<$fromEmail>");
         $sendCommand($socket, "RCPT TO:<$to>");
-        $sendCommand($socket, "DATA");
+        
+        $res = $sendCommand($socket, "DATA");
+        if (\strpos($res, '354') !== 0) {
+            \error_log("SMTP DATA Command Rejected: $res");
+            return false;
+        }
         
         $msgId = \sprintf("<%s.%s@%s>", \base_convert(\microtime(), 10, 36), \base_convert(\bin2hex(\random_bytes(8)), 16, 36), ($_SERVER['HTTP_HOST'] ?? 'fleetlog.com'));
 
@@ -172,13 +189,13 @@ class Mailer
             'Message-ID: ' . $msgId,
             'MIME-Version: 1.0',
             'Content-Type: ' . ($isHtml ? 'text/html' : 'text/plain') . '; charset=utf-8',
-            'Content-Transfer-Encoding: 8bit',
             'X-Priority: 3 (Normal)',
             'X-Mailer: FleetLog-Custom-SMTP'
         ];
 
-        $message = \implode("\r\n", $headers) . "\r\n\r\n" . $body . "\r\n.";
-        $res = $sendCommand($socket, $message);
+        $fullMsg = \implode("\r\n", $headers) . "\r\n\r\n" . $body . "\r\n.";
+        \fputs($socket, $fullMsg . "\r\n");
+        $res = $getResponse($socket);
 
         $sendCommand($socket, "QUIT");
         \fclose($socket);

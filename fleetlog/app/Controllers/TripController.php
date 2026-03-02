@@ -26,9 +26,17 @@ class TripController extends BaseController
         }
 
         $vehicles = $this->vehicleRepo->all();
+        
+        // Fetch Tenant custom trip types
+        $tenantId = Auth::tenantId();
+        $tenant = DB::fetch("SELECT trip_types FROM tenants WHERE id = ?", [$tenantId]);
+        $rawTypes = $tenant['trip_types'] ?? 'CURSE,NAVETA,LIVRARE SPECIALA,SERVICE,ALTE';
+        $tripTypes = array_map('trim', explode(',', $rawTypes));
+
         $this->render('driver/trips/start', [
             'title' => 'Start Trip',
-            'vehicles' => $vehicles
+            'vehicles' => $vehicles,
+            'tripTypes' => $tripTypes
         ]);
     }
 
