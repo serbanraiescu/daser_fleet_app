@@ -16,7 +16,17 @@ class Autoloader
             }
 
             $relative_class = substr($class, $len);
-            $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
+            $path = str_replace('\\', '/', $relative_class);
+            $file = $base_dir . $path . '.php';
+
+            // Handle Linux case-sensitivity (Core -> core, App -> app)
+            if (!file_exists($file)) {
+                $parts = explode('/', $path);
+                if (count($parts) > 1) {
+                    $parts[0] = strtolower($parts[0]);
+                    $file = $base_dir . implode('/', $parts) . '.php';
+                }
+            }
 
             if (file_exists($file)) {
                 require $file;
