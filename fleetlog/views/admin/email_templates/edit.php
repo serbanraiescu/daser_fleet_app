@@ -10,8 +10,29 @@
     <div class="lg:col-span-2">
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
             <form action="/admin/email-templates/edit/<?php echo $template['id']; ?>" method="POST" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Days Before Expiry</label>
+                        <div class="flex items-center">
+                            <input type="number" name="alert_days" value="<?php echo (int)$template['alert_days']; ?>" required min="0" max="365"
+                                   class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all">
+                            <span class="ml-3 text-slate-500 text-sm">days</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">Only relevant for expiry alerts (ITP, RCA, etc).</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Send Notification To</label>
+                        <select name="recipient_type" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all cursor-pointer">
+                            <option value="tenant" <?php echo $template['recipient_type'] === 'tenant' ? 'selected' : ''; ?>>Tenant / Company Email</option>
+                            <option value="admin" <?php echo $template['recipient_type'] === 'admin' ? 'selected' : ''; ?>>Manager (Tenant Admin)</option>
+                        </select>
+                        <p class="text-xs text-slate-400 mt-1">Choose who should receive the automated alert.</p>
+                    </div>
+                </div>
+
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Email Subject</label>
+                    <label class="block text-sm font-bold text-slate-700 mb-2 text-indigo-600">Email Subject</label>
                     <input type="text" name="subject" value="<?php echo htmlspecialchars($template['subject']); ?>" required
                            class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all">
                 </div>

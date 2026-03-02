@@ -143,8 +143,12 @@ class SuperAdminController extends BaseController
     {
         $subject = $_POST['subject'];
         $body = $_POST['body'];
+        $alertDays = (int)$_POST['alert_days'];
+        $recipientType = $_POST['recipient_type'];
 
-        DB::query("UPDATE email_templates SET subject = ?, body = ? WHERE id = ?", [$subject, $body, $id]);
+        DB::query("UPDATE email_templates SET subject = ?, body = ?, alert_days = ?, recipient_type = ? WHERE id = ?", [
+            $subject, $body, $alertDays, $recipientType, $id
+        ]);
         $this->redirect('/admin/email-templates?success=1');
     }
 }

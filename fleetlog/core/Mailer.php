@@ -18,10 +18,31 @@ class Mailer
         return self::$settings;
     }
 
-    public static function sendTemplate(string $to, string $templateSlug, array $placeholders = []): bool
+    public static function getRecipientEmail(int $tenantId, string $templateSlug): ?string
+    {
+        $template = DB::fetch("SELECT recipient_type FROM email_templates WHERE slug = ?", [$templateSlug]);
+        if (!$template) return null;
+
+        if ($template['recipient_type'] === 'admin') {
+            // Find the primary tenant admin
+            $admin = DB::fetch("SELECT email FROM users WHERE tenant_id = ? AND role = 'tenant_admin' AND active = 1 LIMIT 1", [$tenantId]);
+            return $admin['email'] ?? null;
+        }
+
+        // Default to tenant company email
+        $tenant = DB::fetch("SELECT email FROM tenants WHERE id = ?", [$tenantId]);
+        return $tenant['email'] ?? null;
+    }
+
+    public static function sendTemplate(int $tenantId, string $templateSlug, array $placeholders = []): bool
     {
         $template = DB::fetch("SELECT * FROM email_templates WHERE slug = ?", [$templateSlug]);
         if (!$template) {
+            return false;
+        }
+
+        $to = self::getRecipientEmail($tenantId, $templateSlug);
+        if (!$to) {
             return false;
         }
 
