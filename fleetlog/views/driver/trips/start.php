@@ -7,7 +7,11 @@
             <select name="vehicle_id" required class="w-full p-4 bg-white border border-slate-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
                 <option value="">-- Choose vehicle --</option>
                 <?php foreach ($vehicles as $vehicle): ?>
-                    <option value="<?php echo $vehicle['id']; ?>"><?php echo $vehicle['license_plate']; ?> (<?php echo $vehicle['make']; ?>)</option>
+                    <?php if ($vehicle['status'] === 'active'): ?>
+                        <option value="<?php echo $vehicle['id']; ?>" <?php echo (isset($selectedVehicleId) && $selectedVehicleId == $vehicle['id']) ? 'selected' : ''; ?>>
+                            <?php echo $vehicle['license_plate']; ?> - <?php echo $vehicle['make']; ?> <?php echo $vehicle['model']; ?>
+                        </option>
+                    <?php endif; ?>
                 <?php endforeach; ?>
             </select>
         </div>

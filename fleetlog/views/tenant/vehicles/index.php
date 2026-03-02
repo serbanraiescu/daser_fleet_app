@@ -36,8 +36,16 @@
                         <div>ITP: <?php echo $vehicle['expiry_itp']; ?></div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo $vehicle['is_active'] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
-                            <?php echo $vehicle['is_active'] ? 'Active' : 'Inactive'; ?>
+                        <?php
+                            $statusColors = [
+                                'active' => 'bg-green-100 text-green-800',
+                                'inactive' => 'bg-red-100 text-red-800',
+                                'service' => 'bg-orange-100 text-orange-800'
+                            ];
+                            $color = $statusColors[$vehicle['status']] ?? 'bg-slate-100 text-slate-800';
+                        ?>
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo $color; ?>">
+                            <?php echo ucfirst($vehicle['status']); ?>
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

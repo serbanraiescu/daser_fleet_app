@@ -12,8 +12,8 @@ class VehicleRepository extends BaseRepository
     public function create(array $data): bool
     {
         $data = $this->prepareData($data);
-        $sql = "INSERT INTO vehicles (tenant_id, license_plate, make, model, expiry_rca, expiry_itp, expiry_rovigneta, is_active, current_odometer) 
-                VALUES (:tenant_id, :license_plate, :make, :model, :expiry_rca, :expiry_itp, :expiry_rovigneta, :is_active, :current_odometer)";
+        $sql = "INSERT INTO vehicles (tenant_id, license_plate, make, model, expiry_rca, expiry_itp, expiry_rovigneta, status, current_odometer) 
+                VALUES (:tenant_id, :license_plate, :make, :model, :expiry_rca, :expiry_itp, :expiry_rovigneta, :status, :current_odometer)";
         
         return DB::query($sql, $data)->rowCount() > 0;
     }
@@ -47,7 +47,7 @@ class VehicleRepository extends BaseRepository
                 expiry_rca = :expiry_rca,
                 expiry_itp = :expiry_itp,
                 expiry_rovigneta = :expiry_rovigneta,
-                is_active = :is_active,
+                status = :status,
                 current_odometer = :current_odometer
                 WHERE id = :id AND tenant_id = :tenant_id";
         

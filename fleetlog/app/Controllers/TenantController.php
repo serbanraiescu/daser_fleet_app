@@ -89,7 +89,7 @@ class TenantController extends BaseController
             'expiry_itp' => !empty($_POST['expiry_itp']) ? $_POST['expiry_itp'] : null,
             'expiry_rovigneta' => !empty($_POST['expiry_rovigneta']) ? $_POST['expiry_rovigneta'] : null,
             'current_odometer' => (int)($_POST['current_odometer'] ?? 0),
-            'is_active' => 1
+            'status' => $_POST['status'] ?? 'active'
         ];
 
         if ($repo->create($data)) {
@@ -192,7 +192,7 @@ class TenantController extends BaseController
             'expiry_itp' => !empty($_POST['expiry_itp']) ? $_POST['expiry_itp'] : null,
             'expiry_rovigneta' => !empty($_POST['expiry_rovigneta']) ? $_POST['expiry_rovigneta'] : null,
             'current_odometer' => (int)($_POST['current_odometer'] ?? 0),
-            'is_active' => (int)($_POST['is_active'] ?? 0)
+            'status' => $_POST['status'] ?? 'active'
         ];
 
         if ($repo->update($id, $data)) {
