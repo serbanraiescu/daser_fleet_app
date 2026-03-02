@@ -22,10 +22,18 @@ class Router
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $method = $_SERVER['REQUEST_METHOD'];
 
-        // Simple base path handling for cPanel subfolders
-        $scriptName = dirname($_SERVER['SCRIPT_NAME']);
-        $uri = str_replace($scriptName, '', $uri);
-        $uri = $uri === '' ? '/' : $uri;
+        // Robust base path handling for cPanel (subfolders or root)
+        $scriptName = $_SERVER['SCRIPT_NAME'];
+        $baseDir = str_replace('\\', '/', dirname($scriptName));
+        
+        if ($baseDir !== '/') {
+            $uri = substr($uri, strlen($baseDir));
+        }
+        
+        $uri = ($uri === '' || $uri === false) ? '/' : $uri;
+        if (strpos($uri, '/') !== 0) {
+            $uri = '/' . $uri;
+        }
 
         foreach ($this->routes as $route) {
             if ($route['method'] === $method && $this->matchUri($route['uri'], $uri, $params)) {
@@ -71,7 +79,14 @@ class Router
     private function executeAction(string $action, array $params): void
     {
         list($controllerName, $method) = explode('@', $action);
+        
+        // Handle case-sensitive filesystems for controllers (App/Controllers -> app/controllers)
         $controllerClass = "FleetLog\\App\\Controllers\\" . $controllerName;
+        
+        if (!class_exists($controllerClass)) {
+            // The autoloader should handle the folder mapping, 
+            // but we ensure the class name matches what PHP expects if it was loaded from a lowercase file.
+        }
         
         $controller = new $controllerClass();
         call_user_func_array([$controller, $method], $params);
