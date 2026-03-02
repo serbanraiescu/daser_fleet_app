@@ -13,10 +13,20 @@ class FuelingController extends BaseController
     {
         $vehicleRepo = new VehicleRepository();
         $vehicles = $vehicleRepo->getActiveByTenant(Auth::tenantId());
+        $vehicleId = null;
+
+        if (isset($_GET['qr'])) {
+            $qrCode = $_GET['qr'];
+            $vehicleByQr = $vehicleRepo->findByQrCode($qrCode);
+            if ($vehicleByQr && $vehicleByQr['status'] === 'active') {
+                $vehicleId = $vehicleByQr['id'];
+            }
+        }
 
         $this->render('driver/fueling/create', [
             'title' => 'Log Fueling',
-            'vehicles' => $vehicles
+            'vehicles' => $vehicles,
+            'selectedVehicleId' => $vehicleId
         ]);
     }
 

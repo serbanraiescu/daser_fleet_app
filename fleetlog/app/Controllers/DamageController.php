@@ -22,6 +22,14 @@ class DamageController extends BaseController
         $vehicles = $this->vehicleRepo->all();
         $vehicleId = $_GET['vehicle_id'] ?? null;
 
+        if (isset($_GET['qr'])) {
+            $qrCode = $_GET['qr'];
+            $vehicleByQr = $this->vehicleRepo->findByQrCode($qrCode);
+            if ($vehicleByQr && $vehicleByQr['status'] === 'active') {
+                $vehicleId = $vehicleByQr['id'];
+            }
+        }
+
         $this->render('driver/damage/create', [
             'title' => 'Report Damage',
             'vehicles' => $vehicles,
