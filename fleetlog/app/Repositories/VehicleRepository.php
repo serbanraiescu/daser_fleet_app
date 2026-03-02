@@ -12,8 +12,8 @@ class VehicleRepository extends BaseRepository
     public function create(array $data): bool
     {
         $data = $this->prepareData($data);
-        $sql = "INSERT INTO vehicles (tenant_id, license_plate, make, model, expiry_rca, expiry_itp, expiry_rovigneta, status, current_odometer) 
-                VALUES (:tenant_id, :license_plate, :make, :model, :expiry_rca, :expiry_itp, :expiry_rovigneta, :status, :current_odometer)";
+        $sql = "INSERT INTO vehicles (tenant_id, license_plate, make, model, expiry_rca, expiry_itp, expiry_rovigneta, status, current_odometer, qr_code) 
+                VALUES (:tenant_id, :license_plate, :make, :model, :expiry_rca, :expiry_itp, :expiry_rovigneta, :status, :current_odometer, :qr_code)";
         
         return DB::query($sql, $data)->rowCount() > 0;
     }
@@ -48,7 +48,8 @@ class VehicleRepository extends BaseRepository
                 expiry_itp = :expiry_itp,
                 expiry_rovigneta = :expiry_rovigneta,
                 status = :status,
-                current_odometer = :current_odometer
+                current_odometer = :current_odometer,
+                qr_code = :qr_code
                 WHERE id = :id AND tenant_id = :tenant_id";
         
         return DB::query($sql, $data)->rowCount() > 0;
@@ -57,5 +58,10 @@ class VehicleRepository extends BaseRepository
     public function getActiveByTenant(int $tenantId): array
     {
         return DB::fetchAll("SELECT * FROM vehicles WHERE tenant_id = ? AND status = 'active'", [$tenantId]);
+    }
+
+    public function findByQrCode(string $code): ?array
+    {
+        return DB::fetch("SELECT * FROM vehicles WHERE qr_code = ?", [$code]);
     }
 }

@@ -31,6 +31,19 @@
                 <label class="block text-sm font-medium text-slate-700 mb-1">Current Odometer (KM)</label>
                 <input type="number" name="current_odometer" required value="<?php echo $vehicle['current_odometer']; ?>" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
             </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Unique QR Code</label>
+                <div class="flex items-center space-x-3">
+                    <input type="text" name="qr_code" readonly value="<?php echo $vehicle['qr_code']; ?>" class="w-full px-3 py-2 border border-slate-200 bg-slate-50 rounded-md text-slate-500 font-mono">
+                    <?php 
+                        $qrUrl = "https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=" . urlencode("https://" . ($_SERVER['HTTP_HOST'] ?? 'fleet.daserdesign.ro') . "/driver/start-trip?qr=" . $vehicle['qr_code']);
+                    ?>
+                    <a href="<?php echo $qrUrl; ?>" target="_blank" title="View Large QR" class="flex-shrink-0">
+                        <img src="<?php echo $qrUrl; ?>" alt="QR" class="w-10 h-10 border border-slate-300 rounded shadow-sm">
+                    </a>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1 italic">Used for driver fast-scan selection. Regenerates on save if deleted.</p>
+            </div>
         </div>
 
         <div class="pt-4 border-t border-slate-100">

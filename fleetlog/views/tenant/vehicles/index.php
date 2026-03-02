@@ -11,6 +11,7 @@
             <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Vehicle</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Plate</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">QR Code</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Odometer</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Expiries (RCA/ITP)</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
@@ -29,6 +30,16 @@
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                        <div class="flex items-center space-x-2">
+                            <?php 
+                                $qrUrl = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=" . urlencode("https://" . ($_SERVER['HTTP_HOST'] ?? 'fleet.daserdesign.ro') . "/driver/start-trip?qr=" . $vehicle['qr_code']);
+                            ?>
+                            <a href="<?php echo $qrUrl; ?>" target="_blank" class="hover:scale-110 transition-transform" title="View/Download QR Code">
+                                <img src="<?php echo $qrUrl; ?>" alt="QR" class="w-8 h-8 rounded border border-slate-200 shadow-sm">
+                            </a>
+                            <span class="font-mono text-xs text-slate-400"><?php echo $vehicle['qr_code']; ?></span>
+                        </div>
+                    </td>
                         <?php echo number_format($vehicle['current_odometer']); ?> KM
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-500">

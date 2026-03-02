@@ -27,6 +27,15 @@ class TripController extends BaseController
 
         $vehicles = $this->vehicleRepo->all();
         
+        $selectedVehicleId = null;
+        if (isset($_GET['qr'])) {
+            $qrCode = $_GET['qr'];
+            $vehicleByQr = $this->vehicleRepo->findByQrCode($qrCode);
+            if ($vehicleByQr && $vehicleByQr['status'] === 'active') {
+                $selectedVehicleId = $vehicleByQr['id'];
+            }
+        }
+
         // Fetch Tenant custom trip types
         $tenantId = Auth::tenantId();
         $tenant = DB::fetch("SELECT trip_types FROM tenants WHERE id = ?", [$tenantId]);
@@ -36,7 +45,8 @@ class TripController extends BaseController
         $this->render('driver/trips/start', [
             'title' => 'Start Trip',
             'vehicles' => $vehicles,
-            'tripTypes' => $tripTypes
+            'tripTypes' => $tripTypes,
+            'selectedVehicleId' => $selectedVehicleId
         ]);
     }
 

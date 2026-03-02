@@ -8,7 +8,7 @@
                 <option value="">-- Choose vehicle --</option>
                 <?php foreach ($vehicles as $vehicle): ?>
                     <?php if ($vehicle['status'] === 'active'): ?>
-                        <option value="<?php echo $vehicle['id']; ?>" <?php echo (isset($selectedVehicleId) && $selectedVehicleId == $vehicle['id']) ? 'selected' : ''; ?>>
+                        <option value="<?php echo $vehicle['id']; ?>" <?php echo ((isset($selectedVehicleId) && $selectedVehicleId == $vehicle['id']) || (isset($selectedVehicleId) && $selectedVehicleId == $vehicle['id'])) ? 'selected' : ''; ?>>
                             <?php echo $vehicle['license_plate']; ?> - <?php echo $vehicle['make']; ?> <?php echo $vehicle['model']; ?>
                         </option>
                     <?php endif; ?>
