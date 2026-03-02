@@ -30,7 +30,7 @@
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button class="text-blue-600 hover:text-blue-900">Edit</button>
+                        <a href="/tenant/drivers/edit/<?php echo $driver['id']; ?>" class="text-blue-600 hover:text-blue-900">Edit</a>
                     </td>
                 </tr>
             <?php endforeach; ?>

@@ -34,4 +34,23 @@ class VehicleRepository extends BaseRepository
         $tenantId = Auth::tenantId();
         return DB::fetch("SELECT * FROM vehicles WHERE license_plate = ? AND tenant_id = ?", [$plate, $tenantId]);
     }
+
+    public function update(int $id, array $data): bool
+    {
+        $data['id'] = $id;
+        $data['tenant_id'] = Auth::tenantId();
+        
+        $sql = "UPDATE vehicles SET 
+                license_plate = :license_plate,
+                make = :make,
+                model = :model,
+                expiry_rca = :expiry_rca,
+                expiry_itp = :expiry_itp,
+                expiry_rovigneta = :expiry_rovigneta,
+                is_active = :is_active,
+                current_odometer = :current_odometer
+                WHERE id = :id AND tenant_id = :tenant_id";
+        
+        return DB::query($sql, $data)->rowCount() > 0;
+    }
 }

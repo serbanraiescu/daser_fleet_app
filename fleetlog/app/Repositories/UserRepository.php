@@ -31,4 +31,31 @@ class UserRepository extends BaseRepository
         
         return DB::query($sql, $data)->rowCount() > 0;
     }
+
+    public function update(int $id, array $data): bool
+    {
+        $data['id'] = $id;
+        $data['tenant_id'] = Auth::tenantId();
+
+        $passwordSql = "";
+        if (!empty($data['password'])) {
+            $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+            $passwordSql = "password = :password,";
+        } else {
+            unset($data['password']);
+        }
+
+        $sql = "UPDATE users SET 
+                name = :name,
+                email = :email,
+                $passwordSql
+                active = :active,
+                cnp = :cnp,
+                id_expiry = :id_expiry,
+                license_series = :license_series,
+                license_expiry = :license_expiry
+                WHERE id = :id AND tenant_id = :tenant_id";
+        
+        return DB::query($sql, $data)->rowCount() > 0;
+    }
 }

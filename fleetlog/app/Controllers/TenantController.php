@@ -165,4 +165,87 @@ class TenantController extends BaseController
         
         $this->redirect('/tenant/settings?success=1');
     }
+
+    public function showEditVehicle(int $id): void
+    {
+        $repo = new \FleetLog\App\Repositories\VehicleRepository();
+        $vehicle = $repo->find($id);
+        
+        if (!$vehicle) {
+            $this->redirect('/tenant/vehicles');
+        }
+
+        $this->render('tenant/vehicles/edit', [
+            'title' => 'Edit Vehicle',
+            'vehicle' => $vehicle
+        ]);
+    }
+
+    public function updateVehicle(int $id): void
+    {
+        $repo = new \FleetLog\App\Repositories\VehicleRepository();
+        $data = [
+            'license_plate' => strtoupper($_POST['license_plate'] ?? ''),
+            'make' => $_POST['make'] ?? '',
+            'model' => $_POST['model'] ?? '',
+            'expiry_rca' => !empty($_POST['expiry_rca']) ? $_POST['expiry_rca'] : null,
+            'expiry_itp' => !empty($_POST['expiry_itp']) ? $_POST['expiry_itp'] : null,
+            'expiry_rovigneta' => !empty($_POST['expiry_rovigneta']) ? $_POST['expiry_rovigneta'] : null,
+            'current_odometer' => (int)($_POST['current_odometer'] ?? 0),
+            'is_active' => (int)($_POST['is_active'] ?? 0)
+        ];
+
+        if ($repo->update($id, $data)) {
+            $this->redirect('/tenant/vehicles?success=updated');
+        } else {
+            $this->render('tenant/vehicles/edit', [
+                'title' => 'Edit Vehicle',
+                'vehicle' => array_merge($data, ['id' => $id]),
+                'error' => 'Failed to update vehicle.'
+            ]);
+        }
+    }
+
+    public function showEditDriver(int $id): void
+    {
+        $repo = new \FleetLog\App\Repositories\UserRepository();
+        $driver = $repo->find($id);
+        
+        if (!$driver || $driver['role'] !== 'driver') {
+            $this->redirect('/tenant/drivers');
+        }
+
+        $this->render('tenant/drivers/edit', [
+            'title' => 'Edit Driver',
+            'driver' => $driver
+        ]);
+    }
+
+    public function updateDriver(int $id): void
+    {
+        $repo = new \FleetLog\App\Repositories\UserRepository();
+        $data = [
+            'name' => $_POST['name'] ?? '',
+            'email' => $_POST['email'] ?? '',
+            'active' => (int)($_POST['active'] ?? 0),
+            'cnp' => $_POST['cnp'] ?? null,
+            'id_expiry' => !empty($_POST['id_expiry']) ? $_POST['id_expiry'] : null,
+            'license_series' => $_POST['license_series'] ?? null,
+            'license_expiry' => !empty($_POST['license_expiry']) ? $_POST['license_expiry'] : null
+        ];
+
+        if (!empty($_POST['password'])) {
+            $data['password'] = $_POST['password'];
+        }
+
+        if ($repo->update($id, $data)) {
+            $this->redirect('/tenant/drivers?success=updated');
+        } else {
+            $this->render('tenant/drivers/edit', [
+                'title' => 'Edit Driver',
+                'driver' => array_merge($data, ['id' => $id]),
+                'error' => 'Failed to update driver.'
+            ]);
+        }
+    }
 }
