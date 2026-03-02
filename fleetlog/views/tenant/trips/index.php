@@ -18,10 +18,10 @@
             <?php foreach ($trips as $trip): ?>
                 <tr class="hover:bg-slate-50">
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-slate-900"><?php echo $trip['driver_id']; // For V1, simple ID or join if needed ?></div>
+                        <div class="text-sm text-slate-900"><?php echo $trip['driver_name'] ?? 'Unknown'; ?></div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="text-sm text-slate-600 font-mono"><?php echo $trip['vehicle_id']; ?></span>
+                        <span class="text-sm text-slate-600 font-mono"><?php echo $trip['license_plate'] ?? 'Unknown'; ?></span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-500">
                         <div><?php echo $trip['start_time']; ?></div>

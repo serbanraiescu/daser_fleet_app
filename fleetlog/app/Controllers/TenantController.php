@@ -52,8 +52,16 @@ class TenantController extends BaseController
 
     public function trips(): void
     {
-        $tripRepo = new \FleetLog\App\Repositories\TripRepository();
-        $trips = $tripRepo->all();
+        $tenantId = Auth::tenantId();
+        $trips = DB::fetchAll("
+            SELECT t.*, u.name as driver_name, v.license_plate 
+            FROM trips t
+            LEFT JOIN users u ON t.driver_id = u.id
+            LEFT JOIN vehicles v ON t.vehicle_id = v.id
+            WHERE t.tenant_id = ?
+            ORDER BY t.start_time DESC
+        ", [$tenantId]);
+
         $this->render('tenant/trips/index', [
             'title' => 'Fleet Trip Logs',
             'trips' => $trips
