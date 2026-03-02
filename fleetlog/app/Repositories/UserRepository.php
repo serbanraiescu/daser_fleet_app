@@ -8,6 +8,11 @@ class UserRepository extends BaseRepository
 {
     protected string $table = 'users';
 
+    public function find(int $id): ?array
+    {
+        return DB::fetch("SELECT * FROM users WHERE id = ?", [$id]);
+    }
+
     public function findByEmail(string $email): ?array
     {
         return DB::fetch("SELECT * FROM users WHERE email = ?", [$email]);
