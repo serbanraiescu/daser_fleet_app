@@ -41,9 +41,7 @@ class Router
             $uri = '/' . $uri;
         }
 
-        if (getenv('APP_DEBUG') === 'true' && isset($_GET['debug_router'])) {
-            echo "<!-- Router Debug: Method=$method, URI=$uri -->\n";
-        }
+        $isDebug = ($_SERVER['APP_DEBUG'] ?? $_ENV['APP_DEBUG'] ?? 'false') === 'true';
 
         foreach ($this->routes as $route) {
             if ($route['method'] === $method && $this->matchUri($route['uri'], $uri, $params)) {
@@ -54,8 +52,15 @@ class Router
         }
 
         http_response_code(404);
-        if (getenv('APP_DEBUG') === 'true') {
-            echo "404 Not Found (Requested: $uri)";
+        if ($isDebug) {
+            echo "<h1>404 Not Found</h1>";
+            echo "<p><b>Requested URI:</b> $uri</p>";
+            echo "<p><b>Method:</b> $method</p>";
+            echo "<h3>Registered Routes:</h3><ul>";
+            foreach ($this->routes as $r) {
+                echo "<li>{$r['method']} {$r['uri']}</li>";
+            }
+            echo "</ul>";
         } else {
             echo "404 Not Found";
         }

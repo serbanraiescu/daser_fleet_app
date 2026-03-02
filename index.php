@@ -22,10 +22,11 @@ Autoloader::register();
 EnvLoader::load(__DIR__ . '/fleetlog/.env');
 
 // Auto-run Migrations
-if (getenv('APP_ENV') === 'local' || !file_exists(__DIR__ . '/fleetlog/storage/installed.lock')) {
+$appEnv = $_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? 'production';
+if ($appEnv === 'local' || !file_exists(__DIR__ . '/fleetlog/storage/installed.lock')) {
     $migrationRunner = new MigrationRunner();
     $migrationRunner->run();
-    if (getenv('APP_ENV') !== 'local') {
+    if ($appEnv !== 'local') {
         if (!is_dir(__DIR__ . '/fleetlog/storage')) {
             mkdir(__DIR__ . '/fleetlog/storage', 0755, true);
         }
