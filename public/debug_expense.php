@@ -3,11 +3,11 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require '../fleetlog/core/EnvLoader.php';
-require '../fleetlog/core/DB.php';
-require '../fleetlog/core/Auth.php';
+require 'fleetlog/core/EnvLoader.php';
+require 'fleetlog/core/DB.php';
+require 'fleetlog/core/Auth.php';
 
-\FleetLog\Core\EnvLoader::load(dirname(__DIR__) . '/fleetlog/.env');
+\FleetLog\Core\EnvLoader::load(__DIR__ . '/fleetlog/.env');
 session_start();
 
 try {
