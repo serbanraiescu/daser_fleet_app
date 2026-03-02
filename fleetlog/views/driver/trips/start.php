@@ -14,8 +14,8 @@
     <?php endif; ?>
 
     <form action="/driver/start-trip" method="POST" class="space-y-6" x-data="{ 
-        selectedVehicleId: '<?php echo $selectedVehicleId ?? ''; ?>',
-        vehicles: <?php echo json_encode($vehicles); ?>,
+        selectedVehicleId: '<?php echo htmlspecialchars($selectedVehicleId ?? '', ENT_QUOTES, 'UTF-8'); ?>',
+        vehicles: <?php echo htmlspecialchars(json_encode($vehicles), ENT_QUOTES, 'UTF-8'); ?>,
         startKm: '',
         get currentVehicle() {
             return this.vehicles.find(v => v.id == this.selectedVehicleId);
