@@ -1,4 +1,3 @@
-<?php require dirname(__DIR__) . '/partials/header.php'; ?>
 
 <div class="mb-6 flex items-center justify-between">
     <div>
@@ -120,4 +119,3 @@
     toggleReminder();
 </script>
 
-<?php require dirname(__DIR__) . '/partials/footer.php'; ?>
