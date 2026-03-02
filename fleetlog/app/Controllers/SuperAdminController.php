@@ -9,7 +9,12 @@ class SuperAdminController extends BaseController
 {
     public function tenants(): void
     {
-        $tenants = DB::fetchAll("SELECT * FROM tenants ORDER BY created_at DESC");
+        $tenants = DB::fetchAll("
+            SELECT t.*, 
+                   (SELECT COUNT(*) FROM vehicles v WHERE v.tenant_id = t.id) as vehicles_count 
+            FROM tenants t 
+            ORDER BY t.created_at DESC
+        ");
         $this->render('admin/tenants/index', [
             'title' => 'System Tenants',
             'tenants' => $tenants

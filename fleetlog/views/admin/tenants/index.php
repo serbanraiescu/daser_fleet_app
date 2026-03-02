@@ -10,6 +10,7 @@
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Company</th>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Vehicles</th>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">CUI</th>
                     <th class="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
                 </tr>
@@ -25,6 +26,9 @@
                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo $tenant['status'] === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
                             <?php echo ucfirst($tenant['status']); ?>
                         </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
+                        <?php echo $tenant['vehicles_count']; ?>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                         <?php echo $tenant['cui']; ?>
