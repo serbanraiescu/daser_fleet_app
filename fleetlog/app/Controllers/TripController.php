@@ -3,6 +3,7 @@
 namespace FleetLog\App\Controllers;
 
 use FleetLog\Core\Auth;
+use FleetLog\Core\DB;
 use FleetLog\App\Repositories\TripRepository;
 use FleetLog\App\Repositories\VehicleRepository;
 
