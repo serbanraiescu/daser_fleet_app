@@ -26,8 +26,8 @@ class UserRepository extends BaseRepository
             $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
         }
         
-        $sql = "INSERT INTO users (tenant_id, name, email, password, role, active) 
-                VALUES (:tenant_id, :name, :email, :password, :role, :active)";
+        $sql = "INSERT INTO users (tenant_id, name, email, password, role, active, cnp, id_expiry, license_series, license_expiry) 
+                VALUES (:tenant_id, :name, :email, :password, :role, :active, :cnp, :id_expiry, :license_series, :license_expiry)";
         
         return DB::query($sql, $data)->rowCount() > 0;
     }

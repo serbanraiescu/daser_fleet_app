@@ -112,7 +112,11 @@ class TenantController extends BaseController
             'email' => $_POST['email'] ?? '',
             'password' => $_POST['password'] ?? '',
             'role' => 'driver',
-            'active' => 1
+            'active' => 1,
+            'cnp' => $_POST['cnp'] ?? null,
+            'id_expiry' => !empty($_POST['id_expiry']) ? $_POST['id_expiry'] : null,
+            'license_series' => $_POST['license_series'] ?? null,
+            'license_expiry' => !empty($_POST['license_expiry']) ? $_POST['license_expiry'] : null
         ];
 
         if ($repo->create($data)) {
