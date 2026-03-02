@@ -2,7 +2,7 @@
 
 namespace FleetLog\App\Controllers;
 
-require_once __DIR__ . '/../../core/qrcode.php';
+require_once __DIR__ . '/../../core/qrcode_new.php';
 
 class QrController extends BaseController
 {
@@ -15,13 +15,12 @@ class QrController extends BaseController
             return;
         }
 
-        // Options: 'sf' => scale factor (size)
-        $options = [
-            'sf' => (float)($_GET['sf'] ?? 4),
-            'p' => (int)($_GET['p'] ?? 2) // padding
-        ];
+        $size = (int)($_GET['sf'] ?? 4);
 
-        $generator = new \QRCode($data, $options);
-        $generator->output_image();
+        // This library generates SVG without needing GD extension
+        $qr = \QRCode::getMinimumQRCode($data, QR_ERROR_CORRECT_LEVEL_L);
+        
+        header('Content-Type: image/svg+xml');
+        $qr->printSVG($size);
     }
 }
