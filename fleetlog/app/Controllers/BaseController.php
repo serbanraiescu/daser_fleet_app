@@ -24,8 +24,8 @@ abstract class BaseController
         require $viewPath;
         $content = ob_get_clean();
 
-        // Check if layout should be used (e.g., skip for login)
-        if (strpos($view, 'auth/') === 0) {
+        // Check if layout should be used (e.g., skip for login/home)
+        if (strpos($view, 'auth/') === 0 || $view === 'home') {
             echo $content;
             return;
         }

@@ -77,9 +77,9 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
                 <div class="flex items-center space-x-4">
-                    <span class="text-sm font-medium text-slate-600"><?php echo $currentUser['name']; ?></span>
+                    <span class="text-sm font-medium text-slate-600"><?php echo $currentUser['name'] ?? 'Guest'; ?></span>
                     <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center border border-slate-300">
-                        <span class="text-xs font-bold text-slate-500"><?php echo strtoupper(substr($currentUser['name'], 0, 1)); ?></span>
+                        <span class="text-xs font-bold text-slate-500"><?php echo strtoupper(substr($currentUser['name'] ?? 'G', 0, 1)); ?></span>
                     </div>
                 </div>
             </header>
