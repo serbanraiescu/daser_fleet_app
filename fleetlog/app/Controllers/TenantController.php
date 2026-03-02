@@ -25,12 +25,14 @@ class TenantController extends BaseController
         ]);
     }
 
-    public function index(): void
+    public function drivers(): void
     {
-        $tenants = DB::fetchAll("SELECT * FROM tenants ORDER BY created_at DESC");
-        $this->render('admin/tenants/index', [
-            'title' => 'Manage Tenants',
-            'tenants' => $tenants
+        $tenantId = Auth::tenantId();
+        $drivers = DB::fetchAll("SELECT * FROM users WHERE tenant_id = ? AND role = 'driver' ORDER BY name ASC", [$tenantId]);
+        
+        $this->render('tenant/drivers/index', [
+            'title' => 'Fleet Drivers',
+            'drivers' => $drivers
         ]);
     }
 
@@ -65,6 +67,52 @@ class TenantController extends BaseController
         $this->render('tenant/trips/index', [
             'title' => 'Fleet Trip Logs',
             'trips' => $trips
-        ]);
+    public function showAddVehicle(): void
+    {
+        $this->render('tenant/vehicles/create', ['title' => 'Add New Vehicle']);
+    }
+
+    public function storeVehicle(): void
+    {
+        $repo = new \FleetLog\App\Repositories\VehicleRepository();
+        $data = [
+            'license_plate' => strtoupper($_POST['license_plate'] ?? ''),
+            'make' => $_POST['make'] ?? '',
+            'model' => $_POST['model'] ?? '',
+            'expiry_rca' => $_POST['expiry_rca'] ?? null,
+            'expiry_itp' => $_POST['expiry_itp'] ?? null,
+            'expiry_rovigneta' => $_POST['expiry_rovigneta'] ?? null,
+            'current_odometer' => (int)($_POST['current_odometer'] ?? 0),
+            'is_active' => 1
+        ];
+
+        if ($repo->create($data)) {
+            $this->redirect('/tenant/vehicles');
+        } else {
+            $this->render('tenant/vehicles/create', ['title' => 'Add New Vehicle', 'error' => 'Failed to save vehicle. Check if plate exists.']);
+        }
+    }
+
+    public function showAddDriver(): void
+    {
+        $this->render('tenant/drivers/create', ['title' => 'Add New Driver']);
+    }
+
+    public function storeDriver(): void
+    {
+        $repo = new \FleetLog\App\Repositories\UserRepository();
+        $data = [
+            'name' => $_POST['name'] ?? '',
+            'email' => $_POST['email'] ?? '',
+            'password' => $_POST['password'] ?? '',
+            'role' => 'driver',
+            'active' => 1
+        ];
+
+        if ($repo->create($data)) {
+            $this->redirect('/tenant/drivers');
+        } else {
+            $this->render('tenant/drivers/create', ['title' => 'Add New Driver', 'error' => 'Failed to save driver. Email might be in use.']);
+        }
     }
 }

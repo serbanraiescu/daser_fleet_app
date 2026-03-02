@@ -16,6 +16,11 @@ $router->add('GET', '/admin/tenants/impersonate/{id}', 'SuperAdminController@imp
 // Tenant Admin Routes
 $router->add('GET', '/tenant/dashboard', 'TenantController@dashboard', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('GET', '/tenant/vehicles', 'TenantController@vehicles', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('GET', '/tenant/vehicles/add', 'TenantController@showAddVehicle', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('POST', '/tenant/vehicles/add', 'TenantController@storeVehicle', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('GET', '/tenant/drivers', 'TenantController@drivers', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('GET', '/tenant/drivers/add', 'TenantController@showAddDriver', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('POST', '/tenant/drivers/add', 'TenantController@storeDriver', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('GET', '/tenant/trips', 'TenantController@trips', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('GET', '/tenant/reports', 'ReportController@index', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 
