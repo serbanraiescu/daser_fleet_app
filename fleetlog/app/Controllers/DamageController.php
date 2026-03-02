@@ -51,6 +51,22 @@ class DamageController extends BaseController
             $this->handlePhotoUploads($reportId, $_FILES['photos']);
         }
 
+        // Send Email Notification
+        if ($reportId) {
+            $vehicle = $this->vehicleRepo->find($vehicleId);
+            $driver = Auth::user();
+            $tenantId = Auth::tenantId();
+            $tenant = \FleetLog\Core\DB::fetch("SELECT email FROM tenants WHERE id = ?", [$tenantId]);
+
+            if ($tenant && !empty($tenant['email'])) {
+                \FleetLog\Core\Mailer::sendTemplate($tenant['email'], 'new_damage', [
+                    'vehicle_plate' => $vehicle['license_plate'] ?? 'Unknown',
+                    'driver_name' => $driver['name'],
+                    'datetime' => $datetime
+                ]);
+            }
+        }
+
         $this->redirect('/driver/dashboard?success=damage_reported');
     }
 

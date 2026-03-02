@@ -31,8 +31,8 @@ class UserRepository extends BaseRepository
             $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
         }
         
-        $sql = "INSERT INTO users (tenant_id, name, email, password, role, active, cnp, id_expiry, license_series, license_expiry) 
-                VALUES (:tenant_id, :name, :email, :password, :role, :active, :cnp, :id_expiry, :license_series, :license_expiry)";
+        $sql = "INSERT INTO users (tenant_id, name, email, phone, password, role, active, cnp, id_expiry, license_series, license_expiry) 
+                VALUES (:tenant_id, :name, :email, :phone, :password, :role, :active, :cnp, :id_expiry, :license_series, :license_expiry)";
         
         return DB::query($sql, $data)->rowCount() > 0;
     }
@@ -53,6 +53,7 @@ class UserRepository extends BaseRepository
         $sql = "UPDATE users SET 
                 name = :name,
                 email = :email,
+                phone = :phone,
                 $passwordSql
                 active = :active,
                 cnp = :cnp,

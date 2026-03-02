@@ -110,6 +110,7 @@ class TenantController extends BaseController
         $data = [
             'name' => $_POST['name'] ?? '',
             'email' => $_POST['email'] ?? '',
+            'phone' => $_POST['phone'] ?? '',
             'password' => $_POST['password'] ?? '',
             'role' => 'driver',
             'active' => 1,
@@ -232,6 +233,7 @@ class TenantController extends BaseController
         $data = [
             'name' => $_POST['name'] ?? '',
             'email' => $_POST['email'] ?? '',
+            'phone' => $_POST['phone'] ?? '',
             'active' => (int)($_POST['active'] ?? 0),
             'cnp' => $_POST['cnp'] ?? null,
             'id_expiry' => !empty($_POST['id_expiry']) ? $_POST['id_expiry'] : null,

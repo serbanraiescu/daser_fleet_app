@@ -94,4 +94,57 @@ class SuperAdminController extends BaseController
 
         $this->redirect('/admin/tenants?success=tenant_added');
     }
+
+    public function settings(): void
+    {
+        $settingsRaw = DB::fetchAll("SELECT * FROM system_settings");
+        $settings = [];
+        foreach ($settingsRaw as $s) {
+            $settings[$s['key']] = $s['value'];
+        }
+
+        $this->render('admin/settings', [
+            'title' => 'System Settings',
+            'settings' => $settings
+        ]);
+    }
+
+    public function updateSettings(): void
+    {
+        foreach ($_POST['settings'] as $key => $value) {
+            DB::query("UPDATE system_settings SET value = ? WHERE `key` = ?", [$value, $key]);
+        }
+        $this->redirect('/admin/settings?success=1');
+    }
+
+    public function emailTemplates(): void
+    {
+        $templates = DB::fetchAll("SELECT * FROM email_templates ORDER BY name ASC");
+        $this->render('admin/email_templates/index', [
+            'title' => 'Email Templates',
+            'templates' => $templates
+        ]);
+    }
+
+    public function editEmailTemplate(int $id): void
+    {
+        $template = DB::fetch("SELECT * FROM email_templates WHERE id = ?", [$id]);
+        if (!$template) {
+            $this->redirect('/admin/email-templates');
+        }
+
+        $this->render('admin/email_templates/edit', [
+            'title' => 'Edit Email Template',
+            'template' => $template
+        ]);
+    }
+
+    public function updateEmailTemplate(int $id): void
+    {
+        $subject = $_POST['subject'];
+        $body = $_POST['body'];
+
+        DB::query("UPDATE email_templates SET subject = ?, body = ? WHERE id = ?", [$subject, $body, $id]);
+        $this->redirect('/admin/email-templates?success=1');
+    }
 }
