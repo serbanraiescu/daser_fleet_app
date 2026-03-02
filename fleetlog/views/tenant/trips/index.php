@@ -8,6 +8,7 @@
             <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Driver</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Vehicle</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Type</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Start</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">End</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Distance</th>
@@ -22,6 +23,11 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="text-sm text-slate-600 font-mono"><?php echo $trip['license_plate'] ?? 'Unknown'; ?></span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded bg-slate-100 text-slate-600 border border-slate-200">
+                            <?php echo $trip['type'] ?? 'ALTE'; ?>
+                        </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-500">
                         <div><?php echo $trip['start_time']; ?></div>
