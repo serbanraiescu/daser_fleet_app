@@ -12,11 +12,14 @@ class TenantController extends BaseController
         $tenantId = Auth::tenantId();
         
         // V1 Basic Stats
+        // Use 'datetime' column for damage reports instead of 'created_at' if needed, 
+        // but 'created_at' is usually better for "recent" stats. 
+        // Let's make it more robust by just checking tenant_id first.
         $stats = [
             'vehicles_count' => DB::fetch("SELECT COUNT(*) as count FROM vehicles WHERE tenant_id = ?", [$tenantId])['count'],
             'drivers_count' => DB::fetch("SELECT COUNT(*) as count FROM users WHERE tenant_id = ? AND role = 'driver'", [$tenantId])['count'],
             'active_trips' => DB::fetch("SELECT COUNT(*) as count FROM trips WHERE tenant_id = ? AND status = 'open'", [$tenantId])['count'],
-            'recent_damages' => DB::fetch("SELECT COUNT(*) as count FROM damage_reports WHERE tenant_id = ? AND created_at > DATE_SUB(NOW(), INTERVAL 7 DAY)", [$tenantId])['count']
+            'recent_damages' => DB::fetch("SELECT COUNT(*) as count FROM damage_reports WHERE tenant_id = ? AND datetime > DATE_SUB(NOW(), INTERVAL 30 DAY)", [$tenantId])['count']
         ];
 
         $this->render('tenant/dashboard', [
@@ -117,5 +120,45 @@ class TenantController extends BaseController
         } else {
             $this->render('tenant/drivers/create', ['title' => 'Add New Driver', 'error' => 'Failed to save driver. Email might be in use.']);
         }
+    }
+
+    public function damages(): void
+    {
+        $tenantId = Auth::tenantId();
+        $damages = DB::fetchAll("
+            SELECT d.*, v.license_plate, u.name as driver_name 
+            FROM damage_reports d
+            JOIN vehicles v ON d.vehicle_id = v.id
+            JOIN users u ON d.driver_id = u.id
+            WHERE d.tenant_id = ?
+            ORDER BY d.datetime DESC
+        ", [$tenantId]);
+
+        $this->render('tenant/damages/index', [
+            'title' => 'Damage Reports',
+            'damages' => $damages
+        ]);
+    }
+
+    public function settings(): void
+    {
+        $tenantId = Auth::tenantId();
+        $tenant = DB::fetch("SELECT * FROM tenants WHERE id = ?", [$tenantId]);
+        
+        $this->render('tenant/settings', [
+            'title' => 'Firm Settings',
+            'tenant' => $tenant,
+            'timezones' => \DateTimeZone::listIdentifiers()
+        ]);
+    }
+
+    public function updateSettings(): void
+    {
+        $tenantId = Auth::tenantId();
+        $timezone = $_POST['timezone'] ?? 'Europe/Bucharest';
+        
+        DB::query("UPDATE tenants SET timezone = ? WHERE id = ?", [$timezone, $tenantId]);
+        
+        $this->redirect('/tenant/settings?success=1');
     }
 }

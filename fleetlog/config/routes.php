@@ -22,6 +22,9 @@ $router->add('GET', '/tenant/drivers', 'TenantController@drivers', [\FleetLog\Ap
 $router->add('GET', '/tenant/drivers/add', 'TenantController@showAddDriver', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('POST', '/tenant/drivers/add', 'TenantController@storeDriver', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('GET', '/tenant/trips', 'TenantController@trips', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('GET', '/tenant/damages', 'TenantController@damages', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('GET', '/tenant/settings', 'TenantController@settings', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('POST', '/tenant/settings', 'TenantController@updateSettings', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('GET', '/tenant/reports', 'ReportController@index', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 
 // Driver Routes
