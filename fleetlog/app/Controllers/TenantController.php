@@ -289,4 +289,43 @@ class TenantController extends BaseController
             'fuelings' => $fuelings
         ]);
     }
+
+    public function showDamage(int $id): void
+    {
+        $tenantId = Auth::tenantId();
+        $damageRepo = new \FleetLog\App\Repositories\DamageReportRepository();
+        
+        $damage = DB::fetch("
+            SELECT d.*, v.license_plate, u.name as driver_name 
+            FROM damage_reports d
+            JOIN vehicles v ON d.vehicle_id = v.id
+            JOIN users u ON d.driver_id = u.id
+            WHERE d.id = ? AND d.tenant_id = ?
+        ", [$id, $tenantId]);
+
+        if (!$damage) {
+            $this->redirect('/tenant/damages');
+        }
+
+        $photos = $damageRepo->getPhotos($id);
+
+        $this->render('tenant/damages/edit', [
+            'title' => 'Manage Damage Report',
+            'damage' => $damage,
+            'photos' => $photos
+        ]);
+    }
+
+    public function updateDamage(int $id): void
+    {
+        $damageRepo = new \FleetLog\App\Repositories\DamageReportRepository();
+        
+        $damageRepo->update($id, [
+            'status' => $_POST['status'],
+            'repair_cost' => $_POST['repair_cost'] ?: 0,
+            'admin_notes' => $_POST['admin_notes']
+        ]);
+
+        $this->redirect('/tenant/damages?success=damage_updated');
+    }
 }

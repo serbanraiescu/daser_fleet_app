@@ -29,6 +29,8 @@ $router->add('POST', '/tenant/drivers/edit/{id}', 'TenantController@updateDriver
 $router->add('GET', '/tenant/trips', 'TenantController@trips', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('GET', '/tenant/fuelings', 'TenantController@fuelings', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('GET', '/tenant/damages', 'TenantController@damages', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('GET', '/tenant/damages/edit/{id}', 'TenantController@showDamage', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('POST', '/tenant/damages/edit/{id}', 'TenantController@updateDamage', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('GET', '/tenant/settings', 'TenantController@settings', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('POST', '/tenant/settings', 'TenantController@updateSettings', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('GET', '/tenant/reports', 'ReportController@index', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);

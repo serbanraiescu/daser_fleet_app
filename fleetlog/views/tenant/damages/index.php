@@ -12,6 +12,7 @@
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Category</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Severity</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
             </tr>
         </thead>
         <tbody class="bg-white divide-y divide-slate-200">
@@ -38,9 +39,13 @@
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-slate-100 text-slate-800">
-                            <?php echo ucfirst($damage['status']); ?>
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            <?php echo $damage['status'] === 'closed' ? 'bg-green-100 text-green-800' : ($damage['status'] === 'in_repair' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-800'); ?>">
+                            <?php echo ucfirst(str_replace('_', ' ', $damage['status'])); ?>
                         </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                        <a href="/tenant/damages/edit/<?php echo $damage['id']; ?>" class="text-blue-600 hover:text-blue-900 font-bold">Manage</a>
                     </td>
                 </tr>
             <?php endforeach; ?>

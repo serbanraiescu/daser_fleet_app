@@ -42,4 +42,19 @@ class DamageReportRepository extends BaseRepository
     {
         return DB::query("UPDATE damage_reports SET status = 'seen' WHERE tenant_id = ? AND status = 'new'", [$tenantId])->rowCount() > 0;
     }
+
+    public function update(int $id, array $data): bool
+    {
+        $tenantId = Auth::tenantId();
+        $data['id'] = $id;
+        $data['tenant_id'] = $tenantId;
+
+        $sql = "UPDATE damage_reports SET 
+                status = :status,
+                repair_cost = :repair_cost,
+                admin_notes = :admin_notes
+                WHERE id = :id AND tenant_id = :tenant_id";
+        
+        return DB::query($sql, $data)->rowCount() > 0;
+    }
 }
