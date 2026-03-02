@@ -387,10 +387,10 @@ class TenantController extends BaseController
         ]);
     }
 
-    public function showAddExpense(int $vehicleId): void
+    public function showAddExpense(int $id): void
     {
         $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
-        $vehicle = $vehicleRepo->find($vehicleId);
+        $vehicle = $vehicleRepo->find($id);
 
         if (!$vehicle || $vehicle['tenant_id'] !== Auth::tenantId()) {
             $this->redirect('/tenant/vehicles');
@@ -402,10 +402,10 @@ class TenantController extends BaseController
         ]);
     }
 
-    public function storeExpense(int $vehicleId): void
+    public function storeExpense(int $id): void
     {
         $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
-        $vehicle = $vehicleRepo->find($vehicleId);
+        $vehicle = $vehicleRepo->find($id);
 
         if (!$vehicle || $vehicle['tenant_id'] !== Auth::tenantId()) {
             $this->redirect('/tenant/vehicles');
@@ -414,7 +414,7 @@ class TenantController extends BaseController
         $expenseRepo = new \FleetLog\App\Repositories\ExpenseRepository();
         
         $expenseRepo->create([
-            'vehicle_id' => $vehicleId,
+            'vehicle_id' => $id,
             'expense_type' => $_POST['expense_type'],
             'name' => $_POST['name'],
             'cost' => $_POST['cost'],
@@ -425,7 +425,7 @@ class TenantController extends BaseController
 
         // If a next_service_km was provided, update the vehicle
         if (!empty($_POST['next_service_km'])) {
-            $expenseRepo->updateNextServiceKm($vehicleId, (int)$_POST['next_service_km']);
+            $expenseRepo->updateNextServiceKm($id, (int)$_POST['next_service_km']);
         }
 
         $this->redirect('/tenant/expenses?success=expense_added');
