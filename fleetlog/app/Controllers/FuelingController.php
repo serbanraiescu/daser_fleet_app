@@ -12,7 +12,7 @@ class FuelingController extends BaseController
     public function show(): void
     {
         $vehicleRepo = new VehicleRepository();
-        $vehicles = $vehicleRepo->getByTenant(Auth::tenantId());
+        $vehicles = $vehicleRepo->getActiveByTenant(Auth::tenantId());
 
         $this->render('driver/fueling/create', [
             'title' => 'Log Fueling',
