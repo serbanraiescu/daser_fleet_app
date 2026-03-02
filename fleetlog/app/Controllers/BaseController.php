@@ -18,6 +18,12 @@ abstract class BaseController
         extract($data);
         
         $currentUser = \FleetLog\Core\Auth::user();
+        $newDamagesCount = 0;
+
+        if ($currentUser && (\FleetLog\Core\RBAC::isTenantAdmin() || \FleetLog\Core\RBAC::isSuperAdmin())) {
+            $damageRepo = new \FleetLog\App\Repositories\DamageReportRepository();
+            $newDamagesCount = $damageRepo->getNewCount(\FleetLog\Core\Auth::tenantId());
+        }
         
         // Render content to buffer
         ob_start();

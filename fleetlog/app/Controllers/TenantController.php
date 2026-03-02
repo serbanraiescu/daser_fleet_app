@@ -129,6 +129,11 @@ class TenantController extends BaseController
     public function damages(): void
     {
         $tenantId = Auth::tenantId();
+        $damageRepo = new \FleetLog\App\Repositories\DamageReportRepository();
+        
+        // Mark as seen so notification disappears
+        $damageRepo->markAllAsSeen($tenantId);
+
         $damages = DB::fetchAll("
             SELECT d.*, v.license_plate, u.name as driver_name 
             FROM damage_reports d

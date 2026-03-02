@@ -31,4 +31,15 @@ class DamageReportRepository extends BaseRepository
         $tenantId = Auth::tenantId();
         return DB::fetchAll("SELECT * FROM damage_photos WHERE damage_report_id = ? AND tenant_id = ?", [$reportId, $tenantId]);
     }
+
+    public function getNewCount(int $tenantId): int
+    {
+        $result = DB::fetch("SELECT COUNT(*) as total FROM damage_reports WHERE tenant_id = ? AND status = 'new'", [$tenantId]);
+        return (int) ($result['total'] ?? 0);
+    }
+
+    public function markAllAsSeen(int $tenantId): bool
+    {
+        return DB::query("UPDATE damage_reports SET status = 'seen' WHERE tenant_id = ? AND status = 'new'", [$tenantId])->rowCount() > 0;
+    }
 }
