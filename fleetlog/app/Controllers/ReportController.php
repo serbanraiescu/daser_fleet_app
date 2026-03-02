@@ -16,25 +16,38 @@ class ReportController extends BaseController
     {
         $tenantId = Auth::tenantId();
         $period = $_GET['period'] ?? 'monthly';
-        $dateFilter = $this->getDateFilter($period);
+        $month = $_GET['month'] ?? date('m');
+        $year = $_GET['year'] ?? date('Y');
+        
+        $dateFilter = $this->getDateFilter($period, $month, $year);
+        $endDate = $this->getEndDate($period, $month, $year);
 
         // Fetch vehicle stats
         $vehicles = DB::fetchAll("
             SELECT 
                 v.id, v.license_plate, v.make, v.model,
-                (SELECT MIN(start_km) FROM trips WHERE vehicle_id = v.id AND tenant_id = ? AND start_time >= ?) as start_km,
-                (SELECT MAX(end_km) FROM trips WHERE vehicle_id = v.id AND tenant_id = ? AND end_time >= ?) as end_km,
-                (SELECT SUM(liters) FROM fuelings WHERE vehicle_id = v.id AND tenant_id = ? AND created_at >= ?) as total_liters,
-                (SELECT SUM(total_price) FROM fuelings WHERE vehicle_id = v.id AND tenant_id = ? AND created_at >= ?) as total_fuel_cost,
-                (SELECT COUNT(*) FROM trips WHERE vehicle_id = v.id AND tenant_id = ? AND start_time >= ?) as trip_count
+                (SELECT MIN(start_km) FROM trips WHERE vehicle_id = v.id AND tenant_id = ? AND start_time >= ? AND start_time < ?) as start_km,
+                (SELECT MAX(end_km) FROM trips WHERE vehicle_id = v.id AND tenant_id = ? AND end_time >= ? AND end_time < ?) as end_km,
+                (SELECT SUM(liters) FROM fuelings WHERE vehicle_id = v.id AND tenant_id = ? AND created_at >= ? AND created_at < ?) as total_liters,
+                (SELECT SUM(total_price) FROM fuelings WHERE vehicle_id = v.id AND tenant_id = ? AND created_at >= ? AND created_at < ?) as total_fuel_cost,
+                (SELECT COUNT(*) FROM trips WHERE vehicle_id = v.id AND tenant_id = ? AND start_time >= ? AND start_time < ?) as trip_count
             FROM vehicles v
             WHERE v.tenant_id = ?
-        ", [$tenantId, $dateFilter, $tenantId, $dateFilter, $tenantId, $dateFilter, $tenantId, $dateFilter, $tenantId, $dateFilter, $tenantId]);
+        ", [
+            $tenantId, $dateFilter, $endDate, 
+            $tenantId, $dateFilter, $endDate, 
+            $tenantId, $dateFilter, $endDate, 
+            $tenantId, $dateFilter, $endDate, 
+            $tenantId, $dateFilter, $endDate, 
+            $tenantId
+        ]);
 
         $this->render('tenant/reports/vehicle_report', [
             'title' => 'Vehicle Performance Report',
             'vehicles' => $vehicles,
-            'period' => $period
+            'period' => $period,
+            'selected_month' => $month,
+            'selected_year' => $year
         ]);
     }
 
@@ -42,33 +55,57 @@ class ReportController extends BaseController
     {
         $tenantId = Auth::tenantId();
         $period = $_GET['period'] ?? 'monthly';
-        $dateFilter = $this->getDateFilter($period);
+        $month = $_GET['month'] ?? date('m');
+        $year = $_GET['year'] ?? date('Y');
+        
+        $dateFilter = $this->getDateFilter($period, $month, $year);
+        $endDate = $this->getEndDate($period, $month, $year);
 
         $drivers = DB::fetchAll("
             SELECT 
                 u.id, u.name,
-                (SELECT SUM(end_km - start_km) FROM trips WHERE driver_id = u.id AND tenant_id = ? AND start_time >= ? AND status = 'closed') as total_km,
-                (SELECT COUNT(*) FROM trips WHERE driver_id = u.id AND tenant_id = ? AND start_time >= ?) as trip_count,
-                (SELECT COUNT(DISTINCT vehicle_id) FROM trips WHERE driver_id = u.id AND tenant_id = ? AND start_time >= ?) as vehicle_count
+                (SELECT SUM(end_km - start_km) FROM trips WHERE driver_id = u.id AND tenant_id = ? AND start_time >= ? AND start_time < ? AND status = 'closed') as total_km,
+                (SELECT COUNT(*) FROM trips WHERE driver_id = u.id AND tenant_id = ? AND start_time >= ? AND start_time < ?) as trip_count,
+                (SELECT COUNT(DISTINCT vehicle_id) FROM trips WHERE driver_id = u.id AND tenant_id = ? AND start_time >= ? AND start_time < ?) as vehicle_count
             FROM users u
             WHERE u.tenant_id = ? AND u.role = 'driver'
-        ", [$tenantId, $dateFilter, $tenantId, $dateFilter, $tenantId, $dateFilter, $tenantId]);
+        ", [
+            $tenantId, $dateFilter, $endDate, 
+            $tenantId, $dateFilter, $endDate, 
+            $tenantId, $dateFilter, $endDate, 
+            $tenantId
+        ]);
 
         $this->render('tenant/reports/driver_report', [
             'title' => 'Driver Activity Report',
             'drivers' => $drivers,
-            'period' => $period
+            'period' => $period,
+            'selected_month' => $month,
+            'selected_year' => $year
         ]);
     }
 
-    private function getDateFilter(string $period): string
+    private function getDateFilter(string $period, string $month, string $year): string
     {
         switch ($period) {
             case 'daily': return date('Y-m-d 00:00:00');
             case 'weekly': return date('Y-m-d 00:00:00', strtotime('-7 days'));
-            case 'yearly': return date('Y-01-01 00:00:00');
+            case 'yearly': return "{$year}-01-01 00:00:00";
             case 'monthly':
-            default: return date('Y-m-01 00:00:00');
+            default: return "{$year}-{$month}-01 00:00:00";
+        }
+    }
+
+    private function getEndDate(string $period, string $month, string $year): string
+    {
+        switch ($period) {
+            case 'daily': return date('Y-m-d 23:59:59');
+            case 'weekly': return date('Y-m-d 23:59:59');
+            case 'yearly': return "{$year}-12-31 23:59:59";
+            case 'monthly':
+            default: 
+                $lastDay = cal_days_in_month(CAL_GREGORIAN, (int)$month, (int)$year);
+                return "{$year}-{$month}-{$lastDay} 23:59:59";
         }
     }
 

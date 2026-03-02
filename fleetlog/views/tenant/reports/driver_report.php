@@ -4,12 +4,41 @@
         <p class="text-slate-500">Driver performance and vehicle usage analysis.</p>
     </div>
     
-    <div class="flex items-center bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
-        <?php foreach (['daily' => 'Azi', 'weekly' => 'Săptămână', 'monthly' => 'Lună', 'yearly' => 'An'] as $p => $label): ?>
-            <a href="?period=<?php echo $p; ?>" class="px-4 py-2 text-sm font-bold rounded-lg transition-all <?php echo $period === $p ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50'; ?>">
-                <?php echo $label; ?>
-            </a>
-        <?php endforeach; ?>
+    <div class="flex flex-wrap items-center gap-2">
+        <?php if ($period === 'monthly' || $period === 'yearly'): ?>
+            <form class="flex items-center space-x-2 mr-4 bg-white p-1 rounded-xl border border-slate-200">
+                <input type="hidden" name="period" value="<?php echo $period; ?>">
+                
+                <?php if ($period === 'monthly'): ?>
+                    <select name="month" class="text-sm font-bold bg-transparent outline-none px-2 cursor-pointer border-r border-slate-100">
+                        <?php for ($m = 1; $m <= 12; $m++): ?>
+                            <?php $mPadded = str_pad($m, 2, '0', STR_PAD_LEFT); ?>
+                            <option value="<?php echo $mPadded; ?>" <?php echo $selected_month == $mPadded ? 'selected' : ''; ?>>
+                                <?php echo date('F', mktime(0, 0, 0, $m, 1)); ?>
+                            </option>
+                        <?php endfor; ?>
+                    </select>
+                <?php endif; ?>
+
+                <select name="year" class="text-sm font-bold bg-transparent outline-none px-2 cursor-pointer">
+                    <?php for ($y = date('Y'); $y >= 2024; $y--): ?>
+                        <option value="<?php echo $y; ?>" <?php echo $selected_year == $y ? 'selected' : ''; ?>><?php echo $y; ?></option>
+                    <?php endfor; ?>
+                </select>
+
+                <button type="submit" class="p-1 px-3 bg-slate-800 text-white rounded-lg text-xs font-bold hover:bg-black transition-colors">
+                    Filtrează
+                </button>
+            </form>
+        <?php endif; ?>
+
+        <div class="flex items-center bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
+            <?php foreach (['daily' => 'Azi', 'weekly' => 'Săptămână', 'monthly' => 'Lună', 'yearly' => 'An'] as $p => $label): ?>
+                <a href="?period=<?php echo $p; ?>" class="px-4 py-2 text-sm font-bold rounded-lg transition-all <?php echo $period === $p ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50'; ?>">
+                    <?php echo $label; ?>
+                </a>
+            <?php endforeach; ?>
+        </div>
     </div>
 </div>
 
