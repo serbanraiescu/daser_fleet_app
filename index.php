@@ -1,14 +1,11 @@
-<?php
-
-/**
- * FleetLog Root Bootstrapper
- * This file allows the app to run directly from the subdomain root.
- */
-
 // Enable error reporting for debugging V1 deployment
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 require_once __DIR__ . '/fleetlog/core/Autoloader.php';
 require_once __DIR__ . '/fleetlog/core/EnvLoader.php';

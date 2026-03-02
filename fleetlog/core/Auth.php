@@ -8,6 +8,9 @@ class Auth
 {
     public static function login(string $email, string $password): bool
     {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         $userRepo = new UserRepository();
         $user = $userRepo->findByEmail($email);
 
