@@ -53,4 +53,9 @@ class VehicleRepository extends BaseRepository
         
         return DB::query($sql, $data)->rowCount() > 0;
     }
+
+    public function getActiveByTenant(int $tenantId): array
+    {
+        return DB::fetchAll("SELECT * FROM vehicles WHERE tenant_id = ? AND status = 'active'", [$tenantId]);
+    }
 }
