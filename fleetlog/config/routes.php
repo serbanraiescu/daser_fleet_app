@@ -15,6 +15,8 @@ $router->add('GET', '/admin/tenants/impersonate/{id}', 'SuperAdminController@imp
 
 // Tenant Admin Routes
 $router->add('GET', '/tenant/dashboard', 'TenantController@dashboard', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('GET', '/tenant/reports', 'ReportController@index', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('GET', '/tenant/reports/trips/export', 'ReportController@exportTrips', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 
 // Driver Routes
 $router->add('GET', '/driver/dashboard', 'DriverController@dashboard', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
@@ -24,5 +26,7 @@ $router->add('GET', '/driver/end-trip', 'TripController@showEndTrip', [\FleetLog
 $router->add('POST', '/driver/end-trip', 'TripController@end', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('GET', '/driver/handover', 'HandoverController@show', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('POST', '/driver/handover', 'HandoverController@store', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('GET', '/driver/report-damage', 'DamageController@showReport', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('POST', '/driver/report-damage', 'DamageController@store', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 
 $router->add('GET', '/', 'HomeController@index');
