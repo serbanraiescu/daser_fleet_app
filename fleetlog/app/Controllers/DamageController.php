@@ -21,6 +21,7 @@ class DamageController extends BaseController
     {
         $vehicles = $this->vehicleRepo->all();
         $vehicleId = $_GET['vehicle_id'] ?? null;
+        $isLocked = false;
 
         if (isset($_GET['qr'])) {
             $qrCode = $_GET['qr'];
@@ -30,10 +31,19 @@ class DamageController extends BaseController
             }
         }
 
+        // Lock vehicle if driver has an active trip
+        $tripRepo = new \FleetLog\App\Repositories\TripRepository();
+        $activeTrip = $tripRepo->getOpenTrip(Auth::user()['id']);
+        if ($activeTrip) {
+            $vehicleId = $activeTrip['vehicle_id'];
+            $isLocked = true;
+        }
+
         $this->render('driver/damage/create', [
             'title' => 'Report Damage',
             'vehicles' => $vehicles,
-            'selectedVehicleId' => $vehicleId
+            'selectedVehicleId' => $vehicleId,
+            'isLocked' => $isLocked
         ]);
     }
 

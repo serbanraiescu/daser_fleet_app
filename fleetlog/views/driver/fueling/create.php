@@ -10,6 +10,11 @@
     <form action="/driver/fueling" method="POST" enctype="multipart/form-data" class="space-y-4" x-data="{ 
         selectedVehicleId: '<?php echo htmlspecialchars($selectedVehicleId ?? '', ENT_QUOTES, 'UTF-8'); ?>'
     }">
+        <?php $isLocked = $isLocked ?? false; ?>
+        <?php if ($isLocked): ?>
+            <input type="hidden" name="vehicle_id" value="<?php echo htmlspecialchars($selectedVehicleId ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+        <?php endif; ?>
+
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
             <div x-data="{ 
                 scannerOpen: false, 
@@ -20,11 +25,11 @@
                         this.html5QrCode = new Html5Qrcode('reader-fueling');
                         const config = { fps: 10, qrbox: { width: 250, height: 250 } };
                         this.html5QrCode.start({ facingMode: 'environment' }, config, (decodedText) => {
+                            let qrCode = decodedText;
                             if (decodedText.includes('qr=')) {
-                                window.location.href = decodedText;
-                            } else {
-                                window.location.href = '/driver/fueling?qr=' + decodedText;
+                                qrCode = new URL(decodedText).searchParams.get('qr') || decodedText;
                             }
+                            window.location.href = '/driver/fueling?qr=' + qrCode;
                             this.stopScanner();
                         });
                     });
@@ -44,12 +49,16 @@
             }">
                 <div class="flex items-center justify-between mb-2">
                     <label class="block text-sm font-semibold text-slate-700">Select Vehicle</label>
+                    <?php if (!$isLocked): ?>
                     <button type="button" @click="startScanner()" class="inline-flex items-center text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg border border-blue-200">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v-4m6 0h-2m-6 0H4m0 4v2m0 4v4m0-4h2m16-4v-2m0-4V4m0 4h-2M4 4h2"></path></svg>
                         SCAN QR
                     </button>
+                    <?php else: ?>
+                    <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded">Locked to Active Trip</span>
+                    <?php endif; ?>
                 </div>
-                <select name="vehicle_id" x-model="selectedVehicleId" required class="w-full p-4 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all appearance-none">
+                <select <?php echo $isLocked ? 'disabled' : 'name="vehicle_id"'; ?> x-model="selectedVehicleId" required class="w-full p-4 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all appearance-none <?php echo $isLocked ? 'opacity-75 cursor-not-allowed' : ''; ?>">
                     <option value="">-- Choose vehicle --</option>
                     <?php foreach ($vehicles as $vehicle): ?>
                         <option value="<?php echo $vehicle['id']; ?>">

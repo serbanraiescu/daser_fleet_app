@@ -68,21 +68,28 @@
                 </a>
             </div>
             
-            <a href="/driver/fueling" class="flex flex-col items-center justify-center p-8 bg-indigo-600 text-white rounded-2xl shadow-lg hover:bg-indigo-700 transition-all active:scale-95">
-                <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                <span class="text-lg font-bold">Log Fueling</span>
+            <a href="/driver/report-damage" class="flex flex-col items-center justify-center p-8 bg-amber-500 text-white rounded-2xl shadow-lg hover:bg-amber-600 transition-all active:scale-95">
+                <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                <span class="text-lg font-bold">Report Damage</span>
             </a>
         <?php else: ?>
             <a href="/driver/end-trip" class="flex flex-col items-center justify-center p-8 bg-red-600 text-white rounded-2xl shadow-lg hover:bg-red-700 transition-all active:scale-95">
                 <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3 3L22 4"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path></svg>
                 <span class="text-lg font-bold">End Current Trip</span>
             </a>
-        <?php endif; ?>
 
-        <a href="/driver/report-damage" class="flex flex-col items-center justify-center p-8 bg-amber-500 text-white rounded-2xl shadow-lg hover:bg-amber-600 transition-all active:scale-95">
-            <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-            <span class="text-lg font-bold">Report Damage</span>
-        </a>
+            <div class="grid grid-cols-2 gap-4">
+                <a href="/driver/fueling" class="flex flex-col items-center justify-center p-6 bg-indigo-600 text-white rounded-2xl shadow-lg hover:bg-indigo-700 transition-all active:scale-95">
+                    <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    <span class="text-sm font-bold text-center">Log Fueling</span>
+                </a>
+                
+                <a href="/driver/report-damage" class="flex flex-col items-center justify-center p-6 bg-amber-500 text-white rounded-2xl shadow-lg hover:bg-amber-600 transition-all active:scale-95">
+                    <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <span class="text-sm font-bold text-center">Report Damage</span>
+                </a>
+            </div>
+        <?php endif; ?>
     </div>
 
     <!-- Active Status Info -->
