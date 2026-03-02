@@ -3,3 +3,8 @@ User: qqgbtymm_fleet_user
 Database: qqgbtymm_fleet
 
 Parola: DasFleet0203@^
+
+
+e-mail:
+fleet@daserdesign.ro
+ParolaFleet0203@^

@@ -14,6 +14,17 @@ class Mailer
             foreach ($raw as $s) {
                 self::$settings[$s['key']] = $s['value'];
             }
+            
+            // Sensitive data from .env overrides DB
+            if (getenv('SMTP_PASS')) {
+                self::$settings['smtp_pass'] = getenv('SMTP_PASS');
+            }
+            if (getenv('SMTP_USER')) {
+                self::$settings['smtp_user'] = getenv('SMTP_USER');
+            }
+            if (getenv('SMTP_HOST')) {
+                self::$settings['smtp_host'] = getenv('SMTP_HOST');
+            }
         }
         return self::$settings;
     }

@@ -151,4 +151,21 @@ class SuperAdminController extends BaseController
         ]);
         $this->redirect('/admin/email-templates?success=1');
     }
+
+    public function sendTestEmail(): void
+    {
+        $to = $_POST['test_email'] ?? '';
+        if (empty($to)) {
+            $this->redirect('/admin/settings?error=email_empty');
+        }
+
+        $subject = "FleetLog - Test Email Configuration";
+        $body = "Congratulations! If you are reading this, your email configuration (SMTP) is working correctly.\n\nTime sent: " . date('Y-m-d H:i:s');
+
+        if (\FleetLog\Core\Mailer::send($to, $subject, $body)) {
+            $this->redirect('/admin/settings?success=test_sent');
+        } else {
+            $this->redirect('/admin/settings?error=test_failed');
+        }
+    }
 }
