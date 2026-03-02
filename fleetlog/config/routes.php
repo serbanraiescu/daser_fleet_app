@@ -31,6 +31,8 @@ $router->add('POST', '/tenant/vehicles/add', 'TenantController@storeVehicle', [\
 $router->add('GET', '/tenant/vehicles/edit/{id}', 'TenantController@showEditVehicle', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('POST', '/tenant/vehicles/edit/{id}', 'TenantController@updateVehicle', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('GET', '/tenant/vehicles/status/{id}/{status}', 'TenantController@quickStatusVehicle', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('GET', '/tenant/vehicles/archive/{id}', 'TenantController@showArchiveVehicle', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('POST', '/tenant/vehicles/archive/{id}', 'TenantController@archiveVehicle', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('GET', '/tenant/drivers', 'TenantController@drivers', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('GET', '/tenant/drivers/add', 'TenantController@showAddDriver', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('POST', '/tenant/drivers/add', 'TenantController@storeDriver', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);

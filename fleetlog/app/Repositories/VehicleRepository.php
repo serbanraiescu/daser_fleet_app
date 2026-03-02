@@ -60,8 +60,29 @@ class VehicleRepository extends BaseRepository
         return DB::fetchAll("SELECT * FROM vehicles WHERE tenant_id = ? AND status = 'active'", [$tenantId]);
     }
 
+    public function getAllNonArchivedByTenant(int $tenantId): array
+    {
+        return DB::fetchAll("SELECT * FROM vehicles WHERE tenant_id = ? AND status != 'archived' ORDER BY id DESC", [$tenantId]);
+    }
+
+    public function getArchivedByTenant(int $tenantId): array
+    {
+        return DB::fetchAll("SELECT * FROM vehicles WHERE tenant_id = ? AND status = 'archived' ORDER BY id DESC", [$tenantId]);
+    }
+
     public function findByQrCode(string $code): ?array
     {
         return DB::fetch("SELECT * FROM vehicles WHERE qr_code = ?", [$code]);
+    }
+
+    public function archiveVehicle(int $id, string $notes): bool
+    {
+        $tenantId = Auth::tenantId();
+        $sql = "UPDATE vehicles SET status = 'archived', archive_notes = :notes WHERE id = :id AND tenant_id = :tenant_id";
+        return DB::query($sql, [
+            'notes' => $notes,
+            'id' => $id,
+            'tenant_id' => $tenantId
+        ])->rowCount() > 0;
     }
 }
