@@ -246,12 +246,12 @@ class Mailer
         $fullMsg = \implode("\r\n", $headers) . "\r\n\r\n";
         $fullMsg .= "--$boundary\r\n";
         $fullMsg .= "Content-Type: text/plain; charset=utf-8\r\n";
-        $fullMsg .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
-        $fullMsg .= $textVersion . "\r\n\r\n";
+        $fullMsg .= "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
+        $fullMsg .= \quoted_printable_encode($textVersion) . "\r\n\r\n";
         $fullMsg .= "--$boundary\r\n";
         $fullMsg .= "Content-Type: text/html; charset=utf-8\r\n";
-        $fullMsg .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
-        $fullMsg .= $body . "\r\n\r\n";
+        $fullMsg .= "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
+        $fullMsg .= \quoted_printable_encode($body) . "\r\n\r\n";
         $fullMsg .= "--$boundary--\r\n.";
 
         \fputs($socket, $fullMsg . "\r\n");
