@@ -85,7 +85,7 @@ class Mailer
 
     private static function wrapHtml(string $title, string $content): string
     {
-        $body = \nl2br(\htmlspecialchars($content));
+        $body = $content; // Stop escaping HTML, assume it's pre-formatted or trust the caller
         return "
 <!DOCTYPE html>
 <html>
@@ -137,8 +137,17 @@ class Mailer
         $fromEmail = $settings['smtp_from_email'] ?: ($user ?: 'noreply@' . ($_SERVER['HTTP_HOST'] ?? 'fleetlog.com'));
         $fromName = $settings['smtp_from_name'] ?: 'FleetLog';
 
+        $textVersion = "";
         if ($isHtml) {
+            // Generate Text version BEFORE wrapping with style-heavy layout
+            $textVersion = \preg_replace('/<(style|script)\b[^>]*>.*?<\/\1>/is', '', $body);
+            $textVersion = \str_replace(['<br>', '<br/>', '<br />', '</div>', '</p>', '</h1>', '</h2>', '</h3>', '</h4>', '</h5>', '</h6>'], "\n", $textVersion);
+            $textVersion = \strip_tags($textVersion);
+            $textVersion = \trim(\html_entity_decode($textVersion, ENT_QUOTES, 'UTF-8'));
+            
             $body = self::wrapHtml($subject, $body);
+        } else {
+            $textVersion = $body;
         }
 
         $timeout = 10;
@@ -222,10 +231,6 @@ class Mailer
             'X-Mailer: FleetLog-Custom-SMTP'
         ];
 
-        // Prepare Plain Text version
-        $textVersion = \strip_tags(\str_replace(['<br>', '<br/>', '</p>'], "\n", $body));
-        $textVersion = \trim(\html_entity_decode($textVersion, ENT_QUOTES, 'UTF-8'));
-        
         // Ensure CRLF for both
         $body = \str_replace(["\r\n", "\r", "\n"], "\r\n", $body);
         $textVersion = \str_replace(["\r\n", "\r", "\n"], "\r\n", $textVersion);
