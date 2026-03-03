@@ -33,12 +33,13 @@ class EmailService
                            ($settings['smtp_enc'] === 'tls' ? PHPMailer::ENCRYPTION_STARTTLS : '');
         $mail->Port       = (int)($settings['smtp_port'] ?: 25);
         $mail->CharSet    = 'UTF-8';
-        $mail->Encoding   = 'base64';
+        $mail->Encoding   = 'quoted-printable';
 
         // Recipients
         $fromEmail = $settings['smtp_from_email'] ?: 'noreply@' . ($_SERVER['HTTP_HOST'] ?? 'daserdesign.ro');
         $fromName  = $settings['smtp_from_name'] ?: 'FleetLog';
         $mail->setFrom($fromEmail, $fromName);
+        $mail->Sender = $fromEmail; // Explicit Return-Path
 
         // Content
         $mail->isHTML(true);
