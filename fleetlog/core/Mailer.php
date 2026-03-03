@@ -209,6 +209,7 @@ class Mailer
             'Date: ' . \date('r'),
             'To: ' . $to,
             'From: ' . "$fromName <$fromEmail>",
+            'Sender: ' . "$fromName <$fromEmail>",
             'Reply-To: ' . "$fromName <$fromEmail>",
             'Return-Path: ' . "<$fromEmail>",
             'Subject: ' . "=?UTF-8?B?" . \base64_encode($subject) . "?=",
@@ -216,7 +217,7 @@ class Mailer
             'MIME-Version: 1.0',
             'Content-Type: multipart/alternative; boundary="' . $boundary . '"',
             'Auto-Submitted: auto-generated',
-            'Precedence: bulk',
+            'X-Auto-Response-Suppress: All',
             'X-Priority: 3 (Normal)',
             'X-Mailer: FleetLog-Custom-SMTP'
         ];
