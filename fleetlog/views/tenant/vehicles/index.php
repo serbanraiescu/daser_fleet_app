@@ -19,6 +19,13 @@ $archivedVehicles = $archivedVehicles ?? [];
     </div>
 <?php endif; ?>
 
+<?php if (isset($_GET['error'])): ?>
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center font-bold">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        Error: <?php echo htmlspecialchars($_GET['error']); ?>
+    </div>
+<?php endif; ?>
+
 <!-- Active Fleet Section -->
 <div class="mb-10">
     <h2 class="text-lg font-bold text-slate-700 mb-3 flex items-center">

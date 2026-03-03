@@ -137,11 +137,20 @@ class TenantController extends BaseController
 
     public function showArchiveVehicle(int $id): void
     {
+        $tenantId = Auth::tenantId();
+        error_log("showArchiveVehicle - ID: $id, Tenant: $tenantId");
+
         $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
         $vehicle = $vehicleRepo->find($id);
 
-        if (!$vehicle || $vehicle['tenant_id'] !== Auth::tenantId()) {
-            $this->redirect('/tenant/vehicles');
+        if (!$vehicle) {
+            error_log("showArchiveVehicle - Vehicle not found or not owned by tenant.");
+            $this->redirect('/tenant/vehicles?error=vehicle_not_found');
+        }
+
+        if ((int)$vehicle['tenant_id'] !== $tenantId) {
+            error_log("showArchiveVehicle - Tenant mismatch. Vehicle Tenant: " . $vehicle['tenant_id'] . ", Auth Tenant: " . $tenantId);
+            $this->redirect('/tenant/vehicles?error=tenant_mismatch');
         }
 
         $this->render('tenant/vehicles/archive', [
