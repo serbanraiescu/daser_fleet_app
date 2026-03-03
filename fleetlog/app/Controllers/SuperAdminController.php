@@ -52,30 +52,43 @@ class SuperAdminController extends BaseController
             try {
                 DB::query("SELECT 1");
                 $results['database'] = true;
-            } catch (\Exception $e) {}
+            } catch (\Throwable $e) {}
 
             // 2. Mailer Check
-            $settings = $this->settingsData();
-            $results['mailer'] = !empty($settings['smtp_host']) && !empty($settings['smtp_user']);
+            try {
+                $settings = $this->settingsData();
+                $results['mailer'] = !empty($settings['smtp_host']) && !empty($settings['smtp_user']);
+            } catch (\Throwable $e) {}
 
-            // 3. Storage Check - Root is 3 levels up from App/Controllers
-            $rootPath = dirname(dirname(dirname(__DIR__)));
-            $uploadsPath = $rootPath . '/public/uploads';
-            if (!is_dir($uploadsPath)) {
-                @mkdir($uploadsPath, 0755, true);
-            }
-            $results['storage'] = is_writable($uploadsPath);
+            // 3. Storage Check
+            try {
+                // Root is 3 levels up from fleetlog/app/Controllers
+                $rootPath = dirname(__DIR__, 3);
+                $uploadsPath = $rootPath . '/public/uploads';
+                
+                if (!is_dir($uploadsPath)) {
+                    @mkdir($uploadsPath, 0755, true);
+                }
+                $results['storage'] = is_dir($uploadsPath) && is_writable($uploadsPath);
+            } catch (\Throwable $e) {}
 
             // 4. Cron Check
-            $lastCron = DB::fetch("SELECT created_at FROM email_sent_track ORDER BY created_at DESC LIMIT 1");
-            if ($lastCron) {
-                $diff = time() - strtotime($lastCron['created_at']);
-                $results['cron'] = ($diff < 90000); // 25 hours
-            }
+            try {
+                $lastCron = DB::fetch("SELECT created_at FROM email_sent_track ORDER BY created_at DESC LIMIT 1");
+                if ($lastCron) {
+                    $diff = time() - strtotime($lastCron['created_at']);
+                    $results['cron'] = ($diff < 90000); // 25 hours
+                }
+            } catch (\Throwable $e) {}
 
             $this->json(['success' => true, 'checks' => $results]);
-        } catch (\Exception $e) {
-            $this->json(['success' => false, 'error' => $e->getMessage()], 500);
+        } catch (\Throwable $e) {
+            $this->json([
+                'success' => false, 
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ], 500);
         }
     }
 

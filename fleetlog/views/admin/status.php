@@ -106,7 +106,8 @@ document.getElementById('runDiagnosticBtn').addEventListener('click', async func
             });
         }
     } catch (e) {
-        alert('Diagnostic failed. Check connection.');
+        console.error('Diagnostic error:', e);
+        alert('Diagnostic failed: ' + e.message + '\n\nCheck console (F12) for detailed server response.');
     }
 
     btn.disabled = false;
