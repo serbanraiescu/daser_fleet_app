@@ -84,4 +84,7 @@ foreach ($drivers as $d) {
     checkType($d, 'license_expiry', 'expiry_alert_license', 'user_id');
 }
 
+// 3. Record last run time
+DB::query("INSERT INTO system_settings (`key`, `value`) VALUES ('last_cron_run', NOW()) ON DUPLICATE KEY UPDATE `value` = NOW()");
+
 echo "Done.\n";
