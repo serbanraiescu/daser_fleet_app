@@ -94,7 +94,8 @@ $archivedVehicles = $archivedVehicles ?? [];
                                     $statusColors = [
                                         'active' => 'bg-green-100 text-green-800',
                                         'inactive' => 'bg-slate-100 text-slate-600 border border-slate-200',
-                                        'service' => 'bg-orange-100 text-orange-800'
+                                        'service' => 'bg-orange-100 text-orange-800',
+                                        'archived' => 'bg-red-100 text-red-800 border border-red-200'
                                     ];
                                     $color = $statusColors[$status] ?? 'bg-slate-100 text-slate-800';
                                 ?>
@@ -123,12 +124,6 @@ $archivedVehicles = $archivedVehicles ?? [];
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div class="flex flex-col items-end space-y-2 w-full">
-                                <div class="flex items-center space-x-2">
-                                    <a href="/tenant/expenses/add/<?php echo $vehicle['id']; ?>" class="text-green-700 hover:text-green-900 bg-green-50 px-3 py-1.5 rounded border border-green-200 hover:bg-green-100 transition-colors shadow-sm flex items-center" title="Add Expense/Service">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                                        Expense
-                                    </a>
-                                </div>
                                 <div class="flex items-center space-x-2">
                                     <a href="/tenant/vehicles/mechanic-report/<?php echo $vehicle['id']; ?>" class="text-slate-600 hover:text-slate-900 bg-slate-50 px-3 py-1.5 rounded border border-slate-200 hover:bg-slate-100 transition-colors flex items-center" title="Mechanic Report">
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>

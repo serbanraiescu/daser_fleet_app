@@ -52,9 +52,9 @@ class Auth
     public static function tenantId(): ?int
     {
         if (self::isImpersonating()) {
-            return $_SESSION['impersonate_tenant_id'];
+            return (int)$_SESSION['impersonate_tenant_id'];
         }
-        return $_SESSION['tenant_id'] ?? null;
+        return isset($_SESSION['tenant_id']) ? (int)$_SESSION['tenant_id'] : null;
     }
 
     public static function role(): ?string
