@@ -85,39 +85,46 @@ class Mailer
 
     private static function wrapHtml(string $title, string $content): string
     {
-        $body = $content; // Stop escaping HTML, assume it's pre-formatted or trust the caller
+        $year = \date('Y');
+        $host = $_SERVER['HTTP_HOST'] ?? 'daserdesign.ro';
+        
         return "
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset='UTF-8'>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #334155; margin: 0; padding: 0; background-color: #f8fafc; }
-        .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .header { background: #2563eb; padding: 30px; text-align: center; }
-        .header h1 { color: #ffffff; margin: 0; font-size: 24px; font-weight: 700; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #334155; margin: 0; padding: 0; background-color: #f8fafc; }
+        .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .header { background: #ffffff; padding: 30px 30px 20px 30px; text-align: center; border-bottom: 1px solid #f1f5f9; }
+        .header h1 { color: #1e40af; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.025em; }
+        .header p { color: #64748b; margin: 5px 0 0 0; font-size: 14px; }
         .content { padding: 40px; }
-        .content h2 { color: #1e293b; margin-top: 0; font-size: 20px; }
+        .content h2 { color: #1e293b; margin-top: 0; font-size: 20px; font-weight: 700; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 20px; }
         .content p { margin-bottom: 20px; font-size: 16px; color: #475569; }
-        .footer { background: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9; }
-        .btn { display: inline-block; padding: 12px 28px; background-color: #2563eb; color: #ffffff !important; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 14px; margin-top: 10px; }
+        .footer { background: #f8fafc; padding: 30px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #f1f5f9; }
+        .btn-wrapper { margin-top: 30px; text-align: center; border-top: 1px solid #f1f5f9; padding-top: 25px; }
+        .btn { display: inline-block; padding: 12px 32px; background-color: #2563eb; color: #ffffff !important; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px; transition: background-color 0.2s; }
+        .tech-details { font-size: 12px; color: #64748b; background: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0; list-style: none; }
     </style>
 </head>
 <body>
     <div class='container'>
         <div class='header'>
-            <h1>FleetLog Alerts</h1>
+            <h1>FleetLog</h1>
+            <p>Sistem Gestiune Flotă Auto</p>
         </div>
         <div class='content'>
             <h2>$title</h2>
-            <p>$body</p>
-            <div style='margin-top: 30px; border-top: 1px solid #f1f5f9; padding-top: 25px;'>
-                <a href='https://fleet.daserdesign.ro' class='btn'>Connect to Dashboard</a>
+            $content
+            <div class='btn-wrapper'>
+                <a href='https://$host' class='btn'>Accesează Panoul de Control</a>
             </div>
         </div>
         <div class='footer'>
-            &copy; " . \date('Y') . " FleetLog Management System.
-            <br>This is an automated notification. Please do not reply.
+            &copy; $year Daser Fleet App - Gestiune Flotă.
+            <br>Acesta este un mesaj tehnic automat generat pentru $host. 
+            <br>Vă rugăm să nu răspundeți direct la acest email.
         </div>
     </div>
 </body>

@@ -183,32 +183,20 @@ class SuperAdminController extends BaseController
 
         $subject = "Notificare Test - Sistem FleetLog (" . date('H:i') . ")";
         $body = "
-            <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; color: #334155;'>
-                <div style='text-align: center; margin-bottom: 20px;'>
-                    <h1 style='color: #1e40af; margin: 0;'>FleetLog</h1>
-                    <p style='color: #64748b; font-size: 14px;'>Sistem Gestiune Flotă Auto</p>
-                </div>
-                
-                <h2 style='color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;'>Verificare Configurație Email</h2>
-                
-                <p>Bună ziua,</p>
-                <p>Acesta este un mesaj de test generat automat pentru a confirma funcționarea corectă a setărilor SMTP pe domeniul <strong>" . ($_SERVER['HTTP_HOST'] ?? 'daser_fleet_app') . "</strong>.</p>
-                
-                <div style='background: #eff6ff; padding: 20px; border-radius: 8px; border-left: 4px solid #3b82f6; margin: 25px 0;'>
-                    <p style='margin: 0; color: #1e40af; font-weight: bold;'>Configurație Reușită!</p>
-                    <p style='margin: 5px 0 0 0; font-size: 14px; color: #1e3a8a;'>Dacă citiți acest mesaj în Inbox, înseamnă că serverul de mail este securizat și autorizat corect.</p>
-                </div>
-
-                <p style='font-size: 13px;'>Detalii tehnice trimitere:</p>
-                <ul style='font-size: 12px; color: #64748b; background: #f8fafc; padding: 15px 15px 15px 35px; border-radius: 6px;'>
-                    <li>Data: " . date('d.m.Y H:i:s') . "</li>
-                    <li>Sursă: " . ($_SERVER['REMOTE_ADDR'] ?? 'Server Local') . "</li>
-                    <li>Referință: " . \base_convert(\microtime(true), 10, 36) . "</li>
-                </ul>
-
-                <hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 30px 0;'>
-                <p style='font-size: 11px; color: #94a3b8; text-align: center;'>Acesta este un mesaj tehnic. Vă rugăm să nu răspundeți direct la acest email.<br>&copy; " . date('Y') . " Daser Fleet App</p>
+            <p>Bună ziua,</p>
+            <p>Acesta este un mesaj de test generat automat pentru a confirma funcționarea corectă a setărilor SMTP pe domeniul <strong>" . ($_SERVER['HTTP_HOST'] ?? 'daser_fleet_app') . "</strong>.</p>
+            
+            <div style='background: #eff6ff; padding: 20px; border-radius: 8px; border-left: 4px solid #3b82f6; margin: 25px 0;'>
+                <p style='margin: 0; color: #1e40af; font-weight: bold;'>Configurație Reușită!</p>
+                <p style='margin: 5px 0 0 0; font-size: 14px; color: #1e3a8a;'>Dacă citiți acest mesaj în Inbox, înseamnă că sistemul de mail este autorizat corect (DKIM/SPF Pass).</p>
             </div>
+
+            <p style='font-size: 13px; font-weight: bold; color: #1e293b;'>Detalii tehnice trimitere:</p>
+            <ul class='tech-details'>
+                <li><strong>Data:</strong> " . date('d.m.Y H:i:s') . "</li>
+                <li><strong>Sursă IP:</strong> " . ($_SERVER['REMOTE_ADDR'] ?? 'Server Local') . "</li>
+                <li><strong>Referință:</strong> " . \base_convert(\microtime(true), 10, 36) . "</li>
+            </ul>
         ";
 
         if (\FleetLog\Core\Mailer::send($to, $subject, $body, true)) {
