@@ -50,7 +50,7 @@ class AuthController extends BaseController
     {
         $role = Auth::role();
         if ($role === 'super_admin') {
-            $this->redirect('/admin/tenants');
+            $this->redirect('/admin/dashboard');
         } elseif ($role === 'tenant_admin') {
             $this->redirect('/tenant/dashboard');
         } else {

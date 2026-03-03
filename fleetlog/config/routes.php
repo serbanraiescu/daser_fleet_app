@@ -10,6 +10,10 @@ $router->add('GET', '/account-suspended', 'AuthController@suspended');
 $router->add('GET', '/admin/stop-impersonation', 'AuthController@stopImpersonating', [\FleetLog\App\Middleware\AuthMiddleware::class]);
 
 // Super Admin Routes
+$router->add('GET', '/admin/dashboard', 'SuperAdminController@dashboard', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
+$router->add('GET', '/admin/status', 'SuperAdminController@status', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
+$router->add('POST', '/admin/run-self-test', 'SuperAdminController@runSelfTest', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
+
 $router->add('GET', '/admin/tenants', 'SuperAdminController@tenants', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('GET', '/admin/tenants/add', 'SuperAdminController@showAddTenant', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('POST', '/admin/tenants/add', 'SuperAdminController@storeTenant', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);

@@ -8,6 +8,79 @@ use FleetLog\Core\EmailService;
 
 class SuperAdminController extends BaseController
 {
+    public function dashboard(): void
+    {
+        $tenantsCount = DB::fetch("SELECT COUNT(*) as count FROM tenants")['count'];
+        $vehiclesCount = DB::fetch("SELECT COUNT(*) as count FROM vehicles")['count'];
+        $emailsSent = DB::fetch("SELECT COUNT(*) as count FROM email_logs")['count'];
+        
+        // Mock data for SMS and Uptime as placeholders
+        $smsSent = 0; 
+        $uptime = "99.9%";
+
+        $this->render('admin/dashboard', [
+            'title' => 'Admin Dashboard',
+            'stats' => [
+                'tenants' => $tenantsCount,
+                'vehicles' => $vehiclesCount,
+                'emails' => $emailsSent,
+                'sms' => $smsSent,
+                'uptime' => $uptime,
+                'health' => 95 // %
+            ]
+        ]);
+    }
+
+    public function status(): void
+    {
+        $this->render('admin/status', [
+            'title' => 'System Status'
+        ]);
+    }
+
+    public function runSelfTest(): void
+    {
+        $results = [
+            'database' => true,
+            'mailer' => false,
+            'storage' => true,
+            'cron' => false
+        ];
+
+        // 1. DB Check
+        try {
+            DB::query("SELECT 1");
+            $results['database'] = true;
+        } catch (\Exception $e) { $results['database'] = false; }
+
+        // 2. Mailer Check (Settings exists?)
+        $settings = $this->settingsData();
+        $results['mailer'] = !empty($settings['smtp_host']) && !empty($settings['smtp_user']);
+
+        // 3. Storage Check
+        $results['storage'] = is_writable(dirname(__DIR__, 2) . '/public/uploads');
+
+        // 4. Cron Check (Check if check_expirations ran in last 25h)
+        // We'll just check if email_sent_track has entries within last 2 days for now as a proxy
+        $lastCron = DB::fetch("SELECT created_at FROM email_sent_track ORDER BY created_at DESC LIMIT 1");
+        if ($lastCron) {
+            $diff = time() - strtotime($lastCron['created_at']);
+            $results['cron'] = ($diff < 90000); // 25 hours
+        }
+
+        $this->json(['success' => true, 'checks' => $results]);
+    }
+
+    private function settingsData(): array
+    {
+        $settingsRaw = DB::fetchAll("SELECT * FROM system_settings");
+        $settings = [];
+        foreach ($settingsRaw as $s) {
+            $settings[$s['key']] = $s['value'];
+        }
+        return $settings;
+    }
+
     public function tenants(): void
     {
         $tenants = DB::fetchAll("
