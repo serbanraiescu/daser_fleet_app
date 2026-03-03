@@ -6,6 +6,12 @@ class Autoloader
 {
     public static function register(): void
     {
+        // Include Composer Autoloader
+        $vendorAuto = dirname(__DIR__, 2) . '/vendor/autoload.php';
+        if (file_exists($vendorAuto)) {
+            require_once $vendorAuto;
+        }
+
         spl_autoload_register(function ($class) {
             $prefix = 'FleetLog\\';
             $base_dir = dirname(__DIR__) . '/';

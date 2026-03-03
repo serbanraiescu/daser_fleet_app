@@ -34,11 +34,13 @@ foreach ($tenants as $tenant) {
     $summary .= str_repeat("-", 20) . "\n\n";
 }
 
-$headers = 'From: ' . getenv('MAIL_FROM') . "\r\n" .
-           'X-Mailer: PHP/' . phpversion();
+use FleetLog\Core\EmailService;
 
-if (mail($reportsTo, "Weekly FleetLog Report", $summary, $headers)) {
-    echo "Report sent to $reportsTo\n";
+$htmlReport = "<h2>Raport Săptămânal FleetLog</h2><pre style='background:#f4f4f4; padding:15px; border-radius:4px; font-family:monospace;'>" . htmlspecialchars($summary) . "</pre>";
+$subject = "Raport Săptămânal FleetLog - " . date('d.m.Y');
+
+if (EmailService::queue($reportsTo, $subject, EmailService::wrapHtml($subject, $htmlReport), $summary)) {
+    echo "Report queued for $reportsTo\n";
 } else {
-    echo "Failed to send report.\n";
+    echo "Failed to queue report.\n";
 }

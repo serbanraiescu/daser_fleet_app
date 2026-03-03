@@ -181,28 +181,24 @@ class SuperAdminController extends BaseController
             $this->redirect('/admin/settings?error=email_empty');
         }
 
-        $subject = "Notificare Test - Sistem FleetLog (" . date('H:i') . ")";
+        $subject = "Notificare Test - Sistem FleetLog";
         $body = "
             <p>Bună ziua,</p>
-            <p>Acesta este un mesaj de test generat automat pentru a confirma funcționarea corectă a setărilor SMTP pe domeniul <strong>" . ($_SERVER['HTTP_HOST'] ?? 'daser_fleet_app') . "</strong>.</p>
+            <p>Acesta este un mesaj de test generat automat pentru a confirma funcționarea corectă a setărilor de email pe domeniul <strong>" . ($_SERVER['HTTP_HOST'] ?? 'daser_fleet_app') . "</strong>.</p>
             
-            <div style='background: #eff6ff; padding: 20px; border-radius: 8px; border-left: 4px solid #3b82f6; margin: 25px 0;'>
-                <p style='margin: 0; color: #1e40af; font-weight: bold;'>Configurație Reușită!</p>
-                <p style='margin: 5px 0 0 0; font-size: 14px; color: #1e3a8a;'>Dacă citiți acest mesaj în Inbox, înseamnă că sistemul de mail este autorizat corect (DKIM/SPF Pass).</p>
+            <div style='background: #f3f4f6; padding: 20px; border-radius: 4px; margin: 25px 0;'>
+                <p style='margin: 0; color: #111827; font-weight: bold;'>Configurație Reușită!</p>
+                <p style='margin: 5px 0 0 0; font-size: 14px; color: #4b5563;'>Acest mesaj confirmă că sistemul de notificare este operațional și securizat (DKIM/SPF Pass).</p>
             </div>
 
-            <p style='font-size: 13px; font-weight: bold; color: #1e293b;'>Detalii tehnice trimitere:</p>
-            <ul class='tech-details'>
-                <li><strong>Data:</strong> " . date('d.m.Y H:i:s') . "</li>
-                <li><strong>Sursă IP:</strong> " . ($_SERVER['REMOTE_ADDR'] ?? 'Server Local') . "</li>
-                <li><strong>Referință:</strong> " . \base_convert(\microtime(true), 10, 36) . "</li>
-            </ul>
+            <p style='font-size: 13px; color: #6b7280;'>Detalii tehnice: " . date('d.m.Y H:i:s') . " | Ref: " . \base_convert(\microtime(true), 10, 36) . "</p>
         ";
 
-        if (\FleetLog\Core\Mailer::send($to, $subject, $body, true)) {
-            $this->redirect('/admin/settings?success=test_sent');
+        if (EmailService::sendDirect($to, $subject, $body, null)) {
+            $_SESSION['flash_success'] = "Email de test trimis cu succes către $to!";
         } else {
-            $this->redirect('/admin/settings?error=test_failed');
+            $_SESSION['flash_error'] = "Eroare la trimiterea email-ului. Verifică setările SMTP.";
         }
+        $this->redirect('/admin/settings');
     }
 }
