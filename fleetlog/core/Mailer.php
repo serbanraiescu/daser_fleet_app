@@ -218,24 +218,23 @@ class Mailer
         
         $timestamp = (string)\round(\microtime(true) * 1000);
         $senderDomain = \substr(\strrchr($fromEmail, "@"), 1) ?: 'fleetlog.com';
-        $msgId = \sprintf("<%s.%s@%s>", \base_convert($timestamp, 10, 36), \base_convert(\bin2hex(\random_bytes(8)), 16, 36), $senderDomain);
+        $msgId = '<' . \time() . '.' . \bin2hex(\random_bytes(8)) . '@' . $senderDomain . '>';
         $boundary = "----=_Part_" . \bin2hex(\random_bytes(12));
 
         $headers = [
             'Date: ' . \date('r'),
             'To: ' . $to,
             'From: ' . "$fromName <$fromEmail>",
-            'Sender: ' . "$fromName <$fromEmail>",
             'Reply-To: ' . "$fromName <$fromEmail>",
             'Return-Path: ' . "<$fromEmail>",
             'Subject: ' . "=?UTF-8?B?" . \base64_encode($subject) . "?=",
             'Message-ID: ' . $msgId,
             'MIME-Version: 1.0',
             'Content-Type: multipart/alternative; boundary="' . $boundary . '"',
-            'Auto-Submitted: auto-generated',
-            'X-Auto-Response-Suppress: All',
-            'X-Priority: 3 (Normal)',
-            'X-Mailer: FleetLog-Custom-SMTP'
+            'List-Unsubscribe: <mailto:' . $fromEmail . '?subject=unsubscribe>',
+            'X-Priority: 1 (Highest)',
+            'Importance: High',
+            'X-Entity-Ref-ID: ' . \bin2hex(\random_bytes(16))
         ];
 
         // Ensure CRLF for both

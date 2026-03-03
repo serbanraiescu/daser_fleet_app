@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 /**
  * Script de test pentru trimiterea tuturor template-urilor de email
  * Rulează acest script din browser: https://fleet.daserdesign.ro/test_all_emails.php
@@ -22,15 +24,20 @@ $targetEmail = 'serbanraiescu@yahoo.com';
 echo "Începere test trimitere catre: $targetEmail\n";
 echo str_repeat("=", 50) . "\n\n";
 
-// Luăm toate template-urile din DB
-$templates = DB::fetchAll("SELECT * FROM email_templates");
+try {
+    // Luăm toate template-urile din DB
+    $templates = DB::fetchAll("SELECT * FROM email_templates");
+} catch (\Exception $e) {
+    die("EROARE DATABASE: " . $e->getMessage());
+}
 
 if (empty($templates)) {
     die("Eroare: Nu s-au găsit template-uri în baza de date.");
 }
 
 foreach ($templates as $t) {
-    echo "Trimitere template: " . $t['name'] . " (" . $t['slug'] . ")... ";
+    echo "Trimitere template: " . $t['name'] . " [" . $t['slug'] . "]... ";
+    flush();
     
     // Placeholder-e de test
     $placeholders = [
@@ -49,11 +56,15 @@ foreach ($templates as $t) {
         $body = str_replace('{' . $key . '}', $value, $body);
     }
     
-    // Trimitere forțată către adresa de test, ignorând tenant-ul
-    if (Mailer::send($targetEmail, "[TEST] " . $subject, $body, true)) {
-        echo "SUCCES\n";
-    } else {
-        echo "EȘUAT (Verifică log-urile în aplicație)\n";
+    try {
+        // Trimitere forțată către adresa de test, ignorând tenant-ul
+        if (Mailer::send($targetEmail, "[TEST] " . $subject, $body, true)) {
+            echo "SUCCES\n";
+        } else {
+            echo "EȘUAT (Verifică log-urile în aplicație)\n";
+        }
+    } catch (\Exception $e) {
+        echo "EROARE MAILER: " . $e->getMessage() . "\n";
     }
 }
 
