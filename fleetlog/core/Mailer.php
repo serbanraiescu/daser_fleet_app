@@ -201,7 +201,8 @@ class Mailer
         }
         
         $timestamp = (string)\round(\microtime(true) * 1000);
-        $msgId = \sprintf("<%s.%s@%s>", \base_convert($timestamp, 10, 36), \base_convert(\bin2hex(\random_bytes(8)), 16, 36), ($_SERVER['HTTP_HOST'] ?? 'fleetlog.com'));
+        $senderDomain = \substr(\strrchr($fromEmail, "@"), 1) ?: 'fleetlog.com';
+        $msgId = \sprintf("<%s.%s@%s>", \base_convert($timestamp, 10, 36), \base_convert(\bin2hex(\random_bytes(8)), 16, 36), $senderDomain);
         $boundary = "----=_Part_" . \bin2hex(\random_bytes(12));
 
         $headers = [
