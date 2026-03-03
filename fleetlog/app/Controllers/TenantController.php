@@ -405,14 +405,19 @@ class TenantController extends BaseController
         $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
         $vehicle = $vehicleRepo->find($vehicleId);
 
-        if (!$vehicle || $vehicle['tenant_id'] !== Auth::tenantId()) {
-            $this->redirect('/tenant/expenses');
+        if (!$vehicle) {
+            die("Error: Vehicle with ID $vehicleId not found.");
+        }
+
+        $currentTenantId = Auth::tenantId();
+        if ($vehicle['tenant_id'] !== $currentTenantId) {
+            die("Error: Tenant ID mismatch. Vehicle Tenant: " . $vehicle['tenant_id'] . ", Current Auth Tenant: " . $currentTenantId);
         }
 
         $expenseRepo = new \FleetLog\App\Repositories\ExpenseRepository();
         
         try {
-            $expenseRepo->create([
+            $saved = $expenseRepo->create([
                 'vehicle_id' => $vehicleId,
                 'expense_type' => $_POST['expense_type'],
                 'name' => $_POST['name'],
@@ -421,6 +426,10 @@ class TenantController extends BaseController
                 'expense_date' => $_POST['expense_date'],
                 'notes' => trim($_POST['notes'])
             ]);
+
+            if (!$saved) {
+                die("Error: ExpenseRepository->create returned false. POST data: " . print_r($_POST, true));
+            }
 
             if (!empty($_POST['next_service_km'])) {
                 $expenseRepo->updateNextServiceKm($vehicleId, (int)$_POST['next_service_km']);
@@ -452,14 +461,19 @@ class TenantController extends BaseController
         $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
         $vehicle = $vehicleRepo->find($id);
 
-        if (!$vehicle || $vehicle['tenant_id'] !== Auth::tenantId()) {
-            $this->redirect('/tenant/vehicles');
+        if (!$vehicle) {
+            die("Error: Vehicle with ID $id not found.");
+        }
+
+        $currentTenantId = Auth::tenantId();
+        if ($vehicle['tenant_id'] !== $currentTenantId) {
+            die("Error: Tenant ID mismatch. Vehicle Tenant: " . $vehicle['tenant_id'] . ", Current Auth Tenant: " . $currentTenantId);
         }
 
         $expenseRepo = new \FleetLog\App\Repositories\ExpenseRepository();
         
         try {
-            $expenseRepo->create([
+            $saved = $expenseRepo->create([
                 'vehicle_id' => $id,
                 'expense_type' => $_POST['expense_type'],
                 'name' => $_POST['name'],
@@ -468,6 +482,10 @@ class TenantController extends BaseController
                 'expense_date' => $_POST['expense_date'],
                 'notes' => trim($_POST['notes'])
             ]);
+
+            if (!$saved) {
+                die("Error: ExpenseRepository->create returned false. POST data: " . print_r($_POST, true));
+            }
 
             // If a next_service_km was provided, update the vehicle
             if (!empty($_POST['next_service_km'])) {
