@@ -72,13 +72,15 @@ class SuperAdminController extends BaseController
                 $results['storage'] = is_dir($uploadsPath) && is_writable($uploadsPath);
             } catch (\Throwable $e) {}
 
-            // 4. Cron Check
+            // 4. Cron Check - Check if any activity happened in last 25h
             try {
-                $lastCron = DB::fetch("SELECT created_at FROM email_sent_track ORDER BY created_at DESC LIMIT 1");
-                if ($lastCron) {
-                    $diff = time() - strtotime($lastCron['created_at']);
-                    $results['cron'] = ($diff < 90000); // 25 hours
-                }
+                $lastSent = DB::fetch("SELECT created_at FROM email_sent_track ORDER BY created_at DESC LIMIT 1");
+                $lastLog = DB::fetch("SELECT created_at FROM email_logs ORDER BY created_at DESC LIMIT 1");
+                
+                $hasSentActivity = $lastSent && (time() - strtotime($lastSent['created_at']) < 90000);
+                $hasLogActivity = $lastLog && (time() - strtotime($lastLog['created_at']) < 90000);
+                
+                $results['cron'] = ($hasSentActivity || $hasLogActivity);
             } catch (\Throwable $e) {}
 
             $this->json(['success' => true, 'checks' => $results]);
