@@ -122,12 +122,9 @@ class SuperAdminController extends BaseController
             $settings[$s['key']] = $s['value'];
         }
 
-        $emailLogs = DB::fetchAll("SELECT * FROM email_logs ORDER BY created_at DESC LIMIT 50");
-
         $this->render('admin/settings', [
             'title' => 'System Settings',
-            'settings' => $settings,
-            'emailLogs' => $emailLogs
+            'settings' => $settings
         ]);
     }
 
@@ -142,9 +139,12 @@ class SuperAdminController extends BaseController
     public function emailTemplates(): void
     {
         $templates = DB::fetchAll("SELECT * FROM email_templates ORDER BY name ASC");
+        $emailLogs = DB::fetchAll("SELECT * FROM email_logs ORDER BY created_at DESC LIMIT 50");
+        
         $this->render('admin/email_templates/index', [
-            'title' => 'Email Templates',
-            'templates' => $templates
+            'title' => 'Email Templates & Logs',
+            'templates' => $templates,
+            'emailLogs' => $emailLogs
         ]);
     }
 
