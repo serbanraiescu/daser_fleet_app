@@ -380,10 +380,40 @@ class TenantController extends BaseController
         $expenses = $expenseRepo->getByTenant($tenantId);
         $serviceDue = $expenseRepo->getServiceDueVehicles($tenantId, 1000); // vehicles within 1000km of service or past due
 
+        // Enhance serviceDue with last maintenance notes
+        foreach ($serviceDue as &$veh) {
+            $lastMaint = $expenseRepo->getLastMaintenance($veh['id']);
+            $veh['last_maintenance_notes'] = $lastMaint['notes'] ?? 'No previous notes recorded.';
+            $veh['last_maintenance_date'] = $lastMaint['expense_date'] ?? null;
+        }
+
         $this->render('tenant/expenses/index', [
             'title' => 'Vehicle Expenses & Maintenance',
             'expenses' => $expenses,
             'serviceDue' => $serviceDue
+        ]);
+    }
+
+    public function mechanicReport(int $id): void
+    {
+        $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
+        $vehicle = $vehicleRepo->find($id);
+
+        if (!$vehicle || (int)$vehicle['tenant_id'] !== (int)Auth::tenantId()) {
+            $this->redirect('/tenant/vehicles');
+        }
+
+        $expenseRepo = new \FleetLog\App\Repositories\ExpenseRepository();
+        $damageRepo = new \FleetLog\App\Repositories\DamageReportRepository();
+
+        $history = $expenseRepo->getVehicleHistory($id);
+        $activeDamages = $damageRepo->getActiveByVehicle($id);
+
+        $this->render('tenant/vehicles/mechanic_report', [
+            'title' => 'Mechanic Report: ' . $vehicle['license_plate'],
+            'vehicle' => $vehicle,
+            'history' => $history,
+            'activeDamages' => $activeDamages
         ]);
     }
 

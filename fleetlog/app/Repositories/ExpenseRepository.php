@@ -118,4 +118,26 @@ class ExpenseRepository extends BaseRepository
         $tenantId = Auth::tenantId();
         return DB::query("DELETE FROM vehicle_expenses WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->rowCount() > 0;
     }
+
+    public function getVehicleHistory(int $vehicleId): array
+    {
+        $tenantId = Auth::tenantId();
+        return DB::fetchAll("
+            SELECT * FROM vehicle_expenses 
+            WHERE vehicle_id = ? AND tenant_id = ? 
+            ORDER BY expense_date DESC, id DESC
+        ", [$vehicleId, $tenantId]);
+    }
+
+    public function getLastMaintenance(int $vehicleId): ?array
+    {
+        $tenantId = Auth::tenantId();
+        return DB::fetch("
+            SELECT * FROM vehicle_expenses 
+            WHERE vehicle_id = ? AND tenant_id = ? 
+            AND expense_type IN ('maintenance', 'consumable')
+            ORDER BY expense_date DESC, id DESC 
+            LIMIT 1
+        ", [$vehicleId, $tenantId]);
+    }
 }

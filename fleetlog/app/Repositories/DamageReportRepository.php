@@ -57,4 +57,14 @@ class DamageReportRepository extends BaseRepository
         
         return DB::query($sql, $data)->rowCount() > 0;
     }
+
+    public function getActiveByVehicle(int $vehicleId): array
+    {
+        $tenantId = Auth::tenantId();
+        return DB::fetchAll("
+            SELECT * FROM damage_reports 
+            WHERE vehicle_id = ? AND tenant_id = ? AND status != 'fixed'
+            ORDER BY datetime DESC
+        ", [$vehicleId, $tenantId]);
+    }
 }

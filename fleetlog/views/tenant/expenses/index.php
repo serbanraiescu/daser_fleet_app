@@ -52,6 +52,18 @@
                                 <span>Current: <?php echo number_format($veh['current_odometer']); ?></span>
                                 <span>Next: <?php echo number_format($veh['next_service_km']); ?></span>
                             </div>
+
+                            <div class="mt-3 p-3 bg-white/50 rounded-lg border border-black/5">
+                                <div class="text-[10px] uppercase font-bold text-slate-400 mb-1">Last Service Note:</div>
+                                <div class="text-xs text-slate-700 italic"><?php echo htmlspecialchars($veh['last_maintenance_notes']); ?></div>
+                                <?php if ($veh['last_maintenance_date']): ?>
+                                    <div class="text-[10px] text-slate-400 mt-1"><?php echo date('d M Y', strtotime($veh['last_maintenance_date'])); ?></div>
+                                <?php endif; ?>
+                            </div>
+
+                            <a href="/tenant/vehicles/mechanic-report/<?php echo $veh['id']; ?>" class="mt-3 block w-full py-2 text-center bg-white text-blue-600 text-xs font-bold rounded-lg border border-blue-200 hover:bg-blue-50 transition-colors">
+                                View Mechanic Report
+                            </a>
                         </div>
                     <?php endforeach; ?>
                 </div>
