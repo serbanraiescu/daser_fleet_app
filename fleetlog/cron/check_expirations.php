@@ -65,9 +65,9 @@ function checkType(array $vehicle, string $dateField, string $templateSlug) {
 $vehicles = DB::fetchAll("SELECT * FROM vehicles WHERE status = 'active'");
 
 foreach ($vehicles as $v) {
-    checkType($v, 'rca_expiry', 'expiry_alert_rca');
-    checkType($v, 'itp_expiry', 'expiry_alert_itp');
-    checkType($v, 'rovigneta_expiry', 'expiry_alert_rovigneta');
+    checkType($v, 'expiry_rca', 'expiry_alert_rca');
+    checkType($v, 'expiry_itp', 'expiry_alert_itp');
+    checkType($v, 'expiry_rovigneta', 'expiry_alert_rovigneta');
 }
 
 echo "Done.\n";
