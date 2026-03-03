@@ -21,22 +21,42 @@ try {
     echo "1. Curățare stare migrație 026...\n";
     DB::query("DELETE FROM migrations WHERE migration = '026_create_email_delivery_system'");
     
-    echo "2. Rulare migrație corectată (026)...\n";
+    echo "2. Rulare migrație corectată (queue și logs)...\n";
     $runner = new MigrationRunner();
     $runner->run();
     
-    echo "3. Verificare tabele...\n";
-    $queueCheck = DB::fetch("SHOW TABLES LIKE 'email_queue'");
-    $logsCheck = DB::fetch("SHOW TABLES LIKE 'email_logs'");
-    
-    if ($queueCheck) echo " - [OK] email_queue există\n"; else echo " - [!] email_queue lipsește\n";
-    if ($logsCheck) echo " - [OK] email_logs există\n"; else echo " - [!] email_logs lipsește\n";
+    echo "3. Verificare și actualizare structură email_logs...\n";
+    // Verificăm dacă coloana provider_response există
+    $columns = DB::fetchAll("SHOW COLUMNS FROM email_logs");
+    $hasProviderResponse = false;
+    foreach ($columns as $col) {
+        if ($col['Field'] === 'provider_response') {
+            $hasProviderResponse = true;
+            break;
+        }
+    }
 
-    echo "4. Curățare singular 'email_log' dacă a apucat să fie creat...\n";
+    if (!$hasProviderResponse) {
+        echo " - Adăugare coloană 'provider_response' în email_logs...\n";
+        DB::query("ALTER TABLE email_logs ADD COLUMN provider_response TEXT AFTER error_message");
+        echo " - [OK] Coloană adăugată.\n";
+    } else {
+        echo " - [OK] Coloana 'provider_response' există deja.\n";
+    }
+
+    echo "4. Verificare email_queue...\n";
+    $queueCheck = DB::fetch("SHOW TABLES LIKE 'email_queue'");
+    if ($queueCheck) {
+        echo " - [OK] Tabelul email_queue există.\n";
+    } else {
+        echo " - [!] Tabelul email_queue lipsește (ceva a mers prost la migrație).\n";
+    }
+
+    echo "5. Curățare tabel vechi (singular) dacă există...\n";
     DB::query("DROP TABLE IF EXISTS email_log");
 
-    echo "\nREPARARE FINALIZATĂ CU SUCCES! ✅\n";
-    echo "Acum poți încerca din nou scriptul de test sau butonul de Test Email.";
+    echo "\nREPARARE FINALIZATĂ! ✅\n";
+    echo "Acum poți încerca din nou testul.";
     
 } catch (Exception $e) {
     echo "\nEROARE: " . $e->getMessage() . "\n";
