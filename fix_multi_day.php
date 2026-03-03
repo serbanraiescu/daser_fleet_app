@@ -17,11 +17,39 @@ EnvLoader::load(__DIR__ . '/fleetlog/.env');
 header('Content-Type: text/plain; charset=utf-8');
 
 try {
-    echo "1. Forțare conversie coloană alert_days în VARCHAR...\n";
-    DB::query("ALTER TABLE email_templates MODIFY COLUMN alert_days VARCHAR(255) DEFAULT '7'");
-    echo " - [OK] Coloana alert_days a fost convertită.\n";
+    echo "1. Creare tabel email_queue...\n";
+    DB::query("CREATE TABLE IF NOT EXISTS email_queue (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        recipient VARCHAR(255) NOT NULL,
+        subject VARCHAR(255) NOT NULL,
+        body_html LONGTEXT,
+        body_text LONGTEXT,
+        attempts INT DEFAULT 0,
+        status ENUM('pending', 'processing', 'sent', 'failed') DEFAULT 'pending',
+        error_message TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        scheduled_at TIMESTAMP NULL,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    echo " - [OK] Tabelul email_queue creat.\n";
 
-    echo "2. Creare tabel email_sent_track (dacă lipsește)...\n";
+    echo "2. Creare tabel email_logs...\n";
+    DB::query("CREATE TABLE IF NOT EXISTS email_logs (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        recipient VARCHAR(255) NOT NULL,
+        subject VARCHAR(255) NOT NULL,
+        status ENUM('success', 'failed') NOT NULL,
+        error_message TEXT,
+        provider_response TEXT,
+        sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    echo " - [OK] Tabelul email_logs creat.\n";
+
+    echo "3. Forțare conversie alert_days în VARCHAR...\n";
+    DB::query("ALTER TABLE email_templates MODIFY COLUMN alert_days VARCHAR(255) DEFAULT '7'");
+    echo " - [OK] Coloana alert_days convertită.\n";
+
+    echo "4. Creare tabel email_sent_track...\n";
     DB::query("CREATE TABLE IF NOT EXISTS email_sent_track (
         id INT AUTO_INCREMENT PRIMARY KEY,
         tenant_id INT NOT NULL,
@@ -31,13 +59,10 @@ try {
         sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE KEY vehicle_template_day (vehicle_id, template_slug, alert_day)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-    echo " - [OK] Tabelul email_sent_track este pregătit.\n";
+    echo " - [OK] Tabelul email_sent_track creat.\n";
 
-    echo "3. Marcare migrație 027 ca finalizată în DB...\n";
-    DB::query("INSERT IGNORE INTO migrations (migration) VALUES ('027_multi_day_alerts')");
-    
-    echo "\nTOATE REPARAȚIILE AU FOST APLICATE! ✅\n";
-    echo "Acum poți salva template-ul cu multiple zile (ex: 30, 7, 3).";
+    echo "\nTOATE REPARAȚIILE DE INFRASTRUCTURĂ AU FOST APLICATE! ✅\n";
+    echo "Acum email-urile automate vor putea fi puse în coadă și trimise.";
 
 } catch (Exception $e) {
     echo "\nEROARE: " . $e->getMessage() . "\n";
