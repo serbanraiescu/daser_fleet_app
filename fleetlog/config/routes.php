@@ -61,15 +61,24 @@ $router->add('GET', '/tenant/reports/vehicle', 'ReportController@vehicleReport',
 $router->add('GET', '/tenant/reports/driver', 'ReportController@driverReport', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 
 // Driver Routes
-$router->add('GET', '/driver/dashboard', 'DriverController@dashboard', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
-$router->add('GET', '/driver/start-trip', 'TripController@showStartTrip', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
-$router->add('POST', '/driver/start-trip', 'TripController@start', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
-$router->add('GET', '/driver/end-trip', 'TripController@showEndTrip', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
-$router->add('POST', '/driver/end-trip', 'TripController@end', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
-$router->add('GET', '/driver/fueling', 'FuelingController@show', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
-$router->add('POST', '/driver/fueling', 'FuelingController@store', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
-$router->add('GET', '/driver/report-damage', 'DamageController@showReport', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
-$router->add('POST', '/driver/report-damage', 'DamageController@store', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$driverMiddleware = [
+    \FleetLog\App\Middleware\AuthMiddleware::class, 
+    \FleetLog\App\Middleware\TenantStatusMiddleware::class,
+    \FleetLog\App\Middleware\DriverProfileMiddleware::class
+];
+
+$router->add('GET', '/driver/complete-profile', 'DriverController@showCompleteProfile', [\FleetLog\App\Middleware\AuthMiddleware::class]);
+$router->add('POST', '/driver/complete-profile', 'DriverController@updateProfile', [\FleetLog\App\Middleware\AuthMiddleware::class]);
+
+$router->add('GET', '/driver/dashboard', 'DriverController@dashboard', $driverMiddleware);
+$router->add('GET', '/driver/start-trip', 'TripController@showStartTrip', $driverMiddleware);
+$router->add('POST', '/driver/start-trip', 'TripController@start', $driverMiddleware);
+$router->add('GET', '/driver/end-trip', 'TripController@showEndTrip', $driverMiddleware);
+$router->add('POST', '/driver/end-trip', 'TripController@end', $driverMiddleware);
+$router->add('GET', '/driver/fueling', 'FuelingController@show', $driverMiddleware);
+$router->add('POST', '/driver/fueling', 'FuelingController@store', $driverMiddleware);
+$router->add('GET', '/driver/report-damage', 'DamageController@showReport', $driverMiddleware);
+$router->add('POST', '/driver/report-damage', 'DamageController@store', $driverMiddleware);
 
 // QR Generation
 $router->add('GET', '/qr/generate', 'QrController@generate');
