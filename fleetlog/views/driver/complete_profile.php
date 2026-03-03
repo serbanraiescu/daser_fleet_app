@@ -31,7 +31,7 @@
             </div>
 
             <div>
-                <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Serie Permis</label>
+                <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Serie Permis (Punctul 5 din permis)</label>
                 <input type="text" name="license_series" required 
                        value="<?php echo $user['license_series'] ?? ''; ?>"
                        placeholder="Ex: B123456"

@@ -3,6 +3,7 @@
 namespace FleetLog\App\Repositories;
 
 use FleetLog\Core\DB;
+use FleetLog\Core\Auth;
 
 class UserRepository extends BaseRepository
 {
