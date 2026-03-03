@@ -6,14 +6,15 @@ ini_set('display_errors', 1);
  * Rulează acest script din browser: https://fleet.daserdesign.ro/test_all_emails.php
  */
 
+require_once __DIR__ . '/fleetlog/core/Autoloader.php';
 require_once __DIR__ . '/fleetlog/core/EnvLoader.php';
-require_once __DIR__ . '/fleetlog/core/DB.php';
-require_once __DIR__ . '/fleetlog/core/Auth.php';
-require_once __DIR__ . '/fleetlog/core/Mailer.php';
 
+use FleetLog\Core\Autoloader;
+use FleetLog\Core\EnvLoader;
 use FleetLog\Core\DB;
 use FleetLog\Core\Mailer;
-use FleetLog\Core\EnvLoader;
+
+Autoloader::register();
 
 header('Content-Type: text/plain; charset=utf-8');
 
@@ -57,9 +58,9 @@ foreach ($templates as $t) {
     }
     
     try {
-        // Trimitere forțată către adresa de test, ignorând tenant-ul
-        if (Mailer::send($targetEmail, "[TEST] " . $subject, $body, true)) {
-            echo "SUCCES\n";
+        // Trimitere forțată imediată (fără coadă) pentru feedback rapid în browser
+        if (EmailService::sendDirect($targetEmail, "[TEST] " . $subject, $body, null)) {
+            echo "SUCCES (Trimis direct)\n";
         } else {
             echo "EȘUAT (Verifică log-urile în aplicație)\n";
         }

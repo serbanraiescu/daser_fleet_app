@@ -4,6 +4,7 @@ namespace FleetLog\App\Controllers;
 
 use FleetLog\Core\Auth;
 use FleetLog\Core\DB;
+use FleetLog\Core\EmailService;
 
 class SuperAdminController extends BaseController
 {
@@ -191,7 +192,7 @@ class SuperAdminController extends BaseController
                 <p style='margin: 5px 0 0 0; font-size: 14px; color: #4b5563;'>Acest mesaj confirmă că sistemul de notificare este operațional și securizat (DKIM/SPF Pass).</p>
             </div>
 
-            <p style='font-size: 13px; color: #6b7280;'>Detalii tehnice: " . date('d.m.Y H:i:s') . " | Ref: " . \base_convert(\microtime(true), 10, 36) . "</p>
+            <p style='font-size: 13px; color: #6b7280;'>Detalii tehnice: " . date('d.m.Y H:i:s') . " | Ref: " . \base_convert((int)(\microtime(true) * 1000), 10, 36) . "</p>
         ";
 
         if (EmailService::sendDirect($to, $subject, $body, null)) {
