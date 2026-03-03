@@ -60,7 +60,7 @@ class Mailer
         return array_unique($emails);
     }
 
-    public static function sendTemplate(int $tenantId, string $templateSlug, array $placeholders = []): bool
+    public static function sendTemplate(int $tenantId, string $templateSlug, array $placeholders = [], bool $instant = false): bool
     {
         $template = DB::fetch("SELECT * FROM email_templates WHERE slug = ?", [$templateSlug]);
         if (!$template) return false;
@@ -78,7 +78,7 @@ class Mailer
 
         $success = true;
         foreach ($recipients as $to) {
-            if (!self::send($to, $subject, $body, true)) {
+            if (!self::send($to, $subject, $body, true, $instant)) {
                 $success = false;
             }
         }
@@ -86,10 +86,14 @@ class Mailer
         return $success;
     }
 
-    public static function send(string $to, string $subject, string $body, bool $isHtml = true): bool
+    public static function send(string $to, string $subject, string $body, bool $isHtml = true, bool $instant = false): bool
     {
         if ($isHtml) {
             $body = EmailService::wrapHtml($subject, $body);
+        }
+        
+        if ($instant) {
+            return EmailService::sendDirect($to, $subject, $body);
         }
         
         return EmailService::queue($to, $subject, $body);

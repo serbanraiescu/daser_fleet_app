@@ -79,7 +79,7 @@ class DamageController extends BaseController
                 'vehicle_plate' => $vehicle['license_plate'] ?? 'Unknown',
                 'driver_name' => $driver['name'],
                 'datetime' => $datetime
-            ]);
+            ], true);
         }
 
         $this->redirect('/driver/dashboard?success=damage_reported');
