@@ -152,18 +152,30 @@ class TenantController extends BaseController
 
     public function archiveVehicle(int $id): void
     {
+        $tenantId = Auth::tenantId();
+        error_log("Attempting to archive vehicle ID: $id for Tenant ID: $tenantId");
+
         $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
         $vehicle = $vehicleRepo->find($id);
 
-        if (!$vehicle || $vehicle['tenant_id'] !== Auth::tenantId()) {
+        if (!$vehicle) {
+            error_log("Archive failed: Vehicle $id not found.");
+            $this->redirect('/tenant/vehicles');
+        }
+
+        if ((int)$vehicle['tenant_id'] !== $tenantId) {
+            error_log("Archive failed: Tenant mismatch. Vehicle Tenant: " . $vehicle['tenant_id'] . ", Auth Tenant: " . $tenantId);
             $this->redirect('/tenant/vehicles');
         }
 
         $notes = trim($_POST['archive_notes'] ?? '');
+        error_log("Archive notes: " . $notes);
 
         if ($vehicleRepo->archiveVehicle($id, $notes)) {
+            error_log("Archive success for vehicle $id");
             $this->redirect('/tenant/vehicles?success=vehicle_archived');
         } else {
+            error_log("Archive failed in repository for vehicle $id");
             $this->redirect("/tenant/vehicles/archive/{$id}?error=archiving_failed");
         }
     }

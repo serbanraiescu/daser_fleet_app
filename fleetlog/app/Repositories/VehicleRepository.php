@@ -77,12 +77,20 @@ class VehicleRepository extends BaseRepository
 
     public function archiveVehicle(int $id, string $notes): bool
     {
-        $tenantId = Auth::tenantId();
-        $sql = "UPDATE vehicles SET status = 'archived', archive_notes = :notes WHERE id = :id AND tenant_id = :tenant_id";
-        return DB::query($sql, [
-            'notes' => $notes,
-            'id' => $id,
-            'tenant_id' => $tenantId
-        ])->rowCount() > 0;
+        try {
+            $tenantId = Auth::tenantId();
+            $sql = "UPDATE vehicles SET status = 'archived', archive_notes = :notes WHERE id = :id AND tenant_id = :tenant_id";
+            $res = DB::query($sql, [
+                'notes' => $notes,
+                'id' => $id,
+                'tenant_id' => $tenantId
+            ]);
+            $count = $res->rowCount();
+            error_log("VehicleRepository::archiveVehicle - Affected Rows: $count");
+            return $count > 0;
+        } catch (\Exception $e) {
+            error_log("VehicleRepository::archiveVehicle - ERROR: " . $e->getMessage());
+            return false;
+        }
     }
 }
