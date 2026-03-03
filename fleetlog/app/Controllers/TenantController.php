@@ -10,21 +10,98 @@ class TenantController extends BaseController
     public function dashboard(): void
     {
         $tenantId = Auth::tenantId();
+        $expenseRepo = new \FleetLog\App\Repositories\ExpenseRepository();
         
-        // V1 Basic Stats
-        // Use 'datetime' column for damage reports instead of 'created_at' if needed, 
-        // but 'created_at' is usually better for "recent" stats. 
-        // Let's make it more robust by just checking tenant_id first.
-        $stats = [
-            'vehicles_count' => DB::fetch("SELECT COUNT(*) as count FROM vehicles WHERE tenant_id = ?", [$tenantId])['count'],
-            'drivers_count' => DB::fetch("SELECT COUNT(*) as count FROM users WHERE tenant_id = ? AND role = 'driver'", [$tenantId])['count'],
-            'active_trips' => DB::fetch("SELECT COUNT(*) as count FROM trips WHERE tenant_id = ? AND status = 'open'", [$tenantId])['count'],
-            'recent_damages' => DB::fetch("SELECT COUNT(*) as count FROM damage_reports WHERE tenant_id = ? AND datetime > DATE_SUB(NOW(), INTERVAL 30 DAY)", [$tenantId])['count']
-        ];
+        // 1. Service Due Soon (within 1000km)
+        $serviceDue = $expenseRepo->getServiceDueVehicles($tenantId, 1000);
+        foreach ($serviceDue as &$veh) {
+            $lastMaint = $expenseRepo->getLastMaintenance($veh['id']);
+            $veh['last_maintenance_notes'] = $lastMaint['notes'] ?? 'No previous notes.';
+        }
+
+        // 2. Expiring Documents (RCA, ITP, Rovigneta within 30 days)
+        $expiringDocs = DB::fetchAll("
+            SELECT id, license_plate, make, model, 
+                   expiry_rca, expiry_itp, expiry_rovigneta
+            FROM vehicles 
+            WHERE tenant_id = ? 
+            AND status != 'archived'
+            AND (
+                (expiry_rca IS NOT NULL AND expiry_rca <= DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY)) OR 
+                (expiry_itp IS NOT NULL AND expiry_itp <= DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY)) OR 
+                (expiry_rovigneta IS NOT NULL AND expiry_rovigneta <= DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY))
+            )
+            ORDER BY GREATEST(
+                COALESCE(expiry_rca, '1970-01-01'), 
+                COALESCE(expiry_itp, '1970-01-01'), 
+                COALESCE(expiry_rovigneta, '1970-01-01')
+            ) ASC
+        ", [$tenantId]);
+
+        // 5. Fleet Status Distribution
+        $fleetStatus = DB::fetchAll("
+            SELECT status, COUNT(*) as count 
+            FROM vehicles 
+            WHERE tenant_id = ? AND status != 'archived'
+            GROUP BY status
+        ", [$tenantId]);
+        $statusCounts = [];
+        foreach ($fleetStatus as $row) { $statusCounts[$row['status']] = $row['count']; }
+
+        // 6. Active Trips
+        $activeTrips = DB::fetchAll("
+            SELECT t.*, v.license_plate, v.make, v.model, u.name as driver_name 
+            FROM trips t 
+            JOIN vehicles v ON t.vehicle_id = v.id 
+            JOIN users u ON t.driver_id = u.id 
+            WHERE t.tenant_id = ? AND t.status = 'open' 
+            ORDER BY t.start_time DESC
+        ", [$tenantId]);
+
+        // 8. Current Month Expenses
+        $currentMonthExpenses = DB::fetch("
+            SELECT SUM(cost) as total 
+            FROM vehicle_expenses 
+            WHERE tenant_id = ? 
+            AND MONTH(expense_date) = MONTH(CURRENT_DATE())
+            AND YEAR(expense_date) = YEAR(CURRENT_DATE())
+        ", [$tenantId])['total'] ?? 0;
+
+        // 9. Top 3 Costly Vehicles (Last 90 days)
+        $topCostly = DB::fetchAll("
+            SELECT v.id, v.license_plate, v.make, v.model, SUM(e.cost) as total_cost 
+            FROM vehicles v 
+            JOIN vehicle_expenses e ON v.id = e.vehicle_id 
+            WHERE v.tenant_id = ? 
+            AND e.expense_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 90 DAY)
+            GROUP BY v.id 
+            ORDER BY total_cost DESC 
+            LIMIT 3
+        ", [$tenantId]);
+
+        // 12. Monthly KM Driven
+        $monthlyKm = DB::fetch("
+            SELECT SUM(end_km - start_km) as total 
+            FROM trips 
+            WHERE tenant_id = ? 
+            AND status = 'closed'
+            AND MONTH(end_time) = MONTH(CURRENT_DATE())
+            AND YEAR(end_time) = YEAR(CURRENT_DATE())
+        ", [$tenantId])['total'] ?? 0;
 
         $this->render('tenant/dashboard', [
             'title' => 'Admin Dashboard',
-            'stats' => $stats
+            'stats' => [
+                'monthly_expenses' => $currentMonthExpenses,
+                'monthly_km' => $monthlyKm,
+                'active_trips_count' => count($activeTrips),
+                'fleet_status' => $statusCounts,
+                'total_vehicles' => array_sum($statusCounts)
+            ],
+            'serviceDue' => $serviceDue,
+            'expiringDocs' => $expiringDocs,
+            'activeTrips' => $activeTrips,
+            'topCostly' => $topCostly
         ]);
     }
 
