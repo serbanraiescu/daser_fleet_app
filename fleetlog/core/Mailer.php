@@ -200,20 +200,28 @@ class Mailer
             return false;
         }
         
-        $msgId = \sprintf("<%s.%s@%s>", \base_convert((string)\microtime(true), 10, 36), \base_convert(\bin2hex(\random_bytes(8)), 16, 36), ($_SERVER['HTTP_HOST'] ?? 'fleetlog.com'));
+        // Use an integer for base_convert to avoid deprecated warning with dots/spaces
+        $timestamp = (string)\round(\microtime(true) * 1000);
+        $msgId = \sprintf("<%s.%s@%s>", \base_convert($timestamp, 10, 36), \base_convert(\bin2hex(\random_bytes(8)), 16, 36), ($_SERVER['HTTP_HOST'] ?? 'fleetlog.com'));
 
         $headers = [
             'Date: ' . \date('r'),
             'To: ' . $to,
             'From: ' . "$fromName <$fromEmail>",
+            'Reply-To: ' . "$fromName <$fromEmail>",
+            'Return-Path: ' . "<$fromEmail>",
             'Subject: ' . "=?UTF-8?B?" . \base64_encode($subject) . "?=",
             'Message-ID: ' . $msgId,
             'MIME-Version: 1.0',
             'Content-Type: ' . ($isHtml ? 'text/html' : 'text/plain') . '; charset=utf-8',
+            'Content-Transfer-Encoding: 8bit',
             'X-Priority: 3 (Normal)',
             'X-Mailer: FleetLog-Custom-SMTP'
         ];
 
+        // Ensure CRLF for the body
+        $body = \str_replace(["\r\n", "\r", "\n"], "\r\n", $body);
+        
         $fullMsg = \implode("\r\n", $headers) . "\r\n\r\n" . $body . "\r\n.";
         \fputs($socket, $fullMsg . "\r\n");
         $res = $getResponse($socket);
@@ -222,7 +230,7 @@ class Mailer
         \fclose($socket);
 
         $success = (\strpos($res, '250') === 0);
-        self::logDelivery($to, $subject, $success, $success ? null : "Server response: $res");
+        self::logDelivery($to, $subject, $success, "Server: " . \trim($res));
 
         return $success;
     }
