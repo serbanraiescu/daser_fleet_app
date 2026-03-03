@@ -200,9 +200,9 @@ class Mailer
             return false;
         }
         
-        // Use an integer for base_convert to avoid deprecated warning with dots/spaces
         $timestamp = (string)\round(\microtime(true) * 1000);
         $msgId = \sprintf("<%s.%s@%s>", \base_convert($timestamp, 10, 36), \base_convert(\bin2hex(\random_bytes(8)), 16, 36), ($_SERVER['HTTP_HOST'] ?? 'fleetlog.com'));
+        $boundary = "----=_Part_" . \bin2hex(\random_bytes(12));
 
         $headers = [
             'Date: ' . \date('r'),
@@ -213,16 +213,33 @@ class Mailer
             'Subject: ' . "=?UTF-8?B?" . \base64_encode($subject) . "?=",
             'Message-ID: ' . $msgId,
             'MIME-Version: 1.0',
-            'Content-Type: ' . ($isHtml ? 'text/html' : 'text/plain') . '; charset=utf-8',
-            'Content-Transfer-Encoding: 8bit',
+            'Content-Type: multipart/alternative; boundary="' . $boundary . '"',
+            'Auto-Submitted: auto-generated',
+            'Precedence: bulk',
             'X-Priority: 3 (Normal)',
             'X-Mailer: FleetLog-Custom-SMTP'
         ];
 
-        // Ensure CRLF for the body
-        $body = \str_replace(["\r\n", "\r", "\n"], "\r\n", $body);
+        // Prepare Plain Text version
+        $textVersion = \strip_tags(\str_replace(['<br>', '<br/>', '</p>'], "\n", $body));
+        $textVersion = \trim(\html_entity_decode($textVersion, ENT_QUOTES, 'UTF-8'));
         
-        $fullMsg = \implode("\r\n", $headers) . "\r\n\r\n" . $body . "\r\n.";
+        // Ensure CRLF for both
+        $body = \str_replace(["\r\n", "\r", "\n"], "\r\n", $body);
+        $textVersion = \str_replace(["\r\n", "\r", "\n"], "\r\n", $textVersion);
+
+        // Build Multipart Body
+        $fullMsg = \implode("\r\n", $headers) . "\r\n\r\n";
+        $fullMsg .= "--$boundary\r\n";
+        $fullMsg .= "Content-Type: text/plain; charset=utf-8\r\n";
+        $fullMsg .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
+        $fullMsg .= $textVersion . "\r\n\r\n";
+        $fullMsg .= "--$boundary\r\n";
+        $fullMsg .= "Content-Type: text/html; charset=utf-8\r\n";
+        $fullMsg .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
+        $fullMsg .= $body . "\r\n\r\n";
+        $fullMsg .= "--$boundary--\r\n.";
+
         \fputs($socket, $fullMsg . "\r\n");
         $res = $getResponse($socket);
 
