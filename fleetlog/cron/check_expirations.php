@@ -14,18 +14,18 @@ EnvLoader::load(__DIR__ . '/../.env');
 echo "Checking for expiring vehicle documentation...\n";
 
 /**
- * Helper to process expiries for a specific type
+ * Helper to process expiries for a specific type (Vehicle or User)
  */
-function checkType(array $vehicle, string $dateField, string $templateSlug) {
-    if (empty($vehicle[$dateField])) return;
+function checkType(array $record, string $dateField, string $templateSlug, string $idType = 'vehicle_id') {
+    if (empty($record[$dateField])) return;
 
     // Fetch alert config
-    $template = DB::fetch("SELECT alert_days FROM email_templates WHERE slug = ?", [$templateSlug]);
+    $template = DB::fetch("SELECT alert_days, recipient_type FROM email_templates WHERE slug = ?", [$templateSlug]);
     if (!$template) return;
 
     $alertDays = array_map('intval', explode(',', $template['alert_days']));
     
-    $expiryDate = new DateTime($vehicle[$dateField]);
+    $expiryDate = new DateTime($record[$dateField]);
     $today = new DateTime();
     $today->setTime(0, 0, 0);
     $expiryDate->setTime(0, 0, 0);
@@ -33,27 +33,35 @@ function checkType(array $vehicle, string $dateField, string $templateSlug) {
     $interval = $today->diff($expiryDate);
     $diffDays = (int)$interval->format('%r%a');
 
-    // Only alert for future or today expiries (or very recently expired if we want, but let's stick to reminders)
     foreach ($alertDays as $day) {
         if ($diffDays == $day) {
-            // Check if already sent for this day
-            $alreadySent = DB::fetch("SELECT id FROM email_sent_track WHERE vehicle_id = ? AND template_slug = ? AND alert_day = ?", [
-                $vehicle['id'], $templateSlug, $day
+            // Check if already sent
+            $where = ($idType === 'vehicle_id') ? "vehicle_id = ?" : "user_id = ?";
+            $alreadySent = DB::fetch("SELECT id FROM email_sent_track WHERE $where AND template_slug = ? AND alert_day = ?", [
+                $record['id'], $templateSlug, $day
             ]);
 
             if (!$alreadySent) {
-                echo " - Queuing alert for vehicle {$vehicle['license_plate']}, template $templateSlug, day $day\n";
+                echo " - Queuing alert for " . ($idType === 'vehicle_id' ? "vehicle {$record['license_plate']}" : "driver {$record['name']}") . ", template $templateSlug, day $day\n";
                 
                 $placeholders = [
-                    'vehicle' => $vehicle['make'] . ' ' . $vehicle['model'] . ' (' . $vehicle['license_plate'] . ')',
-                    'vehicle_plate' => $vehicle['license_plate'],
-                    'expiry_date' => date('d.m.Y', strtotime($vehicle[$dateField])),
+                    'vehicle' => ($record['make'] ?? '') . ' ' . ($record['model'] ?? '') . ' (' . ($record['license_plate'] ?? '') . ')',
+                    'vehicle_plate' => $record['license_plate'] ?? '',
+                    'driver_name' => $record['name'] ?? 'Unknown',
+                    'expiry_date' => date('d.m.Y', strtotime($record[$dateField])),
                     'days' => $day
                 ];
 
-                if (Mailer::sendTemplate((int)$vehicle['tenant_id'], $templateSlug, $placeholders)) {
-                    DB::query("INSERT INTO email_sent_track (tenant_id, vehicle_id, template_slug, alert_day) VALUES (?, ?, ?, ?)", [
-                        $vehicle['tenant_id'], $vehicle['id'], $templateSlug, $day
+                // Determine recipient
+                $explicitTo = null;
+                if ($idType === 'user_id' && !empty($record['email'])) {
+                    $explicitTo = $record['email'];
+                }
+
+                if (Mailer::sendTemplate((int)$record['tenant_id'], $templateSlug, $placeholders, false, $explicitTo)) {
+                    $col = ($idType === 'vehicle_id') ? 'vehicle_id' : 'user_id';
+                    DB::query("INSERT INTO email_sent_track (tenant_id, $col, template_slug, alert_day) VALUES (?, ?, ?, ?)", [
+                        $record['tenant_id'], $record['id'], $templateSlug, $day
                     ]);
                 }
             }
@@ -61,13 +69,19 @@ function checkType(array $vehicle, string $dateField, string $templateSlug) {
     }
 }
 
-// Fetch all active vehicles
+// 1. VEHICLE EXPIRATIONS
 $vehicles = DB::fetchAll("SELECT * FROM vehicles WHERE status = 'active'");
-
 foreach ($vehicles as $v) {
     checkType($v, 'expiry_rca', 'expiry_alert_rca');
     checkType($v, 'expiry_itp', 'expiry_alert_itp');
     checkType($v, 'expiry_rovigneta', 'expiry_alert_rovigneta');
+}
+
+// 2. DRIVER EXPIRATIONS
+$drivers = DB::fetchAll("SELECT * FROM users WHERE role = 'driver' AND active = 1");
+foreach ($drivers as $d) {
+    checkType($d, 'id_expiry', 'expiry_alert_id', 'user_id');
+    checkType($d, 'license_expiry', 'expiry_alert_license', 'user_id');
 }
 
 echo "Done.\n";

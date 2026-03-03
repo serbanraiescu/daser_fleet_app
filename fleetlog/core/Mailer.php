@@ -60,12 +60,17 @@ class Mailer
         return array_unique($emails);
     }
 
-    public static function sendTemplate(int $tenantId, string $templateSlug, array $placeholders = [], bool $instant = false): bool
+    public static function sendTemplate(int $tenantId, string $templateSlug, array $placeholders = [], bool $instant = false, $explicitTo = null): bool
     {
         $template = DB::fetch("SELECT * FROM email_templates WHERE slug = ?", [$templateSlug]);
         if (!$template) return false;
 
-        $recipients = self::getRecipientEmail($tenantId, $templateSlug);
+        if ($explicitTo) {
+            $recipients = is_array($explicitTo) ? $explicitTo : [$explicitTo];
+        } else {
+            $recipients = self::getRecipientEmail($tenantId, $templateSlug);
+        }
+
         if (empty($recipients)) return false;
 
         $subject = $template['subject'];
