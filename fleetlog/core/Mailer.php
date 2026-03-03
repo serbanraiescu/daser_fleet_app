@@ -29,18 +29,32 @@ class Mailer
         return self::$settings;
     }
 
-    public static function getRecipientEmail(int $tenantId, string $templateSlug): ?string
+    public static function getRecipientEmail(int $tenantId, string $templateSlug): array
     {
+        $emails = [];
         $template = DB::fetch("SELECT recipient_type FROM email_templates WHERE slug = ?", [$templateSlug]);
-        if (!$template) return null;
+        if (!$template) return [];
 
         if ($template['recipient_type'] === 'admin') {
             $admin = DB::fetch("SELECT email FROM users WHERE tenant_id = ? AND role = 'tenant_admin' AND active = 1 LIMIT 1", [$tenantId]);
-            return $admin['email'] ?? null;
+            if ($admin) $emails[] = $admin['email'];
+        } else {
+            $tenant = DB::fetch("SELECT email, notification_emails FROM tenants WHERE id = ?", [$tenantId]);
+            if ($tenant) {
+                if ($tenant['email']) $emails[] = $tenant['email'];
+                if ($tenant['notification_emails']) {
+                    $others = explode(',', $tenant['notification_emails']);
+                    foreach ($others as $email) {
+                        $email = trim($email);
+                        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                            $emails[] = $email;
+                        }
+                    }
+                }
+            }
         }
 
-        $tenant = DB::fetch("SELECT email FROM tenants WHERE id = ?", [$tenantId]);
-        return $tenant['email'] ?? null;
+        return array_unique($emails);
     }
 
     public static function sendTemplate(int $tenantId, string $templateSlug, array $placeholders = []): bool
@@ -48,8 +62,8 @@ class Mailer
         $template = DB::fetch("SELECT * FROM email_templates WHERE slug = ?", [$templateSlug]);
         if (!$template) return false;
 
-        $to = self::getRecipientEmail($tenantId, $templateSlug);
-        if (!$to) return false;
+        $recipients = self::getRecipientEmail($tenantId, $templateSlug);
+        if (empty($recipients)) return false;
 
         $subject = $template['subject'];
         $body = $template['body'];
@@ -59,7 +73,14 @@ class Mailer
             $body = \str_replace('{' . $key . '}', $value, $body);
         }
 
-        return self::send($to, $subject, $body, true);
+        $success = true;
+        foreach ($recipients as $to) {
+            if (!self::send($to, $subject, $body, true)) {
+                $success = false;
+            }
+        }
+
+        return $success;
     }
 
     private static function wrapHtml(string $title, string $content): string

@@ -35,7 +35,8 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <a href="/admin/tenants/impersonate/<?php echo $tenant['id']; ?>" class="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded inline-block mr-2">Impersonate</a>
-                        <a href="/admin/tenants/edit/<?php echo $tenant['id']; ?>" class="text-slate-600 hover:text-slate-900 font-bold">Edit</a>
+                        <a href="/admin/tenants/edit/<?php echo $tenant['id']; ?>" class="text-slate-600 hover:text-slate-900 font-bold mr-2">Edit</a>
+                        <a href="/admin/tenants/delete/<?php echo $tenant['id']; ?>" class="text-red-600 hover:text-red-900 font-bold" onclick="return confirm('Are you sure you want to delete this tenant? This action is permanent and will delete all associated data.');">Delete</a>
                     </td>
                 </tr>
                 <?php endforeach; ?>

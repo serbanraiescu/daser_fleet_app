@@ -27,6 +27,19 @@
                        class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all">
             </div>
 
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Contact Phone</label>
+                    <input type="text" name="contact_phone" value="<?php echo $tenant['contact_phone'] ?? ''; ?>"
+                           class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="e.g. +40722123456">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Notification Phone (SMS)</label>
+                    <input type="text" name="notification_phone" value="<?php echo $tenant['notification_phone'] ?? ''; ?>"
+                           class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="e.g. +40722987654">
+                </div>
+            </div>
+
             <div>
                 <label class="block text-sm font-bold text-slate-700 mb-2">Account Status</label>
                 <select name="status" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all cursor-pointer">

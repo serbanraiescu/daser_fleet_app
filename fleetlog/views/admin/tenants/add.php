@@ -24,6 +24,19 @@
                     <input type="text" name="cui" placeholder="RO12345678" required
                            class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all">
                 </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Contact Phone</label>
+                        <input type="text" name="contact_phone" placeholder="+40..."
+                               class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Notification Phone</label>
+                        <input type="text" name="notification_phone" placeholder="+40..."
+                               class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all">
+                    </div>
+                </div>
             </div>
 
             <h2 class="text-lg font-bold text-slate-800 border-b pb-2 mb-4 mt-8">Admin Account</h2>

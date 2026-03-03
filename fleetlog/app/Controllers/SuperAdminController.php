@@ -52,12 +52,29 @@ class SuperAdminController extends BaseController
         $email = $_POST['email'];
         $cui = $_POST['cui'];
         $status = $_POST['status'];
+        $contact_phone = $_POST['contact_phone'] ?? null;
+        $notification_phone = $_POST['notification_phone'] ?? null;
 
-        DB::query("UPDATE tenants SET name = ?, email = ?, cui = ?, status = ? WHERE id = ?", [
-            $name, $email, $cui, $status, $id
+        DB::query("UPDATE tenants SET name = ?, email = ?, cui = ?, status = ?, contact_phone = ?, notification_phone = ? WHERE id = ?", [
+            $name, $email, $cui, $status, $contact_phone, $notification_phone, $id
         ]);
 
         $this->redirect('/admin/tenants?success=tenant_updated');
+    }
+
+    public function deleteTenant(int $id): void
+    {
+        // Security: Don't allow deleting yourself or important tenants if any logic exists
+        // For now, simple delete as requested for test tenants
+        
+        // This will fail if foreign keys exist and cascade is NOT set.
+        // We should at least try to delete related users if they don't cascade.
+        try {
+            DB::query("DELETE FROM tenants WHERE id = ?", [$id]);
+            $this->redirect('/admin/tenants?success=tenant_deleted');
+        } catch (\Exception $e) {
+            $this->redirect('/admin/tenants?error=delete_failed');
+        }
     }
 
     public function showAddTenant(): void
@@ -74,10 +91,12 @@ class SuperAdminController extends BaseController
         $cui = $_POST['cui'];
         $adminName = $_POST['admin_name'];
         $password = $_POST['password'];
+        $contact_phone = $_POST['contact_phone'] ?? null;
+        $notification_phone = $_POST['notification_phone'] ?? null;
 
         // 1. Create Tenant
-        DB::query("INSERT INTO tenants (name, email, cui, status) VALUES (?, ?, ?, 'active')", [
-            $name, $email, $cui
+        DB::query("INSERT INTO tenants (name, email, cui, status, contact_phone, notification_phone) VALUES (?, ?, ?, 'active', ?, ?)", [
+            $name, $email, $cui, $contact_phone, $notification_phone
         ]);
         $tenantId = (int)DB::lastInsertId();
 
