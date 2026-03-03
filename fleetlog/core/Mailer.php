@@ -225,17 +225,14 @@ class Mailer
             'Date: ' . \date('r'),
             'To: ' . $to,
             'From: ' . "$fromName <$fromEmail>",
-            'Sender: ' . "$fromName <$fromEmail>",
             'Reply-To: ' . "$fromName <$fromEmail>",
             'Return-Path: ' . "<$fromEmail>",
             'Subject: ' . "=?UTF-8?B?" . \base64_encode($subject) . "?=",
             'Message-ID: ' . $msgId,
             'MIME-Version: 1.0',
             'Content-Type: multipart/alternative; boundary="' . $boundary . '"',
-            'Auto-Submitted: auto-generated',
-            'X-Auto-Response-Suppress: All',
-            'X-Priority: 3 (Normal)',
-            'X-Mailer: FleetLog-Custom-SMTP'
+            'List-Unsubscribe: <mailto:' . $fromEmail . '?subject=unsubscribe>',
+            'X-Priority: 3 (Normal)'
         ];
 
         // Ensure CRLF for both
@@ -246,12 +243,12 @@ class Mailer
         $fullMsg = \implode("\r\n", $headers) . "\r\n\r\n";
         $fullMsg .= "--$boundary\r\n";
         $fullMsg .= "Content-Type: text/plain; charset=utf-8\r\n";
-        $fullMsg .= "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
-        $fullMsg .= \quoted_printable_encode($textVersion) . "\r\n\r\n";
+        $fullMsg .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
+        $fullMsg .= $textVersion . "\r\n\r\n";
         $fullMsg .= "--$boundary\r\n";
         $fullMsg .= "Content-Type: text/html; charset=utf-8\r\n";
-        $fullMsg .= "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
-        $fullMsg .= \quoted_printable_encode($body) . "\r\n\r\n";
+        $fullMsg .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
+        $fullMsg .= $body . "\r\n\r\n";
         $fullMsg .= "--$boundary--\r\n.";
 
         \fputs($socket, $fullMsg . "\r\n");
