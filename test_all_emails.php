@@ -13,6 +13,7 @@ use FleetLog\Core\Autoloader;
 use FleetLog\Core\EnvLoader;
 use FleetLog\Core\DB;
 use FleetLog\Core\Mailer;
+use FleetLog\Core\EmailService;
 
 Autoloader::register();
 

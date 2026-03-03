@@ -164,7 +164,7 @@ class EmailService
      */
     public static function log(string $to, string $subject, string $status, string $error = '', string $response = ''): void
     {
-        DB::query("INSERT INTO email_log (recipient, subject, status, error_message, provider_response) VALUES (?, ?, ?, ?, ?)", [
+        DB::query("INSERT INTO email_logs (recipient, subject, status, error_message, provider_response) VALUES (?, ?, ?, ?, ?)", [
             $to, $subject, $status, $error, $response
         ]);
     }
