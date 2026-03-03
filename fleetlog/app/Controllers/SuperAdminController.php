@@ -122,9 +122,12 @@ class SuperAdminController extends BaseController
             $settings[$s['key']] = $s['value'];
         }
 
+        $emailLogs = DB::fetchAll("SELECT * FROM email_logs ORDER BY created_at DESC LIMIT 50");
+
         $this->render('admin/settings', [
             'title' => 'System Settings',
-            'settings' => $settings
+            'settings' => $settings,
+            'emailLogs' => $emailLogs
         ]);
     }
 

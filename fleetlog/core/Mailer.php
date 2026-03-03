@@ -200,7 +200,7 @@ class Mailer
             return false;
         }
         
-        $msgId = \sprintf("<%s.%s@%s>", \base_convert(\microtime(), 10, 36), \base_convert(\bin2hex(\random_bytes(8)), 16, 36), ($_SERVER['HTTP_HOST'] ?? 'fleetlog.com'));
+        $msgId = \sprintf("<%s.%s@%s>", \base_convert((string)\microtime(true), 10, 36), \base_convert(\bin2hex(\random_bytes(8)), 16, 36), ($_SERVER['HTTP_HOST'] ?? 'fleetlog.com'));
 
         $headers = [
             'Date: ' . \date('r'),
@@ -221,6 +221,20 @@ class Mailer
         $sendCommand($socket, "QUIT");
         \fclose($socket);
 
-        return (\strpos($res, '250') === 0);
+        $success = (\strpos($res, '250') === 0);
+        self::logDelivery($to, $subject, $success, $success ? null : "Server response: $res");
+
+        return $success;
+    }
+
+    private static function logDelivery(string $to, string $subject, bool $success, ?string $error = null): void
+    {
+        try {
+            DB::query("INSERT INTO email_logs (recipient, subject, status, error_message) VALUES (?, ?, ?, ?)", [
+                $to, $subject, $success ? 'success' : 'failed', $error
+            ]);
+        } catch (\Exception $e) {
+            \error_log("Failed to log email delivery: " . $e->getMessage());
+        }
     }
 }
