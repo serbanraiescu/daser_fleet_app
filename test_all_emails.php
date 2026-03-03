@@ -11,8 +11,12 @@ require_once __DIR__ . '/fleetlog/core/Mailer.php';
 
 use FleetLog\Core\DB;
 use FleetLog\Core\Mailer;
+use FleetLog\Core\EnvLoader;
 
 header('Content-Type: text/plain; charset=utf-8');
+
+// Initialize Environment
+EnvLoader::load(__DIR__ . '/fleetlog/.env');
 
 $targetEmail = 'serbanraiescu@yahoo.com';
 echo "Începere test trimitere catre: $targetEmail\n";

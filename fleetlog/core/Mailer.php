@@ -225,14 +225,17 @@ class Mailer
             'Date: ' . \date('r'),
             'To: ' . $to,
             'From: ' . "$fromName <$fromEmail>",
+            'Sender: ' . "$fromName <$fromEmail>",
             'Reply-To: ' . "$fromName <$fromEmail>",
             'Return-Path: ' . "<$fromEmail>",
             'Subject: ' . "=?UTF-8?B?" . \base64_encode($subject) . "?=",
             'Message-ID: ' . $msgId,
             'MIME-Version: 1.0',
             'Content-Type: multipart/alternative; boundary="' . $boundary . '"',
-            'List-Unsubscribe: <mailto:' . $fromEmail . '?subject=unsubscribe>',
-            'X-Priority: 3 (Normal)'
+            'Auto-Submitted: auto-generated',
+            'X-Auto-Response-Suppress: All',
+            'X-Priority: 3 (Normal)',
+            'X-Mailer: FleetLog-Custom-SMTP'
         ];
 
         // Ensure CRLF for both
