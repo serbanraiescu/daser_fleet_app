@@ -77,7 +77,14 @@ document.getElementById('runDiagnosticBtn').addEventListener('click', async func
 
     try {
         const response = await fetch('/admin/run-self-test', { method: 'POST' });
-        const data = await response.json();
+        const text = await response.text();
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch(e) {
+            console.error('Raw response:', text);
+            throw new Error('Server returned non-JSON response. Check console.');
+        }
         
         if (data.success) {
             Object.entries(data.checks).forEach(([key, ok]) => {

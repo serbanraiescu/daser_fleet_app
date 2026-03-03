@@ -40,35 +40,43 @@ class SuperAdminController extends BaseController
 
     public function runSelfTest(): void
     {
-        $results = [
-            'database' => true,
-            'mailer' => false,
-            'storage' => true,
-            'cron' => false
-        ];
-
-        // 1. DB Check
         try {
-            DB::query("SELECT 1");
-            $results['database'] = true;
-        } catch (\Exception $e) { $results['database'] = false; }
+            $results = [
+                'database' => false,
+                'mailer' => false,
+                'storage' => false,
+                'cron' => false
+            ];
 
-        // 2. Mailer Check (Settings exists?)
-        $settings = $this->settingsData();
-        $results['mailer'] = !empty($settings['smtp_host']) && !empty($settings['smtp_user']);
+            // 1. DB Check
+            try {
+                DB::query("SELECT 1");
+                $results['database'] = true;
+            } catch (\Exception $e) {}
 
-        // 3. Storage Check
-        $results['storage'] = is_writable(dirname(__DIR__, 2) . '/public/uploads');
+            // 2. Mailer Check
+            $settings = $this->settingsData();
+            $results['mailer'] = !empty($settings['smtp_host']) && !empty($settings['smtp_user']);
 
-        // 4. Cron Check (Check if check_expirations ran in last 25h)
-        // We'll just check if email_sent_track has entries within last 2 days for now as a proxy
-        $lastCron = DB::fetch("SELECT created_at FROM email_sent_track ORDER BY created_at DESC LIMIT 1");
-        if ($lastCron) {
-            $diff = time() - strtotime($lastCron['created_at']);
-            $results['cron'] = ($diff < 90000); // 25 hours
+            // 3. Storage Check - Root is 3 levels up from App/Controllers
+            $rootPath = dirname(dirname(dirname(__DIR__)));
+            $uploadsPath = $rootPath . '/public/uploads';
+            if (!is_dir($uploadsPath)) {
+                @mkdir($uploadsPath, 0755, true);
+            }
+            $results['storage'] = is_writable($uploadsPath);
+
+            // 4. Cron Check
+            $lastCron = DB::fetch("SELECT created_at FROM email_sent_track ORDER BY created_at DESC LIMIT 1");
+            if ($lastCron) {
+                $diff = time() - strtotime($lastCron['created_at']);
+                $results['cron'] = ($diff < 90000); // 25 hours
+            }
+
+            $this->json(['success' => true, 'checks' => $results]);
+        } catch (\Exception $e) {
+            $this->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
-
-        $this->json(['success' => true, 'checks' => $results]);
     }
 
     private function settingsData(): array
