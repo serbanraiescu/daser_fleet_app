@@ -1,7 +1,21 @@
-<div class="mb-6">
-    <h1 class="text-2xl font-bold text-slate-800">Email Templates & Logs</h1>
-    <p class="text-slate-500">Customize notification messages and monitor delivery status.</p>
+<div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">Email Templates & Logs</h1>
+        <p class="text-slate-500">Customize notification messages and monitor delivery status.</p>
+    </div>
+    <div class="flex items-center space-x-3">
+        <a href="/admin/email-templates/run-check" class="px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-md flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Run Expiry Check Now
+        </a>
+    </div>
 </div>
+
+<?php if (isset($_SESSION['flash_success'])): ?>
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+        <?php echo $_SESSION['flash_success']; unset($_SESSION['flash_success']); ?>
+    </div>
+<?php endif; ?>
 
 <?php if (isset($_GET['success'])): ?>
     <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">

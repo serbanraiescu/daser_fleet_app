@@ -23,6 +23,8 @@ $router->add('POST', '/admin/settings/test-email', 'SuperAdminController@sendTes
 $router->add('GET', '/admin/email-templates', 'SuperAdminController@emailTemplates', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('GET', '/admin/email-templates/edit/{id}', 'SuperAdminController@editEmailTemplate', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('POST', '/admin/email-templates/edit/{id}', 'SuperAdminController@updateEmailTemplate', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
+$router->add('GET', '/admin/email-templates/preview/{id}', 'SuperAdminController@previewTemplate', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
+$router->add('GET', '/admin/email-templates/run-check', 'SuperAdminController@runExpirationCheck', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 
 // Tenant Admin Routes
 $router->add('GET', '/tenant/dashboard', 'TenantController@dashboard', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);

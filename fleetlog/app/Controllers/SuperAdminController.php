@@ -166,13 +166,58 @@ class SuperAdminController extends BaseController
     {
         $subject = $_POST['subject'];
         $body = $_POST['body'];
-        $alertDays = (int)$_POST['alert_days'];
+        $alertDays = $_POST['alert_days']; // Keep as string for multi-day support
         $recipientType = $_POST['recipient_type'];
 
         DB::query("UPDATE email_templates SET subject = ?, body = ?, alert_days = ?, recipient_type = ? WHERE id = ?", [
             $subject, $body, $alertDays, $recipientType, $id
         ]);
         $this->redirect('/admin/email-templates?success=1');
+    }
+
+    public function previewTemplate(int $id): void
+    {
+        $template = DB::fetch("SELECT * FROM email_templates WHERE id = ?", [$id]);
+        if (!$template) {
+            $this->redirect('/admin/email-templates');
+        }
+
+        // Mock data for preview
+        $placeholders = [
+            'vehicle' => 'DACIA DUSTER (B-123-ABC)',
+            'vehicle_plate' => 'B-123-ABC',
+            'expiry_date' => date('d.m.Y', strtotime('+7 days')),
+            'days' => '7',
+            'driver_name' => 'Ion Popescu',
+            'datetime' => date('d.m.Y H:i')
+        ];
+
+        $subject = $template['subject'];
+        $body = $template['body'];
+
+        foreach ($placeholders as $key => $value) {
+            $subject = str_replace('{' . $key . '}', $value, $subject);
+            $body = str_replace('{' . $key . '}', $value, $body);
+        }
+
+        // Wrap in HTML but show in a modal-like or simple preview page
+        $html = EmailService::wrapHtml("[PREVIEW] " . $subject, $body);
+        
+        echo $html;
+        echo "<div style='position: fixed; top: 0; left: 0; width: 100%; background: #000; color: #fff; padding: 10px; text-align: center; font-family: sans-serif; z-index: 9999;'>
+                MOD PREVIZUALIZARE - <a href='javascript:window.close()' style='color: #3b82f6;'>Închide Fereastra</a>
+              </div>";
+        exit;
+    }
+
+    public function runExpirationCheck(): void
+    {
+        $output = [];
+        $cmd = "php " . escapeshellarg(dirname(__DIR__, 2) . '/cron/check_expirations.php');
+        exec($cmd, $output);
+        
+        $_SESSION['flash_success'] = "Verificarea expirărilor a fost rulată manual. " . count($output) . " linii de log procesate.";
+        $this->redirect('/admin/email-templates');
     }
 
     public function sendTestEmail(): void

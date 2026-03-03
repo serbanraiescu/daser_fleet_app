@@ -12,13 +12,13 @@
             <form action="/admin/email-templates/edit/<?php echo $template['id']; ?>" method="POST" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">Days Before Expiry</label>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Days Before Expiry (intervals)</label>
                         <div class="flex items-center">
-                            <input type="number" name="alert_days" value="<?php echo (int)$template['alert_days']; ?>" required min="0" max="365"
+                            <input type="text" name="alert_days" value="<?php echo htmlspecialchars($template['alert_days']); ?>" required 
+                                   placeholder="e.g. 30, 7, 3"
                                    class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all">
-                            <span class="ml-3 text-slate-500 text-sm">days</span>
                         </div>
-                        <p class="text-xs text-slate-400 mt-1">Only relevant for expiry alerts (ITP, RCA, etc).</p>
+                        <p class="text-xs text-slate-400 mt-1">Separate multiple days with commas (e.g. 30, 7, 3).</p>
                     </div>
 
                     <div>
@@ -45,6 +45,10 @@
 
                 <div class="pt-6 border-t flex items-center justify-end space-x-4">
                     <a href="/admin/email-templates" class="text-slate-600 font-bold">Cancel</a>
+                    <a href="/admin/email-templates/preview/<?php echo $template['id']; ?>" target="_blank" 
+                       class="px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-all border border-slate-200">
+                        Preview Template
+                    </a>
                     <button type="submit" class="px-10 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all shadow-md">
                         Save Template
                     </button>
