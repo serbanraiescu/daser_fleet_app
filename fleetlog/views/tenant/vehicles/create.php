@@ -105,6 +105,11 @@
                     <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Expirare Trusă Medicală</label>
                     <input type="date" name="medical_kit_expiry" class="w-full text-xs px-2 py-1.5 border border-slate-300 rounded">
                 </div>
+
+                <div class="pt-2">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Expirare Stingător</label>
+                    <input type="date" name="extinguisher_expiry" class="w-full text-xs px-2 py-1.5 border border-slate-300 rounded">
+                </div>
             </div>
         </div>
     </div>
