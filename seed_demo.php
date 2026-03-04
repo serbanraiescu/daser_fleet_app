@@ -25,7 +25,7 @@ try {
         $tenantId = $existing['id'];
         echo "Updating existing Demo Tenant (ID: $tenantId)...\n";
     } else {
-        DB::query("INSERT INTO tenants (name, email, plan) VALUES (?, ?, 'pro')", [$tenantName, $tenantEmail]);
+        DB::query("INSERT INTO tenants (name, email, status) VALUES (?, ?, 'active')", [$tenantName, $tenantEmail]);
         $tenantId = DB::lastInsertId();
         echo "Created Demo Tenant (ID: $tenantId).\n";
     }

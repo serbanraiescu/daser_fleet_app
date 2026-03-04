@@ -352,4 +352,9 @@ class SuperAdminController extends BaseController
         }
         $this->redirect('/admin/settings');
     }
+
+    public function presentation(): void
+    {
+        $this->render('admin/presentation', ['title' => 'FleetLog Platform Presentation']);
+    }
 }
