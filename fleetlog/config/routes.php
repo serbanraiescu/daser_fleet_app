@@ -12,6 +12,7 @@ $router->add('GET', '/admin/stop-impersonation', 'AuthController@stopImpersonati
 // Super Admin Routes
 $router->add('GET', '/admin/dashboard', 'SuperAdminController@dashboard', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('GET', '/admin/status', 'SuperAdminController@status', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
+$router->add('GET', '/admin/presentation', 'SuperAdminController@presentation', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('POST', '/admin/run-self-test', 'SuperAdminController@runSelfTest', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 
 $router->add('GET', '/admin/tenants', 'SuperAdminController@tenants', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
