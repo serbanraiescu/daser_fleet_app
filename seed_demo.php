@@ -87,7 +87,7 @@ try {
         for ($i = 0; $i < 5; $i++) {
             $start = rand(10, 100);
             $dId = $driverIds[array_rand($driverIds)];
-            DB::query("INSERT INTO trips (tenant_id, vehicle_id, driver_id, start_km, end_km, start_time, end_time, status) VALUES (?, ?, ?, ?, ?, NOW() - INTERVAL ? DAY, NOW() - INTERVAL ? DAY + INTERVAL 2 HOUR, 'closed')", [
+            DB::query("INSERT INTO trips (tenant_id, vehicle_id, driver_id, type, start_km, end_km, start_time, end_time, status) VALUES (?, ?, ?, 'CURSE', ?, ?, NOW() - INTERVAL ? DAY, NOW() - INTERVAL ? DAY + INTERVAL 2 HOUR, 'closed')", [
                 $tenantId, $vId, $dId, $v['km'] - ($i * 150) - $start, $v['km'] - ($i * 150), $i + 1, $i + 1
             ]);
         }
