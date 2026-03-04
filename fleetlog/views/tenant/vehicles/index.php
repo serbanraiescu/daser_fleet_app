@@ -51,8 +51,7 @@ $archivedVehicles = $archivedVehicles ?? [];
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Odometer</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Expiries (Act/Ec)</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Inventar</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Status & Actions</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-slate-200">
@@ -121,72 +120,71 @@ $archivedVehicles = $archivedVehicles ?? [];
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center space-x-1.5">
+                            <div class="flex items-center space-x-2">
                                 <!-- Triangles -->
-                                <div title="Triunghiuri: <?php echo $vehicle['has_triangles'] ?? 0; ?>" class="w-6 h-6 rounded flex items-center justify-center <?php echo ($vehicle['has_triangles'] ?? 0) > 0 ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-slate-50 text-slate-300 border border-slate-100'; ?>">
-                                    <span class="text-[9px] font-black"><?php echo ($vehicle['has_triangles'] ?? 0); ?>Δ</span>
+                                <div title="Triunghiuri: <?php echo $vehicle['has_triangles'] ?? 0; ?>" class="w-10 h-10 rounded-lg flex items-center justify-center <?php echo ($vehicle['has_triangles'] ?? 0) > 0 ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-slate-50 text-slate-300 border border-slate-100'; ?>">
+                                    <span class="text-xs font-black"><?php echo ($vehicle['has_triangles'] ?? 0); ?>Δ</span>
                                 </div>
                                 <!-- Vests -->
-                                <div title="Veste: <?php echo $vehicle['has_vest'] ?? 0; ?>" class="w-6 h-6 rounded flex items-center justify-center <?php echo ($vehicle['has_vest'] ?? 0) > 0 ? 'bg-amber-50 text-amber-600 border border-amber-100' : 'bg-slate-50 text-slate-300 border border-slate-100'; ?>">
-                                    <span class="text-[9px] font-black"><?php echo ($vehicle['has_vest'] ?? 0); ?>V</span>
+                                <div title="Veste: <?php echo $vehicle['has_vest'] ?? 0; ?>" class="w-10 h-10 rounded-lg flex items-center justify-center <?php echo ($vehicle['has_vest'] ?? 0) > 0 ? 'bg-amber-50 text-amber-600 border border-amber-100' : 'bg-slate-50 text-slate-300 border border-slate-100'; ?>">
+                                    <span class="text-xs font-black"><?php echo ($vehicle['has_vest'] ?? 0); ?>V</span>
                                 </div>
                                 <!-- Jack -->
-                                <div title="Cric: <?php echo !empty($vehicle['has_jack']) ? 'Da' : 'Nu'; ?>" class="w-6 h-6 rounded flex items-center justify-center <?php echo !empty($vehicle['has_jack']) ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-slate-50 text-slate-300 border border-slate-100'; ?>">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                                <div title="Cric: <?php echo !empty($vehicle['has_jack']) ? 'Da' : 'Nu'; ?>" class="w-10 h-10 rounded-lg flex items-center justify-center <?php echo !empty($vehicle['has_jack']) ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-slate-50 text-slate-300 border border-slate-100'; ?>">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                                 </div>
                                 <!-- Spare Wheel -->
-                                <div title="Roată Rezervă: <?php echo (isset($vehicle['has_spare_wheel']) ? (bool)$vehicle['has_spare_wheel'] : true) ? 'Da' : 'Nu'; ?>" class="w-6 h-6 rounded flex items-center justify-center <?php echo (isset($vehicle['has_spare_wheel']) ? (bool)$vehicle['has_spare_wheel'] : true) ? 'bg-indigo-50 text-indigo-600 border border-indigo-100' : 'bg-slate-50 text-slate-300 border border-slate-100'; ?>">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="relative inline-block text-left group/status">
-                                <?php
-                                    $status = $vehicle['status'] ?? 'active';
-                                    $statusColors = [
-                                        'active' => 'bg-green-100 text-green-800 border-green-200',
-                                        'inactive' => 'bg-slate-100 text-slate-600 border-slate-200',
-                                        'service' => 'bg-orange-100 text-orange-800 border-orange-200',
-                                        'archived' => 'bg-red-100 text-red-800 border-red-200'
-                                    ];
-                                    $color = $statusColors[$status] ?? 'bg-slate-100 text-slate-800';
-                                ?>
-                                <button type="button" class="px-3 py-1.5 inline-flex items-center text-xs font-black rounded-xl justify-center border shadow-sm transition-all hover:shadow-md <?php echo $color; ?>">
-                                    <?php echo ucfirst($status); ?>
-                                    <svg class="ml-1.5 w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                </button>
-                                
-                                <div class="absolute left-0 mt-1 w-32 rounded-2xl bg-white shadow-xl border border-slate-100 opacity-0 invisible group-hover/status:opacity-100 group-hover/status:visible transition-all duration-200 z-50 p-1">
-                                    <?php if ($status !== 'active'): ?>
-                                        <a href="/tenant/vehicles/status/<?php echo $vehicle['id']; ?>/active" class="flex items-center px-3 py-2 text-[10px] font-black uppercase text-slate-600 hover:bg-green-50 hover:text-green-700 rounded-xl transition-colors">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-2"></span> Active
-                                        </a>
-                                    <?php endif; ?>
-                                    <?php if ($status !== 'service'): ?>
-                                        <a href="/tenant/vehicles/status/<?php echo $vehicle['id']; ?>/service" class="flex items-center px-3 py-2 text-[10px] font-black uppercase text-slate-600 hover:bg-orange-50 hover:text-orange-700 rounded-xl transition-colors">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-orange-500 mr-2"></span> Service
-                                        </a>
-                                    <?php endif; ?>
-                                    <?php if ($status !== 'inactive'): ?>
-                                        <a href="/tenant/vehicles/status/<?php echo $vehicle['id']; ?>/inactive" class="flex items-center px-3 py-2 text-[10px] font-black uppercase text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-2"></span> Inactive
-                                        </a>
-                                    <?php endif; ?>
+                                <div title="Roată Rezervă: <?php echo (isset($vehicle['has_spare_wheel']) ? (bool)$vehicle['has_spare_wheel'] : true) ? 'Da' : 'Nu'; ?>" class="w-10 h-10 rounded-lg flex items-center justify-center <?php echo (isset($vehicle['has_spare_wheel']) ? (bool)$vehicle['has_spare_wheel'] : true) ? 'bg-indigo-50 text-indigo-600 border border-indigo-100' : 'bg-slate-50 text-slate-300 border border-slate-100'; ?>">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 </div>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <div class="flex flex-col items-end space-y-2 w-full">
+                            <div class="flex items-center justify-end space-x-3">
+                                <!-- Status Dropdown -->
+                                <div class="relative inline-block text-left group/status">
+                                    <?php
+                                        $status = $vehicle['status'] ?? 'active';
+                                        $statusColors = [
+                                            'active' => 'bg-green-100 text-green-800 border-green-200',
+                                            'inactive' => 'bg-slate-100 text-slate-600 border-slate-200',
+                                            'service' => 'bg-orange-100 text-orange-800 border-orange-200',
+                                            'archived' => 'bg-red-100 text-red-800 border-red-200'
+                                        ];
+                                        $color = $statusColors[$status] ?? 'bg-slate-100 text-slate-800';
+                                    ?>
+                                    <button type="button" class="px-3 py-1.5 inline-flex items-center text-xs font-black rounded-xl justify-center border shadow-sm transition-all hover:shadow-md <?php echo $color; ?>">
+                                        <?php echo ucfirst($status); ?>
+                                        <svg class="ml-1.5 w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </button>
+                                    
+                                    <div class="absolute right-0 mt-1 w-32 rounded-2xl bg-white shadow-xl border border-slate-100 opacity-0 invisible group-hover/status:opacity-100 group-hover/status:visible transition-all duration-200 z-50 p-1">
+                                        <?php if ($status !== 'active'): ?>
+                                            <a href="/tenant/vehicles/status/<?php echo $vehicle['id']; ?>/active" class="flex items-center px-3 py-2 text-[10px] font-black uppercase text-slate-600 hover:bg-green-50 hover:text-green-700 rounded-xl transition-colors">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-2"></span> Active
+                                            </a>
+                                        <?php endif; ?>
+                                        <?php if ($status !== 'service'): ?>
+                                            <a href="/tenant/vehicles/status/<?php echo $vehicle['id']; ?>/service" class="flex items-center px-3 py-2 text-[10px] font-black uppercase text-slate-600 hover:bg-orange-50 hover:text-orange-700 rounded-xl transition-colors">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-orange-500 mr-2"></span> Service
+                                            </a>
+                                        <?php endif; ?>
+                                        <?php if ($status !== 'inactive'): ?>
+                                            <a href="/tenant/vehicles/status/<?php echo $vehicle['id']; ?>/inactive" class="flex items-center px-3 py-2 text-[10px] font-black uppercase text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-2"></span> Inactive
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+
                                 <div class="flex items-center space-x-2">
-                                    <a href="/tenant/vehicles/mechanic-report/<?php echo $vehicle['id']; ?>" class="text-slate-600 hover:text-slate-900 bg-slate-50 px-3 py-1.5 rounded border border-slate-200 hover:bg-slate-100 transition-colors flex items-center" title="Mechanic Report">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                    <a href="/tenant/vehicles/mechanic-report/<?php echo $vehicle['id']; ?>" class="text-slate-600 hover:text-slate-900 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors flex items-center font-black text-xs uppercase" title="Mechanic Report">
+                                        <svg class="w-4 h-4 mr-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                         Report
                                     </a>
-                                    <a href="/tenant/vehicles/edit/<?php echo $vehicle['id']; ?>" class="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1.5 rounded border border-blue-100 hover:bg-blue-100 transition-colors">Edit</a>
-                                    <a href="/tenant/vehicles/archive/<?php echo $vehicle['id']; ?>" class="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1.5 rounded border border-red-100 hover:bg-red-100 transition-colors" title="Write-off / Archive">
-                                        <svg class="w-4 h-4 inline-block -mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                        Archive
+                                    <a href="/tenant/vehicles/edit/<?php echo $vehicle['id']; ?>" class="text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 px-3 py-1.5 rounded-xl border border-blue-100 hover:border-blue-600 transition-all font-black text-xs uppercase">Edit</a>
+                                    <a href="/tenant/vehicles/archive/<?php echo $vehicle['id']; ?>" class="text-red-500 hover:text-white bg-red-50 hover:bg-red-500 px-3 py-1.5 rounded-xl border border-red-100 hover:border-red-500 transition-all" title="Write-off / Archive">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                     </a>
                                 </div>
                             </div>
