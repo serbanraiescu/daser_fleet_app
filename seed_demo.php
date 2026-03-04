@@ -75,7 +75,7 @@ try {
     foreach ($vehicles as $v) {
         $exist = DB::fetch("SELECT id FROM vehicles WHERE license_plate = ?", [$v['plate']]);
         if (!$exist) {
-            DB::query("INSERT INTO vehicles (tenant_id, license_plate, make, model, current_km, next_service_km, expiry_rca, expiry_itp, expiry_rovigneta, status) VALUES (?, ?, ?, ?, ?, ?, ?, '2026-08-01', '2026-12-01', 'active')", [
+            DB::query("INSERT INTO vehicles (tenant_id, license_plate, make, model, current_odometer, next_service_km, expiry_rca, expiry_itp, expiry_rovigneta, status) VALUES (?, ?, ?, ?, ?, ?, ?, '2026-08-01', '2026-12-01', 'active')", [
                 $tenantId, $v['plate'], $v['make'], $v['model'], $v['km'], $v['service'], $v['rca']
             ]);
             $vId = DB::lastInsertId();
