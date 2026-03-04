@@ -224,7 +224,13 @@ class TenantController extends BaseController
             'expiry_rovigneta' => !empty($_POST['expiry_rovigneta']) ? $_POST['expiry_rovigneta'] : null,
             'current_odometer' => (int)($_POST['current_odometer'] ?? 0),
             'status' => $_POST['status'] ?? 'active',
-            'qr_code' => strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 8))
+            'qr_code' => strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 8)),
+            'has_triangles' => (int)($_POST['has_triangles'] ?? 0),
+            'has_vest' => (int)($_POST['has_vest'] ?? 0),
+            'has_jack' => isset($_POST['has_jack']) ? 1 : 0,
+            'medical_kit_expiry' => !empty($_POST['medical_kit_expiry']) ? $_POST['medical_kit_expiry'] : null,
+            'has_tow_rope' => isset($_POST['has_tow_rope']) ? 1 : 0,
+            'has_jumper_cables' => isset($_POST['has_jumper_cables']) ? 1 : 0
         ];
 
         if ($repo->create($data)) {
@@ -340,7 +346,13 @@ class TenantController extends BaseController
             'expiry_rovigneta' => !empty($_POST['expiry_rovigneta']) ? $_POST['expiry_rovigneta'] : null,
             'current_odometer' => (int)($_POST['current_odometer'] ?? 0),
             'status' => $_POST['status'] ?? 'active',
-            'qr_code' => $_POST['qr_code'] ?? ''
+            'qr_code' => $_POST['qr_code'] ?? '',
+            'has_triangles' => (int)($_POST['has_triangles'] ?? 0),
+            'has_vest' => (int)($_POST['has_vest'] ?? 0),
+            'has_jack' => isset($_POST['has_jack']) ? 1 : 0,
+            'medical_kit_expiry' => !empty($_POST['medical_kit_expiry']) ? $_POST['medical_kit_expiry'] : null,
+            'has_tow_rope' => isset($_POST['has_tow_rope']) ? 1 : 0,
+            'has_jumper_cables' => isset($_POST['has_jumper_cables']) ? 1 : 0
         ];
 
         if ($repo->update($id, $data)) {
