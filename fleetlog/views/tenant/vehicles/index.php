@@ -40,7 +40,8 @@ $archivedVehicles = $archivedVehicles ?? [];
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Plate</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">QR Code</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Odometer</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Expiries (RCA/ITP)</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Expiries (Act/Ec)</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Inventar</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
                     <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
                 </tr>
@@ -90,9 +91,45 @@ $archivedVehicles = $archivedVehicles ?? [];
                             }
                             ?>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-500">
-                            <div>RCA: <?php echo $vehicle['expiry_rca'] ?: 'N/A'; ?></div>
-                            <div>ITP: <?php echo $vehicle['expiry_itp'] ?: 'N/A'; ?></div>
+                        <td class="px-6 py-4 whitespace-nowrap text-[10px] text-slate-500">
+                            <div class="space-y-1">
+                                <div class="flex items-center justify-between group/tip">
+                                    <span class="font-bold">ACTE:</span>
+                                    <span class="<?php echo ($vehicle['expiry_rca'] && $vehicle['expiry_rca'] < date('Y-m-d')) ? 'text-red-600 font-black' : ''; ?>"><?php echo $vehicle['expiry_rca'] ? date('d.m.y', strtotime($vehicle['expiry_rca'])) : 'N/A'; ?></span>
+                                </div>
+                                <div class="flex items-center justify-between border-t border-slate-50 pt-1">
+                                    <span class="font-bold">TRUSĂ:</span>
+                                    <span class="<?php echo (!$vehicle['medical_kit_expiry'] || $vehicle['medical_kit_expiry'] < date('Y-m-d')) ? 'text-red-600 font-black' : 'text-blue-600'; ?>">
+                                        <?php echo $vehicle['medical_kit_expiry'] ? date('d.m.y', strtotime($vehicle['medical_kit_expiry'])) : 'GOL'; ?>
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold">STING:</span>
+                                    <span class="<?php echo (!$vehicle['extinguisher_expiry'] || $vehicle['extinguisher_expiry'] < date('Y-m-d')) ? 'text-red-600 font-black' : 'text-blue-600'; ?>">
+                                        <?php echo $vehicle['extinguisher_expiry'] ? date('d.m.y', strtotime($vehicle['extinguisher_expiry'])) : 'GOL'; ?>
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center space-x-1.5">
+                                <!-- Triangles -->
+                                <div title="Triunghiuri: <?php echo $vehicle['has_triangles'] ?? 0; ?>" class="w-6 h-6 rounded flex items-center justify-center <?php echo ($vehicle['has_triangles'] ?? 0) > 0 ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-slate-50 text-slate-300 border border-slate-100'; ?>">
+                                    <span class="text-[9px] font-black"><?php echo ($vehicle['has_triangles'] ?? 0); ?>Δ</span>
+                                </div>
+                                <!-- Vests -->
+                                <div title="Veste: <?php echo $vehicle['has_vest'] ?? 0; ?>" class="w-6 h-6 rounded flex items-center justify-center <?php echo ($vehicle['has_vest'] ?? 0) > 0 ? 'bg-amber-50 text-amber-600 border border-amber-100' : 'bg-slate-50 text-slate-300 border border-slate-100'; ?>">
+                                    <span class="text-[9px] font-black"><?php echo ($vehicle['has_vest'] ?? 0); ?>V</span>
+                                </div>
+                                <!-- Jack -->
+                                <div title="Cric: <?php echo !empty($vehicle['has_jack']) ? 'Da' : 'Nu'; ?>" class="w-6 h-6 rounded flex items-center justify-center <?php echo !empty($vehicle['has_jack']) ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-slate-50 text-slate-300 border border-slate-100'; ?>">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                                </div>
+                                <!-- Spare Wheel -->
+                                <div title="Roată Rezervă: <?php echo (isset($vehicle['has_spare_wheel']) ? (bool)$vehicle['has_spare_wheel'] : true) ? 'Da' : 'Nu'; ?>" class="w-6 h-6 rounded flex items-center justify-center <?php echo (isset($vehicle['has_spare_wheel']) ? (bool)$vehicle['has_spare_wheel'] : true) ? 'bg-indigo-50 text-indigo-600 border border-indigo-100' : 'bg-slate-50 text-slate-300 border border-slate-100'; ?>">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                            </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex flex-col space-y-2">
