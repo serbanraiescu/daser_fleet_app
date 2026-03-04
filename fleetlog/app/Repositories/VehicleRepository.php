@@ -63,6 +63,17 @@ class VehicleRepository extends BaseRepository
         return DB::query($sql, $data)->rowCount() > 0;
     }
 
+    public function updateStatus(int $id, string $status): bool
+    {
+        $tenantId = Auth::tenantId();
+        $sql = "UPDATE vehicles SET status = :status WHERE id = :id AND tenant_id = :tenant_id";
+        return DB::query($sql, [
+            'status' => $status,
+            'id' => $id,
+            'tenant_id' => $tenantId
+        ])->rowCount() > 0;
+    }
+
     public function getActiveByTenant(int $tenantId): array
     {
         return DB::fetchAll("SELECT * FROM vehicles WHERE tenant_id = ? AND status = 'active'", [$tenantId]);
