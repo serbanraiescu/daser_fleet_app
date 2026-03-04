@@ -101,6 +101,11 @@
                     <span class="text-sm font-medium text-slate-700">Cabluri Curent</span>
                 </label>
 
+                <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-slate-50 rounded-lg transition-colors">
+                    <input type="checkbox" name="has_spare_wheel" value="1" checked class="w-4 h-4 text-blue-600 border-slate-300 rounded">
+                    <span class="text-sm font-medium text-slate-700">Roată Rezervă</span>
+                </label>
+
                 <div class="pt-2">
                     <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Expirare Trusă Medicală</label>
                     <input type="date" name="medical_kit_expiry" class="w-full text-xs px-2 py-1.5 border border-slate-300 rounded">

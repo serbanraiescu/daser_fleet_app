@@ -26,6 +26,9 @@ try {
     if (!in_array('extinguisher_expiry', $existing)) {
         DB::query("ALTER TABLE vehicles ADD COLUMN extinguisher_expiry DATE DEFAULT NULL AFTER has_jumper_cables");
     }
+    if (!in_array('has_spare_wheel', $existing)) {
+        DB::query("ALTER TABLE vehicles ADD COLUMN has_spare_wheel BOOLEAN DEFAULT TRUE AFTER extinguisher_expiry");
+    }
 
 } catch (\Exception $e) {
     error_log("Migration 032 failed: " . $e->getMessage());

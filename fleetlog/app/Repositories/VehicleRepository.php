@@ -12,8 +12,8 @@ class VehicleRepository extends BaseRepository
     public function create(array $data): bool
     {
         $data = $this->prepareData($data);
-        $sql = "INSERT INTO vehicles (tenant_id, license_plate, make, model, expiry_rca, expiry_itp, expiry_rovigneta, status, current_odometer, qr_code, has_triangles, has_vest, has_jack, medical_kit_expiry, has_tow_rope, has_jumper_cables, extinguisher_expiry) 
-                VALUES (:tenant_id, :license_plate, :make, :model, :expiry_rca, :expiry_itp, :expiry_rovigneta, :status, :current_odometer, :qr_code, :has_triangles, :has_vest, :has_jack, :medical_kit_expiry, :has_tow_rope, :has_jumper_cables, :extinguisher_expiry)";
+        $sql = "INSERT INTO vehicles (tenant_id, license_plate, make, model, expiry_rca, expiry_itp, expiry_rovigneta, status, current_odometer, qr_code, has_triangles, has_vest, has_jack, medical_kit_expiry, has_tow_rope, has_jumper_cables, extinguisher_expiry, has_spare_wheel) 
+                VALUES (:tenant_id, :license_plate, :make, :model, :expiry_rca, :expiry_itp, :expiry_rovigneta, :status, :current_odometer, :qr_code, :has_triangles, :has_vest, :has_jack, :medical_kit_expiry, :has_tow_rope, :has_jumper_cables, :extinguisher_expiry, :has_spare_wheel)";
         
         return DB::query($sql, $data)->rowCount() > 0;
     }
@@ -56,7 +56,8 @@ class VehicleRepository extends BaseRepository
                 medical_kit_expiry = :medical_kit_expiry,
                 has_tow_rope = :has_tow_rope,
                 has_jumper_cables = :has_jumper_cables,
-                extinguisher_expiry = :extinguisher_expiry
+                extinguisher_expiry = :extinguisher_expiry,
+                has_spare_wheel = :has_spare_wheel
                 WHERE id = :id AND tenant_id = :tenant_id";
         
         return DB::query($sql, $data)->rowCount() > 0;
