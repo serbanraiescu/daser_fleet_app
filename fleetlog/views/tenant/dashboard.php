@@ -126,10 +126,22 @@
                                 ];
                                 ?>
                                 <?php foreach ($checks as $label => $val): ?>
-                                    <?php if ($val && $val <= $limit): ?>
-                                        <div class="px-2 py-1.5 rounded-lg border <?php echo $val < $today ? 'bg-red-50 border-red-100 text-red-600' : 'bg-orange-50 border-orange-100 text-orange-600'; ?>">
+                                    <?php 
+                                        $isEquipment = in_array($label, ['TRUSĂ', 'STING.']);
+                                        $isMissing = empty($val);
+                                        $isExpiring = $val && $val <= $limit;
+                                        $isExpired = $val && $val < $today;
+                                    ?>
+                                    <?php if ($isExpiring || ($isEquipment && $isMissing)): ?>
+                                        <div class="px-2 py-1.5 rounded-lg border <?php echo ($isExpired || ($isEquipment && $isMissing)) ? 'bg-red-50 border-red-100 text-red-600' : 'bg-orange-50 border-orange-100 text-orange-600'; ?>">
                                             <div class="text-[9px] font-black uppercase tracking-widest"><?php echo $label; ?></div>
-                                            <div class="text-[11px] font-bold"><?php echo date('d.m', strtotime($val)); ?><?php if ($val < $today) echo ' <span class="text-[8px]">EXP!</span>'; ?></div>
+                                            <div class="text-[11px] font-bold">
+                                                <?php 
+                                                    if ($isMissing) echo 'NESETAT';
+                                                    else echo date('d.m', strtotime($val)); 
+                                                ?>
+                                                <?php if ($isExpired) echo ' <span class="text-[8px]">EXP!</span>'; ?>
+                                            </div>
                                         </div>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
