@@ -73,13 +73,17 @@ class ReportController extends BaseController
                 (SELECT SUM(end_km - start_km) FROM trips WHERE driver_id = u.id AND tenant_id = ? AND start_time >= ? AND start_time < ? AND status = 'closed') as total_km,
                 (SELECT COUNT(*) FROM trips WHERE driver_id = u.id AND tenant_id = ? AND start_time >= ? AND start_time < ?) as trip_count,
                 (SELECT COUNT(DISTINCT vehicle_id) FROM trips WHERE driver_id = u.id AND tenant_id = ? AND start_time >= ? AND start_time < ?) as vehicle_count,
-                (SELECT COUNT(*) FROM damage_reports WHERE driver_id = u.id AND tenant_id = ? AND datetime >= ? AND datetime < ?) as damage_count
+                (SELECT COUNT(*) FROM damage_reports WHERE driver_id = u.id AND tenant_id = ? AND datetime >= ? AND datetime < ?) as damage_count,
+                (SELECT SUM(liters) FROM fuelings WHERE user_id = u.id AND tenant_id = ? AND created_at >= ? AND created_at < ?) as total_liters,
+                (SELECT SUM(total_price) FROM fuelings WHERE user_id = u.id AND tenant_id = ? AND created_at >= ? AND created_at < ?) as total_fuel_cost
             FROM users u
             WHERE u.tenant_id = ? AND u.role = 'driver'
         ", [
             $tenantId, $dateFilter, $endDate, 
             $tenantId, $dateFilter, $endDate, 
             $tenantId, $dateFilter, $endDate, 
+            $tenantId, $dateFilter, $endDate,
+            $tenantId, $dateFilter, $endDate,
             $tenantId, $dateFilter, $endDate, 
             $tenantId
         ]);

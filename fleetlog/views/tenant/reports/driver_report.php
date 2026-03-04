@@ -47,9 +47,11 @@
         <thead class="bg-slate-50">
             <tr>
                 <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Șofer</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Distanță Condusă</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Distanță</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Alimentat</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Consum Mediu</th>
                 <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Curse</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Daune Raportate</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Daune</th>
                 <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase">Vehicule Diferite</th>
             </tr>
         </thead>
@@ -67,6 +69,25 @@
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="text-lg font-black text-slate-800"><?php echo number_format($d['total_km'] ?? 0); ?></span>
                         <span class="text-xs text-slate-400 font-medium uppercase ml-1">KM</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="text-sm font-bold text-slate-700"><?php echo number_format($d['total_liters'] ?? 0, 1); ?></span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase ml-1">Litri</span>
+                        <div class="text-[10px] text-slate-400 font-medium"><?php echo number_format($d['total_fuel_cost'] ?? 0, 2); ?> RON</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <?php 
+                            $avg = 0;
+                            if (($d['total_km'] ?? 0) > 0 && ($d['total_liters'] ?? 0) > 0) {
+                                $avg = ($d['total_liters'] / $d['total_km']) * 100;
+                            }
+                        ?>
+                        <div class="flex items-center">
+                            <span class="text-lg font-black <?php echo $avg > 12 ? 'text-amber-600' : 'text-emerald-600'; ?>">
+                                <?php echo $avg > 0 ? number_format($avg, 2) : '---'; ?>
+                            </span>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase ml-1">L/100KM</span>
+                        </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                         <?php echo $d['trip_count']; ?> curse
