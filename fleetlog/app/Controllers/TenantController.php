@@ -19,22 +19,27 @@ class TenantController extends BaseController
             $veh['last_maintenance_notes'] = $lastMaint['notes'] ?? 'No previous notes.';
         }
 
-        // 2. Expiring Documents (RCA, ITP, Rovigneta within 30 days)
+        // 2. Expiring Documents (RCA, ITP, Rovigneta, Medical Kit, Extinguisher within 30 days)
         $expiringDocs = DB::fetchAll("
             SELECT id, license_plate, make, model, 
-                   expiry_rca, expiry_itp, expiry_rovigneta
+                   expiry_rca, expiry_itp, expiry_rovigneta,
+                   medical_kit_expiry, extinguisher_expiry
             FROM vehicles 
             WHERE tenant_id = ? 
             AND status != 'archived'
             AND (
                 (expiry_rca IS NOT NULL AND expiry_rca <= DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY)) OR 
                 (expiry_itp IS NOT NULL AND expiry_itp <= DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY)) OR 
-                (expiry_rovigneta IS NOT NULL AND expiry_rovigneta <= DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY))
+                (expiry_rovigneta IS NOT NULL AND expiry_rovigneta <= DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY)) OR
+                (medical_kit_expiry IS NOT NULL AND medical_kit_expiry <= DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY)) OR
+                (extinguisher_expiry IS NOT NULL AND extinguisher_expiry <= DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY))
             )
             ORDER BY GREATEST(
                 COALESCE(expiry_rca, '1970-01-01'), 
                 COALESCE(expiry_itp, '1970-01-01'), 
-                COALESCE(expiry_rovigneta, '1970-01-01')
+                COALESCE(expiry_rovigneta, '1970-01-01'),
+                COALESCE(medical_kit_expiry, '1970-01-01'),
+                COALESCE(extinguisher_expiry, '1970-01-01')
             ) ASC
         ", [$tenantId]);
 

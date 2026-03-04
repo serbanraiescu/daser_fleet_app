@@ -113,9 +113,19 @@
                     <?php foreach ($expiringDocs as $veh): ?>
                         <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
                             <div class="font-bold text-slate-900 text-sm mb-3"><?php echo htmlspecialchars($veh['license_plate']); ?></div>
-                            <div class="grid grid-cols-3 gap-2">
-                                <?php $today = date('Y-m-d'); $limit = date('Y-m-d', strtotime('+30 days')); ?>
-                                <?php foreach (['RCA' => $veh['expiry_rca'], 'ITP' => $veh['expiry_itp'], 'RO' => $veh['expiry_rovigneta']] as $label => $val): ?>
+                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+                                <?php 
+                                $today = date('Y-m-d'); 
+                                $limit = date('Y-m-d', strtotime('+30 days')); 
+                                $checks = [
+                                    'RCA' => $veh['expiry_rca'], 
+                                    'ITP' => $veh['expiry_itp'], 
+                                    'RO' => $veh['expiry_rovigneta'],
+                                    'TRUSĂ' => $veh['medical_kit_expiry'],
+                                    'STING.' => $veh['extinguisher_expiry']
+                                ];
+                                ?>
+                                <?php foreach ($checks as $label => $val): ?>
                                     <?php if ($val && $val <= $limit): ?>
                                         <div class="px-2 py-1.5 rounded-lg border <?php echo $val < $today ? 'bg-red-50 border-red-100 text-red-600' : 'bg-orange-50 border-orange-100 text-orange-600'; ?>">
                                             <div class="text-[9px] font-black uppercase tracking-widest"><?php echo $label; ?></div>

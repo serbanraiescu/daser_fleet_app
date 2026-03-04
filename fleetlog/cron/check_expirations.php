@@ -75,6 +75,8 @@ foreach ($vehicles as $v) {
     checkType($v, 'expiry_rca', 'expiry_alert_rca');
     checkType($v, 'expiry_itp', 'expiry_alert_itp');
     checkType($v, 'expiry_rovigneta', 'expiry_alert_rovigneta');
+    checkType($v, 'medical_kit_expiry', 'expiry_alert_medical_kit');
+    checkType($v, 'extinguisher_expiry', 'expiry_alert_extinguisher');
 }
 
 // 2. DRIVER EXPIRATIONS
