@@ -88,4 +88,8 @@ $router->add('POST', '/driver/report-damage', 'DamageController@store', $driverM
 // QR Generation
 $router->add('GET', '/qr/generate', 'QrController@generate');
 
+// API Routes for Mobile App
+$router->add('POST', '/api/login', 'ApiController@login');
+$router->add('GET', '/api/driver/dashboard', 'ApiController@driverDashboard');
+
 $router->add('GET', '/', 'HomeController@index');
