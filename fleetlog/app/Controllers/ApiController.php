@@ -249,6 +249,16 @@ class ApiController extends BaseController
     {
         $key = $_GET['key'] ?? '';
         
+        // If not in GET, check Authorization header (common in some apps)
+        if (empty($key)) {
+            $headers = getallheaders();
+            $key = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+            // Handle "Bearer <key>" or just "<key>"
+            if (str_starts_with($key, 'Bearer ')) {
+                $key = substr($key, 7);
+            }
+        }
+        
         // Try DB first so UI settings override .env defaults
         $setting = DB::fetch("SELECT value FROM system_settings WHERE `key` = 'sms_gateway_key'");
         $gatewayKey = $setting['value'] ?? '';
@@ -279,6 +289,14 @@ class ApiController extends BaseController
     public function confirmSMS(): void
     {
         $key = $_GET['key'] ?? '';
+        
+        if (empty($key)) {
+            $headers = getallheaders();
+            $key = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+            if (str_starts_with($key, 'Bearer ')) {
+                $key = substr($key, 7);
+            }
+        }
         
         $setting = DB::fetch("SELECT value FROM system_settings WHERE `key` = 'sms_gateway_key'");
         $gatewayKey = $setting['value'] ?? '';
