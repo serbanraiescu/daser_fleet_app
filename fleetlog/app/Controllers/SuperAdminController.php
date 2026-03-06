@@ -14,8 +14,15 @@ class SuperAdminController extends BaseController
         $vehiclesCount = DB::fetch("SELECT COUNT(*) as count FROM vehicles")['count'];
         $emailsSent = DB::fetch("SELECT COUNT(*) as count FROM email_logs")['count'];
         
-        // Real SMS count
-        $smsSent = DB::fetch("SELECT COUNT(*) as count FROM sms_queue WHERE status = 'sent'")['count']; 
+        // Real SMS count (safe check)
+        $smsSent = 0;
+        try {
+            $smsResult = DB::fetch("SELECT COUNT(*) as count FROM sms_queue WHERE status = 'sent'");
+            $smsSent = $smsResult['count'] ?? 0;
+        } catch (\Throwable $e) {
+            // Table doesn't exist yet or migration pending
+        }
+        
         $uptime = "99.9%";
 
         $this->render('admin/dashboard', [

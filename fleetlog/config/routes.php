@@ -97,6 +97,8 @@ $router->add('POST', '/api/login', 'ApiController@login');
 $router->add('GET', '/api/driver/dashboard', 'ApiController@driverDashboard');
 $router->add('POST', '/api/driver/trip/start', 'ApiController@startTrip');
 $router->add('POST', '/api/driver/trip/end', 'ApiController@endTrip');
+$router->add('POST', '/api/driver/fueling', 'ApiController@logFueling');
+$router->add('POST', '/api/driver/damage', 'ApiController@reportDamage');
 
 // SMS Gateway API
 $router->add('GET', '/api/sms/pending', 'ApiController@getPendingSMS');

@@ -169,6 +169,77 @@ class ApiController extends BaseController
         $this->jsonResponse(['success' => true, 'message' => 'Trip ended']);
     }
 
+    /**
+     * Log Fueling
+     * POST /api/driver/fueling
+     */
+    public function logFueling(): void
+    {
+        if (!isset($_SESSION['user_id'])) {
+            $this->jsonResponse(['error' => 'Unauthorized'], 401);
+            return;
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        $vehicleId = $data['vehicle_id'] ?? null;
+        $liters = $data['liters'] ?? null;
+        $cost = $data['cost'] ?? null;
+        $odometer = $data['odometer'] ?? null;
+
+        if (!$vehicleId || !$liters || !$cost || !$odometer) {
+            $this->jsonResponse(['error' => 'All fields (vehicle, liters, cost, odometer) are required'], 400);
+            return;
+        }
+
+        $sql = "INSERT INTO fuelings (tenant_id, driver_id, vehicle_id, liters, cost, odometer, date, is_full) 
+                VALUES (:tenant_id, :driver_id, :vehicle_id, :liters, :cost, :odometer, NOW(), :is_full)";
+        
+        DB::query($sql, [
+            'tenant_id' => $_SESSION['tenant_id'],
+            'driver_id' => $_SESSION['user_id'],
+            'vehicle_id' => $vehicleId,
+            'liters' => $liters,
+            'cost' => $cost,
+            'odometer' => $odometer,
+            'is_full' => $data['is_full'] ?? 1
+        ]);
+
+        $this->jsonResponse(['success' => true, 'message' => 'Fueling logged']);
+    }
+
+    /**
+     * Report Damage
+     * POST /api/driver/damage
+     */
+    public function reportDamage(): void
+    {
+        if (!isset($_SESSION['user_id'])) {
+            $this->jsonResponse(['error' => 'Unauthorized'], 401);
+            return;
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        $vehicleId = $data['vehicle_id'] ?? null;
+        $description = $data['description'] ?? null;
+
+        if (!$vehicleId || !$description) {
+            $this->jsonResponse(['error' => 'Vehicle and Description are required'], 400);
+            return;
+        }
+
+        $sql = "INSERT INTO damage_reports (tenant_id, reported_by, vehicle_id, description, status, reported_at) 
+                VALUES (:tenant_id, :reported_by, :vehicle_id, :description, 'pending', NOW())";
+        
+        DB::query($sql, [
+            'tenant_id' => $_SESSION['tenant_id'],
+            'reported_by' => $_SESSION['user_id'],
+            'vehicle_id' => $vehicleId,
+            'description' => $description
+        ]);
+
+        $this->jsonResponse(['success' => true, 'message' => 'Damage reported']);
+    }
+
 
     /**
      * Get pending SMS for Gateway
