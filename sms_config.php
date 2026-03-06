@@ -58,4 +58,20 @@ function getSmsPdo($config) {
     }
 }
 
+// Logging Helper
+function logSmsRequest($source) {
+    $logFile = __DIR__ . '/fleetlog/storage/sms_debug.txt';
+    $data = [
+        'time' => date('Y-m-d H:i:s'),
+        'source' => $source,
+        'method' => $_SERVER['REQUEST_METHOD'],
+        'url' => $_SERVER['REQUEST_URI'],
+        'ip' => $_SERVER['REMOTE_ADDR'],
+        'ua' => $_SERVER['HTTP_USER_AGENT'] ?? 'N/A',
+        'get' => $_GET,
+        'body' => file_get_contents('php://input')
+    ];
+    file_put_contents($logFile, json_encode($data) . "\n", FILE_APPEND);
+}
+
 return $config;

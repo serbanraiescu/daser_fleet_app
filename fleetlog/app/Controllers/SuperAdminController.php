@@ -403,4 +403,15 @@ class SuperAdminController extends BaseController
         }
         $this->redirect('/admin/sms-logs');
     }
+
+    public function clearSmsQueue(): void
+    {
+        try {
+            DB::query("DELETE FROM sms_queue WHERE status = 'pending'");
+            $_SESSION['flash_success'] = "Coada de SMS a fost golită cu succes (toate mesajele in asteptare au fost sterse).";
+        } catch (\Throwable $e) {
+            $_SESSION['flash_error'] = "Eroare la golirea cozii: " . $e->getMessage();
+        }
+        $this->redirect('/admin/sms-logs');
+    }
 }

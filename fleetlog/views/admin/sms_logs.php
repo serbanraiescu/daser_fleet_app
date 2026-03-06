@@ -4,6 +4,16 @@
         <p class="text-slate-500">Monitorizează mesajele trimise prin aplicația Android Gateway.</p>
     </div>
     <div class="flex space-x-3">
+        <a href="/read_log.php" target="_blank" class="bg-slate-100 text-slate-700 px-4 py-2 rounded-lg font-bold flex items-center shadow-sm border border-slate-200 hover:bg-slate-200 transition-all">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            Log Diagnostic
+        </a>
+        <form action="/admin/sms/clear-queue" method="POST" onsubmit="return confirm('Sigur vrei să ștergi TOATE mesajele în așteptare?');">
+            <button type="submit" class="bg-red-50 text-red-700 px-4 py-2 rounded-lg font-bold flex items-center shadow-sm border border-red-200 hover:bg-red-100 transition-all">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                Golire Coadă
+            </button>
+        </form>
         <div class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg font-bold flex items-center shadow-sm border border-blue-200">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <?php echo $pendingCount; ?> în așteptare
@@ -112,7 +122,7 @@
             </h3>
             <ul class="text-xs text-slate-600 space-y-3">
                 <li>1. Instalează aplicația <strong>SMS Gateway</strong> pe un telefon cu SIM.</li>
-                <li>2. Setează Adresa API: <br><code class="bg-white px-1 border rounded text-blue-600">https://fleet.daserdesign.ro/api/sms</code></li>
+                <li>2. Setează Adresa API: <br><code class="bg-white px-1 border rounded text-blue-600">https://fleet.daserdesign.ro/api/</code></li>
                 <li>3. Setează Cheia de Securitate din <a href="/admin/settings" class="text-blue-600 hover:underline">Setări</a>.</li>
                 <li>4. Terminalul va prelua automat mesajele din coadă la fiecare 30-60 secunde.</li>
             </ul>

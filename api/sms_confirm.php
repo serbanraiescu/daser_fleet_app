@@ -3,6 +3,7 @@
  * sms_confirm.php - Confirmation endpoint for Android SMS Gateway
  */
 $config = require_once 'sms_config.php';
+logSmsRequest('api/sms_confirm');
 validateSmsKey($config);
 $pdo = getSmsPdo($config);
 
