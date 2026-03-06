@@ -101,6 +101,7 @@ $router->add('POST', '/api/driver/fueling', 'ApiController@logFueling');
 $router->add('POST', '/api/driver/damage', 'ApiController@reportDamage');
 
 // SMS Gateway API
+$router->add('GET', '/api/sms', 'ApiController@getPendingSMS'); // Alias for easier config
 $router->add('GET', '/api/sms/pending', 'ApiController@getPendingSMS');
 $router->add('POST', '/api/sms/confirm', 'ApiController@confirmSMS');
 
