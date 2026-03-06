@@ -178,9 +178,29 @@
                             <option value="1" <?php echo ($settings['sms_retry_failed'] ?? '0') === '1' ? 'selected' : ''; ?>>Retrimite mesajele eșuate de 1 dată</option>
                         </select>
                     </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Template Alerte Expirare (Universal)</label>
+                        <textarea name="settings[sms_expiry_template]" rows="3" 
+                                  class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                  placeholder="Ex: Alerta: {expiry_type} expira pentru {vehicle_plate} pe data de {expiry_date}."><?php echo htmlspecialchars($settings['sms_expiry_template'] ?? 'Alerta: {expiry_type} expira pentru {vehicle_plate} pe data de {expiry_date}.'); ?></textarea>
+                        <p class="mt-1 text-xs text-slate-500 italic">Placeholder-e disponibile: <code>{vehicle_plate}</code>, <code>{expiry_type}</code>, <code>{expiry_date}</code>.</p>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Telefon Notificări (Admin)</label>
+                        <input type="text" name="settings[sms_admin_phone]" 
+                               value="<?php echo htmlspecialchars($settings['sms_admin_phone'] ?? ''); ?>"
+                               class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                               placeholder="Numărul unde adminul primește alertele">
+                    </div>
                 </div>
 
-                <div class="mt-8 pt-6 border-t border-slate-100 flex justify-end">
+                <div class="mt-8 pt-6 border-t border-slate-100 flex justify-between items-center">
+                    <div class="text-sm text-slate-500">
+                        <p><b>Cron Job / Trigger:</b> Poți apela manual notificările de expirare:</p>
+                        <a href="/admin/sms/trigger-alerts" class="text-blue-600 hover:underline font-bold">Trimite acum alertele de expirare</a>
+                    </div>
                     <button type="submit" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-md">
                         Salvează Setările
                     </button>

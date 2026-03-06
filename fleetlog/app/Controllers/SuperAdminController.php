@@ -380,9 +380,9 @@ class SuperAdminController extends BaseController
                 $pendingCount = DB::fetch("SELECT COUNT(*) as count FROM sms_queue WHERE status = 'pending'")['count'];
             } else {
                 // Load SMS specific settings
-                $allSettings = DB::fetchAll("SELECT setting_key, setting_value FROM system_settings WHERE setting_key LIKE 'sms_%'");
+                $allSettings = DB::fetchAll("SELECT `key`, `value` FROM system_settings WHERE `key` LIKE 'sms_%'");
                 foreach ($allSettings as $row) {
-                    $settings[$row['setting_key']] = $row['setting_value'];
+                    $settings[$row['key']] = $row['value'];
                 }
             }
         } catch (\Throwable $e) {
@@ -432,14 +432,73 @@ class SuperAdminController extends BaseController
     {
         try {
             foreach ($_POST['settings'] as $key => $value) {
-                DB::query("INSERT INTO system_settings (setting_key, setting_value) 
+                DB::query("INSERT INTO system_settings (`key`, `value`) 
                            VALUES (?, ?) 
-                           ON DUPLICATE KEY UPDATE setting_value = ?", [$key, $value, $value]);
+                           ON DUPLICATE KEY UPDATE `value` = ?", [$key, $value, $value]);
             }
             $_SESSION['flash_success'] = "Setările SMS au fost salvate cu succes.";
         } catch (\Throwable $e) {
             $_SESSION['flash_error'] = "Eroare la salvarea setărilor: " . $e->getMessage();
         }
         $this->redirect('/admin/sms-logs?tab=settings');
+    }
+
+    public function triggerAlerts(): void
+    {
+        try {
+            // 1. Get Settings
+            $settingsArr = DB::fetchAll("SELECT `key`, `value` FROM system_settings WHERE `key` LIKE 'sms_%'");
+            $settings = [];
+            foreach ($settingsArr as $row) { $settings[$row['key']] = $row['value']; }
+
+            $adminPhone = $settings['sms_admin_phone'] ?? '';
+            $template = $settings['sms_expiry_template'] ?? 'Alerta: {expiry_type} expira pentru {vehicle_plate} pe data de {expiry_date}.';
+
+            if (empty($adminPhone)) {
+                $_SESSION['flash_error'] = "Nu poți trimite alerte: Telefonul Admin nu este setat în Setări Gateway.";
+                $this->redirect('/admin/sms-logs?tab=settings');
+            }
+
+            // 2. Find expiring docs (within 30 days)
+            $expiring = DB::fetchAll("
+                SELECT license_plate, expiry_rca, expiry_itp, expiry_rovigneta
+                FROM vehicles 
+                WHERE status != 'archived'
+                AND (
+                    (expiry_rca IS NOT NULL AND expiry_rca <= DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY)) OR 
+                    (expiry_itp IS NOT NULL AND expiry_itp <= DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY)) OR 
+                    (expiry_rovigneta IS NOT NULL AND expiry_rovigneta <= DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY))
+                )
+            ");
+
+            $enqueuedCount = 0;
+            foreach ($expiring as $v) {
+                $docTypes = [
+                    'RCA' => $v['expiry_rca'],
+                    'ITP' => $v['expiry_itp'],
+                    'Rovigneta' => $v['expiry_rovigneta']
+                ];
+
+                foreach ($docTypes as $type => $date) {
+                    if ($date && strtotime($date) <= strtotime('+30 days')) {
+                        // Avoid duplicates if already enqueued today for this specific vehicle/type
+                        $msg = str_replace(
+                            ['{vehicle_plate}', '{expiry_type}', '{expiry_date}'],
+                            [$v['license_plate'], $type, date('d.m.Y', strtotime($date))],
+                            $template
+                        );
+
+                        if (\FleetLog\Core\SMSService::enqueue($adminPhone, $msg)) {
+                            $enqueuedCount++;
+                        }
+                    }
+                }
+            }
+
+            $_SESSION['flash_success'] = "S-au adăugat $enqueuedCount alerte în coada SMS.";
+        } catch (\Throwable $e) {
+            $_SESSION['flash_error'] = "Eroare la generarea alertelor: " . $e->getMessage();
+        }
+        $this->redirect('/admin/sms-logs');
     }
 }
