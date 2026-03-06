@@ -26,13 +26,12 @@ try {
     }
 
     // 2. Check ENV
-    $envKey = getenv('SMS_GATEWAY_KEY');
-    echo "<b>Key in .env / Process:</b> ";
-    if ($envKey) {
-        echo "<code style='background:#eee; padding:2px 5px;'>[" . $envKey . "]</code> (Length: " . strlen($envKey) . ")<br>";
-    } else {
-        echo "<i>Not set in .env</i><br>";
-    }
+    echo "<h3>2. Environment Variables (.env)</h3>";
+    $envSmsGatewayKey = getenv('SMS_GATEWAY_KEY');
+    $envSmsApiKey = getenv('SMS_API_KEY');
+    
+    echo "<b>SMS_GATEWAY_KEY:</b> " . ($envSmsGatewayKey ? "<code style='background:#eee; padding:2px 5px;'>[$envSmsGatewayKey]</code>" : "<i>Not set</i>") . "<br>";
+    echo "<b>SMS_API_KEY:</b> " . ($envSmsApiKey ? "<code style='background:#eee; padding:2px 5px;'>[$envSmsApiKey]</code>" : "<i>Not set</i>") . "<br>";
 
     echo "<h3>Instructions:</h3>";
     echo "1. Verify that the key above (including any spaces) matches EXACTLY what you put in the URL: <code>?key=...</code><br>";

@@ -35,7 +35,6 @@ function validateSmsKey($config) {
             $headers = getallheaders();
             $auth = $headers['Authorization'] ?? $headers['authorization'] ?? '';
         } else {
-            // Manual fallback from $_SERVER
             $auth = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
         }
         
@@ -43,10 +42,15 @@ function validateSmsKey($config) {
         else $key = $auth;
     }
 
-    $gatewayKey = $config['SMS_GATEWAY_KEY'] ?? '';
-    if (empty($gatewayKey) || $key !== $gatewayKey) {
+    // Check DB first, then .env (prioritize SMS_API_KEY as requested)
+    $dbKey = $config['sms_gateway_key'] ?? ''; // From system_settings table
+    $envKey = $config['SMS_API_KEY'] ?? $config['SMS_GATEWAY_KEY'] ?? '';
+    
+    $expectedKey = !empty($dbKey) ? $dbKey : (!empty($envKey) ? $envKey : 'daser_secret_default');
+
+    if ($key !== $expectedKey) {
         http_response_code(403);
-        echo json_encode(["status" => "error", "message" => "Unauthorized", "debug_hint" => "Check your key in .env or settings"]);
+        echo json_encode(["error" => "check your key in .env", "debug_hint" => "The key provided does not match the server configuration."]);
         exit;
     }
 }
