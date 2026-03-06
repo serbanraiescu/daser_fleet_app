@@ -316,18 +316,21 @@ class ApiController extends BaseController
         }
 
         $data = json_decode(file_get_contents('php://input'), true);
-        $id = $data['id'] ?? 0;
-        $status = $data['status'] ?? 'sent';
+        $id = $data['id'] ?? null;
 
         if ($id) {
-            if ($status === 'sent') {
-                SMSService::confirm((int)$id);
-            } else {
+            // Some apps send success/fail status, some just hit confirm on success.
+            // If status is provided and is 'failed', mark as failed, otherwise assume 'sent'.
+            $status = $data['status'] ?? 'sent';
+            if ($status === 'failed') {
                 SMSService::fail((int)$id);
+            } else {
+                SMSService::confirm((int)$id);
             }
+            $this->jsonResponse(['success' => true]);
+        } else {
+            $this->jsonResponse(['error' => 'ID missing'], 400);
         }
-
-        $this->jsonResponse(['success' => true]);
     }
 
     /**
@@ -336,11 +339,10 @@ class ApiController extends BaseController
     private function jsonResponse(array $data, int $code = 200): void
     {
         // Add CORS headers for Mobile App / Development (Browser simulation)
-        $origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
-        header("Access-Control-Allow-Origin: *"); // Force * for simpler connectivity from external apps
-        header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-        header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
-        header('Access-Control-Expose-Headers: Set-Cookie');
+        header("Access-Control-Allow-Origin: *"); 
+        header("Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS");
+        header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-Update-Key");
+        header("Content-Type: application/json; charset=UTF-8");
 
         // Handle preflight OPTIONS request
         if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
