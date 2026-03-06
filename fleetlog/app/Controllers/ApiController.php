@@ -258,12 +258,18 @@ class ApiController extends BaseController
         }
 
         if (empty($gatewayKey) || $key !== $gatewayKey) {
+            error_log("SMS Gateway Auth Failed: Key provided: [$key], Expected: [$gatewayKey]");
             $this->jsonResponse(['error' => 'Unauthorized Gateway Key'], 403);
             return;
         }
 
-        $messages = SMSService::getPending(5);
-        $this->jsonResponse($messages);
+        try {
+            $messages = SMSService::getPending(5);
+            $this->jsonResponse($messages);
+        } catch (\Exception $e) {
+            error_log("SMS Gateway Fetch Error: " . $e->getMessage());
+            $this->jsonResponse(['error' => 'Internal Server Error'], 500);
+        }
     }
 
     /**
@@ -313,13 +319,10 @@ class ApiController extends BaseController
     {
         // Add CORS headers for Mobile App / Development (Browser simulation)
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
-        header("Access-Control-Allow-Origin: $origin");
+        header("Access-Control-Allow-Origin: *"); // Force * for simpler connectivity from external apps
         header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
         header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
         header('Access-Control-Expose-Headers: Set-Cookie');
-        if ($origin !== '*') {
-            header('Access-Control-Allow-Credentials: true');
-        }
 
         // Handle preflight OPTIONS request
         if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
