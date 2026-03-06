@@ -446,24 +446,20 @@ class SuperAdminController extends BaseController
     public function triggerAlerts(): void
     {
         try {
-            // 1. Get Settings
+            // 1. Get Global Settings (Template only now)
             $settingsArr = DB::fetchAll("SELECT `key`, `value` FROM system_settings WHERE `key` LIKE 'sms_%'");
             $settings = [];
             foreach ($settingsArr as $row) { $settings[$row['key']] = $row['value']; }
 
-            $adminPhone = $settings['sms_admin_phone'] ?? '';
             $template = $settings['sms_expiry_template'] ?? 'Alerta: {expiry_type} expira pentru {vehicle_plate} pe data de {expiry_date}.';
 
-            if (empty($adminPhone)) {
-                $_SESSION['flash_error'] = "Nu poți trimite alerte: Telefonul Admin nu este setat în Setări Gateway.";
-                $this->redirect('/admin/sms-logs?tab=settings');
-            }
-
-            // 2. Find expiring docs (within 30 days)
+            // 2. Find expiring docs grouped by tenant
             $expiring = DB::fetchAll("
-                SELECT license_plate, expiry_rca, expiry_itp, expiry_rovigneta
-                FROM vehicles 
-                WHERE status != 'archived'
+                SELECT v.license_plate, v.expiry_rca, v.expiry_itp, v.expiry_rovigneta,
+                       t.id as tenant_id, t.name as tenant_name, t.contact_phone, t.notification_phone
+                FROM vehicles v
+                JOIN tenants t ON v.tenant_id = t.id
+                WHERE v.status != 'archived'
                 AND (
                     (expiry_rca IS NOT NULL AND expiry_rca <= DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY)) OR 
                     (expiry_itp IS NOT NULL AND expiry_itp <= DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY)) OR 
@@ -472,7 +468,17 @@ class SuperAdminController extends BaseController
             ");
 
             $enqueuedCount = 0;
+            $skippedTenants = [];
+
             foreach ($expiring as $v) {
+                // Determine recipient phone (Priority: Notification Phone > Contact Phone)
+                $recipientPhone = !empty($v['notification_phone']) ? $v['notification_phone'] : $v['contact_phone'];
+
+                if (empty($recipientPhone)) {
+                    $skippedTenants[$v['tenant_id']] = $v['tenant_name'];
+                    continue;
+                }
+
                 $docTypes = [
                     'RCA' => $v['expiry_rca'],
                     'ITP' => $v['expiry_itp'],
@@ -481,21 +487,24 @@ class SuperAdminController extends BaseController
 
                 foreach ($docTypes as $type => $date) {
                     if ($date && strtotime($date) <= strtotime('+30 days')) {
-                        // Avoid duplicates if already enqueued today for this specific vehicle/type
                         $msg = str_replace(
                             ['{vehicle_plate}', '{expiry_type}', '{expiry_date}'],
                             [$v['license_plate'], $type, date('d.m.Y', strtotime($date))],
                             $template
                         );
 
-                        if (\FleetLog\Core\SMSService::enqueue($adminPhone, $msg)) {
+                        if (\FleetLog\Core\SMSService::enqueue($recipientPhone, $msg)) {
                             $enqueuedCount++;
                         }
                     }
                 }
             }
 
-            $_SESSION['flash_success'] = "S-au adăugat $enqueuedCount alerte în coada SMS.";
+            $successMsg = "S-au adăugat $enqueuedCount alerte în coada SMS.";
+            if (!empty($skippedTenants)) {
+                $successMsg .= " Atenție: Tenanții (" . implode(', ', $skippedTenants) . ") nu au telefon setat.";
+            }
+            $_SESSION['flash_success'] = $successMsg;
         } catch (\Throwable $e) {
             $_SESSION['flash_error'] = "Eroare la generarea alertelor: " . $e->getMessage();
         }
