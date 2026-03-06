@@ -24,12 +24,14 @@ class ApiController extends BaseController
             return;
         }
 
-        $user = Auth::login($email, $password);
+        $success = Auth::login($email, $password);
 
-        if ($user) {
+        if ($success) {
+            $user = Auth::user();
+            
             // Check if user is a driver
             if ($user['role'] !== 'driver') {
-                $this->jsonResponse(['error' => 'Only driver accounts can access the mobile app'], 403);
+                $this->jsonResponse(['error' => 'Contul tau nu este de tip Sofer (Mobile App)'], 403);
                 return;
             }
 
@@ -41,10 +43,10 @@ class ApiController extends BaseController
                     'email' => $user['email'],
                     'tenant_id' => $user['tenant_id']
                 ],
-                'token' => session_id() // In a real app we would use JWT, but for now session_id works
+                'token' => session_id()
             ]);
         } else {
-            $this->jsonResponse(['error' => 'Invalid credentials'], 401);
+            $this->jsonResponse(['error' => 'Date de autentificare invalide'], 401);
         }
     }
 
