@@ -41,4 +41,45 @@ class ApiService {
       throw Exception('Failed to load dashboard');
     }
   }
+
+  Future<void> startTrip(int vehicleId, int startOdometer) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/driver/trip/start'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Cookie': 'PHPSESSID=$token',
+      },
+      body: jsonEncode({
+        'vehicle_id': vehicleId,
+        'start_odometer': startOdometer,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(jsonDecode(response.body)['error'] ?? 'Failed to start trip');
+    }
+  }
+
+  Future<void> endTrip(int endOdometer) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/driver/trip/end'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Cookie': 'PHPSESSID=$token',
+      },
+      body: jsonEncode({
+        'end_odometer': endOdometer,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(jsonDecode(response.body)['error'] ?? 'Failed to end trip');
+    }
+  }
 }

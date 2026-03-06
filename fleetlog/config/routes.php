@@ -91,5 +91,7 @@ $router->add('GET', '/qr/generate', 'QrController@generate');
 // API Routes for Mobile App
 $router->add('POST', '/api/login', 'ApiController@login');
 $router->add('GET', '/api/driver/dashboard', 'ApiController@driverDashboard');
+$router->add('POST', '/api/driver/trip/start', 'ApiController@startTrip');
+$router->add('POST', '/api/driver/trip/end', 'ApiController@endTrip');
 
 $router->add('GET', '/', 'HomeController@index');
