@@ -4,6 +4,7 @@ namespace FleetLog\App\Controllers;
 
 use FleetLog\Core\DB;
 use FleetLog\Core\Auth;
+use FleetLog\Core\SMSService;
 use FleetLog\App\Repositories\VehicleRepository;
 use FleetLog\App\Repositories\DriverRepository;
 
@@ -166,6 +167,64 @@ class ApiController extends BaseController
         ]);
 
         $this->jsonResponse(['success' => true, 'message' => 'Trip ended']);
+    }
+
+
+    /**
+     * Get pending SMS for Gateway
+     * GET /api/sms/pending?key=...
+     */
+    public function getPendingSMS(): void
+    {
+        $key = $_GET['key'] ?? '';
+        $gatewayKey = getenv('SMS_GATEWAY_KEY');
+        
+        if (empty($gatewayKey)) {
+            $setting = DB::fetch("SELECT value FROM system_settings WHERE `key` = 'sms_gateway_key'");
+            $gatewayKey = $setting['value'] ?? '';
+        }
+
+        if (empty($gatewayKey) || $key !== $gatewayKey) {
+            $this->jsonResponse(['error' => 'Unauthorized Gateway Key'], 403);
+            return;
+        }
+
+        $messages = SMSService::getPending(5);
+        $this->jsonResponse($messages);
+    }
+
+    /**
+     * Confirm SMS sent
+     * POST /api/sms/confirm?key=...
+     */
+    public function confirmSMS(): void
+    {
+        $key = $_GET['key'] ?? '';
+        $gatewayKey = getenv('SMS_GATEWAY_KEY');
+
+        if (empty($gatewayKey)) {
+            $setting = DB::fetch("SELECT value FROM system_settings WHERE `key` = 'sms_gateway_key'");
+            $gatewayKey = $setting['value'] ?? '';
+        }
+
+        if (empty($gatewayKey) || $key !== $gatewayKey) {
+            $this->jsonResponse(['error' => 'Unauthorized Gateway Key'], 403);
+            return;
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        $id = $data['id'] ?? 0;
+        $status = $data['status'] ?? 'sent';
+
+        if ($id) {
+            if ($status === 'sent') {
+                SMSService::confirm((int)$id);
+            } else {
+                SMSService::fail((int)$id);
+            }
+        }
+
+        $this->jsonResponse(['success' => true]);
     }
 
     /**

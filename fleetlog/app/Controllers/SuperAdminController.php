@@ -14,8 +14,8 @@ class SuperAdminController extends BaseController
         $vehiclesCount = DB::fetch("SELECT COUNT(*) as count FROM vehicles")['count'];
         $emailsSent = DB::fetch("SELECT COUNT(*) as count FROM email_logs")['count'];
         
-        // Mock data for SMS and Uptime as placeholders
-        $smsSent = 0; 
+        // Real SMS count
+        $smsSent = DB::fetch("SELECT COUNT(*) as count FROM sms_queue WHERE status = 'sent'")['count']; 
         $uptime = "99.9%";
 
         $this->render('admin/dashboard', [
@@ -356,5 +356,35 @@ class SuperAdminController extends BaseController
     public function presentation(): void
     {
         $this->render('admin/presentation', ['title' => 'FleetLog Platform Presentation']);
+    }
+
+    public function smsLogs(): void
+    {
+        $smsLogs = DB::fetchAll("SELECT * FROM sms_queue ORDER BY created_at DESC LIMIT 100");
+        $pendingCount = DB::fetch("SELECT COUNT(*) as count FROM sms_queue WHERE status = 'pending'")['count'];
+        
+        $this->render('admin/sms_logs', [
+            'title' => 'SMS Gateway Logs',
+            'smsLogs' => $smsLogs,
+            'pendingCount' => $pendingCount
+        ]);
+    }
+
+    public function sendTestSms(): void
+    {
+        $phone = $_POST['test_phone'] ?? '';
+        $message = $_POST['test_message'] ?? 'Acesta este un SMS de test de la FleetLog Gateway. ' . date('H:i:s');
+
+        if (empty($phone)) {
+            $_SESSION['flash_error'] = "Numărul de telefon este obligatoriu.";
+            $this->redirect('/admin/sms-logs');
+        }
+
+        if (\FleetLog\Core\SMSService::enqueue($phone, $message)) {
+            $_SESSION['flash_success'] = "SMS de test adăugat în coadă pentru $phone. Verifică aplicația Android!";
+        } else {
+            $_SESSION['flash_error'] = "Eroare la adăugarea SMS în coadă.";
+        }
+        $this->redirect('/admin/sms-logs');
     }
 }

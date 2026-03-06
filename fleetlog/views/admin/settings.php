@@ -86,6 +86,22 @@
                     </div>
                 </div>
 
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800 border-b pb-2 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                        SMS Gateway Configuration (Android)
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Gateway Security Key</label>
+                            <input type="text" name="settings[sms_gateway_key]" value="<?php echo $settings['sms_gateway_key'] ?? ''; ?>"
+                                   class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all"
+                                   placeholder="fleetlog_secret_123">
+                            <p class="text-[11px] text-slate-500 mt-2 italic">Această cheie trebuie să fie identică cu cea setată în aplicația Android Gateway.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="pt-6 border-t flex items-center justify-end">
                     <button type="submit" class="px-10 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all shadow-md">
                         Save System Settings

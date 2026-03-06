@@ -31,6 +31,10 @@ $router->add('POST', '/admin/email-templates/edit/{id}', 'SuperAdminController@u
 $router->add('GET', '/admin/email-templates/preview/{id}', 'SuperAdminController@previewTemplate', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('GET', '/admin/email-templates/run-check', 'SuperAdminController@runExpirationCheck', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 
+// Super Admin SMS Gateway Routes
+$router->add('GET', '/admin/sms-logs', 'SuperAdminController@smsLogs', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
+$router->add('POST', '/admin/sms/test-send', 'SuperAdminController@sendTestSms', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
+
 // Tenant Admin Routes
 $router->add('GET', '/tenant/dashboard', 'TenantController@dashboard', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('GET', '/tenant/vehicles', 'TenantController@vehicles', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
@@ -93,5 +97,9 @@ $router->add('POST', '/api/login', 'ApiController@login');
 $router->add('GET', '/api/driver/dashboard', 'ApiController@driverDashboard');
 $router->add('POST', '/api/driver/trip/start', 'ApiController@startTrip');
 $router->add('POST', '/api/driver/trip/end', 'ApiController@endTrip');
+
+// SMS Gateway API
+$router->add('GET', '/api/sms/pending', 'ApiController@getPendingSMS');
+$router->add('POST', '/api/sms/confirm', 'ApiController@confirmSMS');
 
 $router->add('GET', '/', 'HomeController@index');
