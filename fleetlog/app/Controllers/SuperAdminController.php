@@ -367,8 +367,16 @@ class SuperAdminController extends BaseController
 
     public function smsLogs(): void
     {
-        $smsLogs = DB::fetchAll("SELECT * FROM sms_queue ORDER BY created_at DESC LIMIT 100");
-        $pendingCount = DB::fetch("SELECT COUNT(*) as count FROM sms_queue WHERE status = 'pending'")['count'];
+        $smsLogs = [];
+        $pendingCount = 0;
+        
+        try {
+            $smsLogs = DB::fetchAll("SELECT * FROM sms_queue ORDER BY created_at DESC LIMIT 100");
+            $pendingCount = DB::fetch("SELECT COUNT(*) as count FROM sms_queue WHERE status = 'pending'")['count'];
+        } catch (\Throwable $e) {
+            // Table doesn't exist yet
+            $_SESSION['flash_error'] = "Tabela 'sms_queue' nu există încă. Te rugăm să te asiguri că migrările au rulat.";
+        }
         
         $this->render('admin/sms_logs', [
             'title' => 'SMS Gateway Logs',
@@ -390,7 +398,7 @@ class SuperAdminController extends BaseController
         if (\FleetLog\Core\SMSService::enqueue($phone, $message)) {
             $_SESSION['flash_success'] = "SMS de test adăugat în coadă pentru $phone. Verifică aplicația Android!";
         } else {
-            $_SESSION['flash_error'] = "Eroare la adăugarea SMS în coadă.";
+            $_SESSION['flash_error'] = "Eroare la adăugarea SMS în coadă. Verifică dacă tabela 'sms_queue' există.";
         }
         $this->redirect('/admin/sms-logs');
     }

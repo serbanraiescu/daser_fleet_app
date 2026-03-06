@@ -44,7 +44,9 @@ class MigrationRunner
         try {
             $result = require $filePath;
             
-            if (is_string($result)) {
+            if (is_object($result) && method_exists($result, 'up')) {
+                $result->up();
+            } elseif (is_string($result)) {
                 DB::query($result);
             }
             
