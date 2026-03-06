@@ -104,4 +104,18 @@ class SMSService
             return false;
         }
     }
+    /**
+     * Enqueue an SMS using a template key
+     */
+    public static function enqueueFromTemplate(string $to, string $templateKey, array $data): int|bool
+    {
+        $template = TemplateService::getTemplate($templateKey);
+        if (!$template) {
+            // Fallback if template doesn't exist
+            return false;
+        }
+
+        $message = TemplateService::replace($template['message_body'], $data);
+        return self::enqueue($to, $message);
+    }
 }

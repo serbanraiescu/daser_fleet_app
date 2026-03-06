@@ -28,6 +28,10 @@
            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm <?php echo $activeTab === 'settings' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'; ?>">
             Setări Gateway
         </a>
+        <a href="/admin/sms-logs?tab=templates" 
+           class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm <?php echo $activeTab === 'templates' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'; ?>">
+            Template-uri SMS
+        </a>
     </nav>
 </div>
 
@@ -136,7 +140,7 @@
             </div>
         </div>
     </div>
-<?php else: ?>
+<?php elseif ($activeTab === 'settings'): ?>
     <!-- Settings Tab -->
     <div class="max-w-4xl">
         <form action="/admin/sms/settings" method="POST" class="space-y-8">
@@ -216,5 +220,84 @@
                 </div>
             </div>
         </form>
+    </div>
+<?php elseif ($activeTab === 'templates'): ?>
+    <!-- Templates Tab -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 space-y-6">
+            <?php foreach ($templates as $tmpl): ?>
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold text-slate-800"><?php echo htmlspecialchars($tmpl['template_name']); ?></h3>
+                            <p class="text-xs text-slate-500 font-mono"><?php echo htmlspecialchars($tmpl['template_key']); ?></p>
+                        </div>
+                        <span class="px-2 py-1 rounded text-[10px] font-bold uppercase <?php echo $tmpl['is_active'] ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-400'; ?>">
+                            <?php echo $tmpl['is_active'] ? 'Activ' : 'Inactiv'; ?>
+                        </span>
+                    </div>
+                    <form action="/admin/sms/template-update" method="POST" class="p-6">
+                        <input type="hidden" name="template_id" value="<?php echo $tmpl['id']; ?>">
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Corp Mesaj</label>
+                            <textarea name="message_body" rows="4" 
+                                      class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-mono text-sm"><?php echo htmlspecialchars($tmpl['message_body']); ?></textarea>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="bg-slate-800 text-white px-6 py-2 rounded-lg font-bold hover:bg-slate-900 transition-all shadow-sm text-sm">
+                                Salvează Template
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="space-y-6">
+            <div class="bg-blue-600 rounded-2xl p-6 text-white shadow-lg">
+                <h3 class="font-bold text-lg mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Placeholder-e
+                </h3>
+                <p class="text-xs text-blue-100 mb-6">Folosește aceste coduri în mesaj pentru a insera date dinamic.</p>
+                
+                <div class="space-y-3 font-mono text-xs">
+                    <div class="flex justify-between items-center border-b border-blue-500/50 pb-2">
+                        <span class="text-blue-200">{expiry_type}</span>
+                        <span>RCA, ITP, etc.</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-blue-500/50 pb-2">
+                        <span class="text-blue-200">{vehicle_plate}</span>
+                        <span>B-123-ABC</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-blue-500/50 pb-2">
+                        <span class="text-blue-200">{expiry_date}</span>
+                        <span>31.12.2024</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-blue-500/50 pb-2">
+                        <span class="text-blue-200">{days_left}</span>
+                        <span>Număr zile</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-blue-500/50 pb-2">
+                        <span class="text-blue-200">{driver_name}</span>
+                        <span>Nume Șofer</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-blue-500/50 pb-2">
+                        <span class="text-blue-200">{company_name}</span>
+                        <span>Nume Firmă</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-amber-50 rounded-2xl p-6 border border-amber-200">
+                <h3 class="font-bold text-amber-800 mb-3 flex items-center text-sm">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    Atenție la Lungime
+                </h3>
+                <p class="text-xs text-amber-700 leading-relaxed">
+                    Un SMS standard are 160 de caractere. Dacă mesajul depășește această limită (după înlocuire), acesta va fi taxat ca 2 sau mai multe SMS-uri. 
+                </p>
+            </div>
+        </div>
     </div>
 <?php endif; ?>
