@@ -368,21 +368,34 @@ class SuperAdminController extends BaseController
 
     public function smsLogs(): void
     {
+        $activeTab = $_GET['tab'] ?? 'logs';
+        
         $smsLogs = [];
         $pendingCount = 0;
-        
+        $settings = [];
+
         try {
-            $smsLogs = DB::fetchAll("SELECT * FROM sms_queue ORDER BY created_at DESC LIMIT 100");
-            $pendingCount = DB::fetch("SELECT COUNT(*) as count FROM sms_queue WHERE status = 'pending'")['count'];
+            if ($activeTab === 'logs') {
+                $smsLogs = DB::fetchAll("SELECT * FROM sms_queue ORDER BY created_at DESC LIMIT 100");
+                $pendingCount = DB::fetch("SELECT COUNT(*) as count FROM sms_queue WHERE status = 'pending'")['count'];
+            } else {
+                // Load SMS specific settings
+                $allSettings = DB::fetchAll("SELECT setting_key, setting_value FROM system_settings WHERE setting_key LIKE 'sms_%'");
+                foreach ($allSettings as $row) {
+                    $settings[$row['setting_key']] = $row['setting_value'];
+                }
+            }
         } catch (\Throwable $e) {
             // Detailed error reporting
             $_SESSION['flash_error'] = "Eroare bază de date: " . $e->getMessage();
         }
         
         $this->render('admin/sms_logs', [
-            'title' => 'SMS Gateway Logs',
+            'title' => 'SMS Gateway',
             'smsLogs' => $smsLogs,
-            'pendingCount' => $pendingCount
+            'pendingCount' => $pendingCount,
+            'activeTab' => $activeTab,
+            'settings' => $settings
         ]);
     }
 
@@ -413,5 +426,20 @@ class SuperAdminController extends BaseController
             $_SESSION['flash_error'] = "Eroare la golirea cozii: " . $e->getMessage();
         }
         $this->redirect('/admin/sms-logs');
+    }
+
+    public function updateSmsSettings(): void
+    {
+        try {
+            foreach ($_POST['settings'] as $key => $value) {
+                DB::query("INSERT INTO system_settings (setting_key, setting_value) 
+                           VALUES (?, ?) 
+                           ON DUPLICATE KEY UPDATE setting_value = ?", [$key, $value, $value]);
+            }
+            $_SESSION['flash_success'] = "Setările SMS au fost salvate cu succes.";
+        } catch (\Throwable $e) {
+            $_SESSION['flash_error'] = "Eroare la salvarea setărilor: " . $e->getMessage();
+        }
+        $this->redirect('/admin/sms-logs?tab=settings');
     }
 }
