@@ -15,4 +15,4 @@ DB::query("CREATE TABLE IF NOT EXISTS expiry_alerts_track (
     INDEX idx_check (vehicle_id, expiry_type, expiry_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
-return "Migration 038 executed successfully.";
+return "SELECT 'Migration 038 handled internally' as result;";

@@ -20,4 +20,4 @@ $defaultBody = "Alerta: {expiry_type} pentru {vehicle_plate} expira la {expiry_d
 DB::query("INSERT IGNORE INTO sms_queue_templates (template_key, template_name, message_body) 
            VALUES ('universal_expiry', 'Universal Expiry Alert', ?)", [$defaultBody]);
 
-return "Migration 037 executed successfully.";
+return "SELECT 'Migration 037 handled internally' as result;";
