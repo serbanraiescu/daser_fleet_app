@@ -244,7 +244,8 @@ class SuperAdminController extends BaseController
     public function updateSettings(): void
     {
         foreach ($_POST['settings'] as $key => $value) {
-            DB::query("UPDATE system_settings SET value = ? WHERE `key` = ?", [$value, $key]);
+            DB::query("INSERT INTO system_settings (`key`, `value`) VALUES (?, ?) 
+                       ON DUPLICATE KEY UPDATE value = VALUES(value)", [$key, $value]);
         }
         $this->redirect('/admin/settings?success=1');
     }
