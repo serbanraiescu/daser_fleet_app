@@ -56,7 +56,7 @@ class SMSService
     {
         try {
             // Use a transaction to mark as 'sending' immediately
-            $pdo = DB::getConnection();
+            $pdo = \FleetLog\Core\DB::getInstance();
             $pdo->beginTransaction();
 
             $stmt = $pdo->prepare("SELECT id, phone, message FROM sms_queue WHERE status = 'pending' ORDER BY id ASC LIMIT ? FOR UPDATE");

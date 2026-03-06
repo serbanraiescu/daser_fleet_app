@@ -374,8 +374,8 @@ class SuperAdminController extends BaseController
             $smsLogs = DB::fetchAll("SELECT * FROM sms_queue ORDER BY created_at DESC LIMIT 100");
             $pendingCount = DB::fetch("SELECT COUNT(*) as count FROM sms_queue WHERE status = 'pending'")['count'];
         } catch (\Throwable $e) {
-            // Table doesn't exist yet
-            $_SESSION['flash_error'] = "Tabela 'sms_queue' nu există încă. Te rugăm să te asiguri că migrările au rulat.";
+            // Detailed error reporting
+            $_SESSION['flash_error'] = "Eroare bază de date: " . $e->getMessage();
         }
         
         $this->render('admin/sms_logs', [

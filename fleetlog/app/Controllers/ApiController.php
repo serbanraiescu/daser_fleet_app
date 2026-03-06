@@ -248,11 +248,13 @@ class ApiController extends BaseController
     public function getPendingSMS(): void
     {
         $key = $_GET['key'] ?? '';
-        $gatewayKey = getenv('SMS_GATEWAY_KEY');
+        
+        // Try DB first so UI settings override .env defaults
+        $setting = DB::fetch("SELECT value FROM system_settings WHERE `key` = 'sms_gateway_key'");
+        $gatewayKey = $setting['value'] ?? '';
         
         if (empty($gatewayKey)) {
-            $setting = DB::fetch("SELECT value FROM system_settings WHERE `key` = 'sms_gateway_key'");
-            $gatewayKey = $setting['value'] ?? '';
+            $gatewayKey = getenv('SMS_GATEWAY_KEY');
         }
 
         if (empty($gatewayKey) || $key !== $gatewayKey) {
@@ -271,7 +273,13 @@ class ApiController extends BaseController
     public function confirmSMS(): void
     {
         $key = $_GET['key'] ?? '';
-        $gatewayKey = getenv('SMS_GATEWAY_KEY');
+        
+        $setting = DB::fetch("SELECT value FROM system_settings WHERE `key` = 'sms_gateway_key'");
+        $gatewayKey = $setting['value'] ?? '';
+        
+        if (empty($gatewayKey)) {
+            $gatewayKey = getenv('SMS_GATEWAY_KEY');
+        }
 
         if (empty($gatewayKey)) {
             $setting = DB::fetch("SELECT value FROM system_settings WHERE `key` = 'sms_gateway_key'");
