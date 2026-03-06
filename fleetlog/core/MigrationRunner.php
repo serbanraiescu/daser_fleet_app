@@ -40,21 +40,24 @@ class MigrationRunner
     private function execute(string $file): void
     {
         $filePath = dirname(__DIR__) . '/migrations/' . $file;
+        echo "Executing migration: $file ... ";
         
         try {
             $result = require $filePath;
             
             if (is_object($result) && method_exists($result, 'up')) {
                 $result->up();
+                echo "<span style='color:green'>Class UP method called.</span> ";
             } elseif (is_string($result)) {
                 DB::query($result);
+                echo "<span style='color:green'>String SQL executed.</span> ";
             }
             
-            // If it returns true or a string, we consider it successful
             DB::query("INSERT INTO migrations (migration) VALUES (?)", [$file]);
-            echo "Executed: $file\n";
+            echo "<b style='color:green'>SUCCESS</b><br>";
         } catch (\Exception $e) {
-            echo "Error executing $file: " . $e->getMessage() . "\n";
+            echo "<b style='color:red'>ERROR:</b> " . $e->getMessage() . "<br>";
+            error_log("Migration Error ($file): " . $e->getMessage());
         }
     }
 }
