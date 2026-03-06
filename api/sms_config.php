@@ -27,10 +27,18 @@ function validateSmsKey($config) {
     }
 
     $key = $_GET['key'] ?? '';
-    // Also check Authorization header for extra compatibility
+    
+    // Authorization header fallback
     if (empty($key)) {
-        $headers = getallheaders();
-        $auth = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+        $auth = "";
+        if (function_exists('getallheaders')) {
+            $headers = getallheaders();
+            $auth = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+        } else {
+            // Manual fallback from $_SERVER
+            $auth = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+        }
+        
         if (str_starts_with($auth, 'Bearer ')) $key = substr($auth, 7);
         else $key = $auth;
     }
@@ -38,7 +46,7 @@ function validateSmsKey($config) {
     $gatewayKey = $config['SMS_GATEWAY_KEY'] ?? '';
     if (empty($gatewayKey) || $key !== $gatewayKey) {
         http_response_code(403);
-        echo json_encode(["status" => "error", "message" => "Unauthorized"]);
+        echo json_encode(["status" => "error", "message" => "Unauthorized", "debug_hint" => "Check your key in .env or settings"]);
         exit;
     }
 }
@@ -53,8 +61,31 @@ function getSmsPdo($config) {
         ]);
     } catch (Exception $e) {
         http_response_code(500);
-        echo json_encode(["status" => "error", "message" => "DB Connection Failed"]);
+        header("Content-Type: application/json");
+        echo json_encode(["status" => "error", "message" => "DB Connection Failed: " . $e->getMessage()]);
         exit;
+    }
+}
+
+// Logging Helper
+function logSmsRequest($source) {
+    try {
+        $logFile = __DIR__ . '/fleetlog/storage/sms_debug.txt';
+        $logDir = dirname($logFile);
+        if (!is_dir($logDir)) @mkdir($logDir, 0755, true);
+        
+        $data = [
+            'time' => date('Y-m-d H:i:s'),
+            'source' => $source,
+            'method' => $_SERVER['REQUEST_METHOD'],
+            'url' => $_SERVER['REQUEST_URI'],
+            'ip' => $_SERVER['REMOTE_ADDR'],
+            'get' => $_GET,
+            'body_len' => strlen(file_get_contents('php://input'))
+        ];
+        @file_put_contents($logFile, json_encode($data) . "\n", FILE_APPEND);
+    } catch (Exception $e) {
+        // Don't 500 if logging fails
     }
 }
 
