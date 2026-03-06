@@ -171,6 +171,19 @@ class ApiController extends BaseController
      */
     private function jsonResponse(array $data, int $code = 200): void
     {
+        // Add CORS headers for Mobile App / Development
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+        header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
+        header('Access-Control-Expose-Headers: Set-Cookie');
+        header('Access-Control-Allow-Credentials: true');
+
+        // Handle preflight OPTIONS request
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            http_response_code(200);
+            exit;
+        }
+
         header('Content-Type: application/json');
         http_response_code($code);
         echo json_encode($data);
