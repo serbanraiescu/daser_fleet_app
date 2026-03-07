@@ -452,9 +452,10 @@ class SuperAdminController extends BaseController
     {
         $id = $_POST['template_id'] ?? 0;
         $body = $_POST['message_body'] ?? '';
+        $alertDays = $_POST['alert_days'] ?? '30,7,3,1';
 
         try {
-            DB::query("UPDATE sms_queue_templates SET message_body = ? WHERE id = ?", [$body, $id]);
+            DB::query("UPDATE sms_queue_templates SET message_body = ?, alert_days = ? WHERE id = ?", [$body, $alertDays, $id]);
             $_SESSION['flash_success'] = "Template-ul a fost actualizat.";
         } catch (\Throwable $e) {
             $_SESSION['flash_error'] = "Eroare la salvare: " . $e->getMessage();
@@ -465,79 +466,11 @@ class SuperAdminController extends BaseController
     public function triggerAlerts(): void
     {
         try {
-            // 1. Find expiring docs that haven't been tracked for current expiry date
-            $expiring = DB::fetchAll("
-                SELECT v.id as vehicle_id, v.license_plate, v.expiry_rca, v.expiry_itp, v.expiry_rovigneta,
-                       t.id as tenant_id, t.name as tenant_name, t.contact_phone, t.notification_phone,
-                       u.name as driver_name
-                FROM vehicles v
-                JOIN tenants t ON v.tenant_id = t.id
-                LEFT JOIN users u ON v.driver_id = u.id
-                WHERE v.status != 'archived'
-                AND (
-                    (expiry_rca IS NOT NULL AND expiry_rca <= DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY)) OR 
-                    (expiry_itp IS NOT NULL AND expiry_itp <= DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY)) OR 
-                    (expiry_rovigneta IS NOT NULL AND expiry_rovigneta <= DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY))
-                )
-            ");
+            list($enqueuedCount, $skippedTenants) = \FleetLog\Core\SMSService::processExpiryAlerts();
 
-            $enqueuedCount = 0;
-            $skippedTenants = [];
-
-            foreach ($expiring as $v) {
-                $recipientPhone = !empty($v['notification_phone']) ? $v['notification_phone'] : $v['contact_phone'];
-
-                if (empty($recipientPhone)) {
-                    $skippedTenants[$v['tenant_id']] = $v['tenant_name'];
-                    continue;
-                }
-
-                $docTypes = [
-                    'RCA' => $v['expiry_rca'],
-                    'ITP' => $v['expiry_itp'],
-                    'Rovigneta' => $v['expiry_rovigneta']
-                ];
-
-                foreach ($docTypes as $type => $date) {
-                    if ($date && strtotime($date) <= strtotime('+30 days')) {
-                        // Check if already tracked for this EXPRIY DATE (not just today)
-                        $tracked = DB::fetch(
-                            "SELECT id FROM expiry_alerts_track WHERE vehicle_id = ? AND expiry_type = ? AND expiry_date = ?",
-                            [$v['vehicle_id'], $type, $date]
-                        );
-
-                        if (!$tracked) {
-                            $daysLeft = ceil((strtotime($date) - time()) / 86400);
-                            
-                            $data = [
-                                'expiry_type' => $type,
-                                'vehicle_plate' => $v['license_plate'],
-                                'expiry_date' => date('d.m.Y', strtotime($date)),
-                                'days_left' => $daysLeft,
-                                'vehicle_id' => $v['vehicle_id'],
-                                'driver_name' => $v['driver_name'] ?? 'N/A',
-                                'company_name' => $v['tenant_name'],
-                                'asset_name' => $v['license_plate'],
-                                'asset_type' => 'Vehicul',
-                                'phone_number' => $recipientPhone
-                            ];
-
-                            if (\FleetLog\Core\SMSService::enqueueFromTemplate($recipientPhone, 'universal_expiry', $data)) {
-                                // Track it
-                                DB::query(
-                                    "INSERT INTO expiry_alerts_track (tenant_id, vehicle_id, expiry_type, expiry_date) VALUES (?, ?, ?, ?)",
-                                    [$v['tenant_id'], $v['vehicle_id'], $type, $date]
-                                );
-                                $enqueuedCount++;
-                            }
-                        }
-                    }
-                }
-            }
-
-            $successMsg = "S-au adăugat $enqueuedCount alerte NOI în coada SMS (cele deja trimise au fost sărite).";
+            $successMsg = "S-au adăugat $enqueuedCount alerte NOI în coada SMS (cele deja trimise la actualele milestoni au fost sărite).";
             if (!empty($skippedTenants)) {
-                $successMsg .= " Atenție: Tenanții (" . implode(', ', array_unique($skippedTenants)) . ") nu au telefon setat.";
+                $successMsg .= " Atenție: Tenanții (" . implode(', ', $skippedTenants) . ") nu au telefon setat.";
             }
             $_SESSION['flash_success'] = $successMsg;
         } catch (\Throwable $e) {
