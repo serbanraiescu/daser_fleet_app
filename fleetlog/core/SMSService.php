@@ -139,11 +139,9 @@ class SMSService
         // 2. Find expiring docs grouped by tenant
         $expiring = DB::fetchAll("
             SELECT v.id as vehicle_id, v.license_plate, v.expiry_rca, v.expiry_itp, v.expiry_rovigneta,
-                   t.id as tenant_id, t.name as tenant_name, t.contact_phone, t.notification_phone,
-                   u.name as driver_name
+                   t.id as tenant_id, t.name as tenant_name, t.contact_phone, t.notification_phone
             FROM vehicles v
             JOIN tenants t ON v.tenant_id = t.id
-            LEFT JOIN users u ON v.driver_id = u.id
             WHERE v.status != 'archived'
             AND (
                 (expiry_rca IS NOT NULL AND expiry_rca <= DATE_ADD(CURRENT_DATE(), INTERVAL ? DAY)) OR 
