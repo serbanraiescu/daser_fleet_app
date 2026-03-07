@@ -18,7 +18,7 @@
 </div>
 
 <!-- Tabs Navigation -->
-<div class="mb-6 border-b border-slate-200">
+<div class="mb-6 border-b border-slate-200 flex justify-between items-end">
     <nav class="-mb-px flex space-x-8">
         <a href="/admin/sms-logs?tab=logs" 
            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm <?php echo $activeTab === 'logs' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'; ?>">
@@ -33,6 +33,13 @@
             Template-uri SMS
         </a>
     </nav>
+    <div class="pb-3 px-1">
+        <a href="/admin/sms/trigger-alerts" 
+           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-all shadow-md">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Verifică manual expirările
+        </a>
+    </div>
 </div>
 
 <?php if (isset($_SESSION['flash_success'])): ?>
@@ -192,11 +199,7 @@
                     </div>
                 </div>
 
-                <div class="mt-8 pt-6 border-t border-slate-100 flex justify-between items-center">
-                    <div class="text-sm text-slate-500">
-                        <p><b>Cron Job / Trigger:</b> Poți apela manual notificările de expirare:</p>
-                        <a href="/admin/sms/trigger-alerts" class="text-blue-600 hover:underline font-bold">Trimite acum alertele de expirare</a>
-                    </div>
+                <div class="mt-8 pt-6 border-t border-slate-100 flex justify-end">
                     <button type="submit" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-md">
                         Salvează Setările
                     </button>
