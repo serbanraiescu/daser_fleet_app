@@ -468,7 +468,7 @@ class SuperAdminController extends BaseController
         try {
             list($enqueuedCount, $skippedTenants) = \FleetLog\Core\SMSService::processExpiryAlerts();
 
-            $successMsg = "S-au adăugat $enqueuedCount alerte NOI în coada SMS (cele deja trimise la actualele milestoni au fost sărite).";
+            $successMsg = "S-au adăugat $enqueuedCount alerte NOI în coada SMS (doar pentru milestonii de AZI).";
             if (!empty($skippedTenants)) {
                 $successMsg .= " Atenție: Tenanții (" . implode(', ', $skippedTenants) . ") nu au telefon setat.";
             }

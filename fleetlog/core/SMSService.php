@@ -170,9 +170,9 @@ class SMSService
                 $expiryTimestamp = strtotime($date);
                 $daysLeft = ceil(($expiryTimestamp - time()) / 86400);
 
-                // Check each milestone
+                // Check each milestone - Trigger ONLY on the exact day
                 foreach ($alertDays as $milestone) {
-                    if ($daysLeft <= (int)$milestone && $daysLeft >= 0) {
+                    if ($daysLeft == (int)$milestone) {
                         // Check if already tracked for this SPECIFIC milestone + date
                         $tracked = DB::fetch(
                             "SELECT id FROM expiry_alerts_track WHERE vehicle_id = ? AND expiry_type = ? AND expiry_date = ? AND alert_day = ?",
