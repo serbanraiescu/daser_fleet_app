@@ -12,28 +12,27 @@ class SuperAdminController extends BaseController
     {
         $tenantsCount = DB::fetch("SELECT COUNT(*) as count FROM tenants")['count'];
         $vehiclesCount = DB::fetch("SELECT COUNT(*) as count FROM vehicles")['count'];
-        $emailsSent = DB::fetch("SELECT COUNT(*) as count FROM email_logs")['count'];
+        $emailsLifetime = DB::fetch("SELECT COUNT(*) as count FROM email_logs")['count'];
+        $emailsToday = DB::fetch("SELECT COUNT(*) as count FROM email_logs WHERE DATE(created_at) = CURRENT_DATE")['count'];
         
-        // Real SMS count (safe check)
-        $smsSent = 0;
+        $smsLifetime = 0;
+        $smsToday = 0;
         try {
-            $smsResult = DB::fetch("SELECT COUNT(*) as count FROM sms_queue WHERE status = 'sent'");
-            $smsSent = $smsResult['count'] ?? 0;
-        } catch (\Throwable $e) {
-            // Table doesn't exist yet or migration pending
-        }
-        
-        $uptime = "99.9%";
+            $smsLifetime = DB::fetch("SELECT COUNT(*) as count FROM sms_queue WHERE status = 'sent'")['count'];
+            $smsToday = DB::fetch("SELECT COUNT(*) as count FROM sms_queue WHERE status = 'sent' AND DATE(created_at) = CURRENT_DATE")['count'];
+        } catch (\Throwable $e) {}
 
         $this->render('admin/dashboard', [
             'title' => 'Admin Dashboard',
             'stats' => [
                 'tenants' => $tenantsCount,
                 'vehicles' => $vehiclesCount,
-                'emails' => $emailsSent,
-                'sms' => $smsSent,
-                'uptime' => $uptime,
-                'health' => 95 // %
+                'emails_lifetime' => $emailsLifetime,
+                'emails_today' => $emailsToday,
+                'sms_lifetime' => $smsLifetime,
+                'sms_today' => $smsToday,
+                'uptime' => "99.9%",
+                'health' => 95
             ]
         ]);
     }
@@ -477,5 +476,45 @@ class SuperAdminController extends BaseController
             $_SESSION['flash_error'] = "Eroare la generarea alertelor: " . $e->getMessage();
         }
         $this->redirect('/admin/sms-logs');
+    }
+
+    public function emailLogs(): void
+    {
+        $activeTab = $_GET['tab'] ?? 'logs';
+        
+        $emailLogs = [];
+        $pendingCount = 0;
+        $templates = [];
+
+        try {
+            if ($activeTab === 'logs') {
+                $emailLogs = DB::fetchAll("SELECT * FROM email_logs ORDER BY created_at DESC LIMIT 100");
+                $pendingCount = DB::fetch("SELECT COUNT(*) as count FROM email_queue WHERE status = 'pending'")['count'];
+            } else {
+                // Templates tab
+                $templates = DB::fetchAll("SELECT * FROM email_templates ORDER BY name ASC");
+            }
+        } catch (\Throwable $e) {
+            $_SESSION['flash_error'] = "Eroare bază de date: " . $e->getMessage();
+        }
+        
+        $this->render('admin/email_logs', [
+            'title' => 'Email Gateway & Logs',
+            'emailLogs' => $emailLogs,
+            'pendingCount' => $pendingCount,
+            'activeTab' => $activeTab,
+            'templates' => $templates
+        ]);
+    }
+
+    public function clearEmailQueue(): void
+    {
+        try {
+            DB::query("DELETE FROM email_queue WHERE status = 'pending'");
+            $_SESSION['flash_success'] = "Coada de e-mail a fost golită cu succes.";
+        } catch (\Throwable $e) {
+            $_SESSION['flash_error'] = "Eroare la golirea cozii: " . $e->getMessage();
+        }
+        $this->redirect('/admin/email-logs');
     }
 }

@@ -25,7 +25,9 @@ $router->add('GET', '/admin/tenants/impersonate/{id}', 'SuperAdminController@imp
 $router->add('GET', '/admin/settings', 'SuperAdminController@settings', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('POST', '/admin/settings', 'SuperAdminController@updateSettings', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('POST', '/admin/settings/test-email', 'SuperAdminController@sendTestEmail', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
-$router->add('GET', '/admin/email-templates', 'SuperAdminController@emailTemplates', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
+$router->add('GET', '/admin/email-logs', 'SuperAdminController@emailLogs', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
+$router->add('GET', '/admin/email-templates', 'SuperAdminController@emailLogs', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
+$router->add('POST', '/admin/email/clear-queue', 'SuperAdminController@clearEmailQueue', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('GET', '/admin/email-templates/edit/{id}', 'SuperAdminController@editEmailTemplate', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('POST', '/admin/email-templates/edit/{id}', 'SuperAdminController@updateEmailTemplate', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('GET', '/admin/email-templates/preview/{id}', 'SuperAdminController@previewTemplate', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);

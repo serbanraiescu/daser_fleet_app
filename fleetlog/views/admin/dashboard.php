@@ -46,7 +46,10 @@
                 <div class="w-12 h-12 bg-emerald-500 text-white rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-emerald-200">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                 </div>
-                <div class="text-4xl font-black text-slate-800"><?php echo $stats['emails']; ?></div>
+                <div class="flex items-baseline space-x-2">
+                    <div class="text-4xl font-black text-slate-800"><?php echo $stats['emails_lifetime']; ?></div>
+                    <div class="text-emerald-600 font-bold text-sm">+<?php echo $stats['emails_today']; ?> azi</div>
+                </div>
                 <div class="text-slate-500 font-bold uppercase text-xs tracking-wider mt-1">Email-uri Trimise</div>
             </div>
         </div>
@@ -54,12 +57,15 @@
         <!-- SMS -->
         <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition-all group overflow-hidden relative">
             <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-amber-50 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
-            <div class="relative z-10 opacity-50">
+            <div class="relative z-10">
                 <div class="w-12 h-12 bg-amber-500 text-white rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-amber-200">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
                 </div>
-                <div class="text-4xl font-black text-slate-800"><?php echo $stats['sms']; ?></div>
-                <div class="text-slate-500 font-bold uppercase text-xs tracking-wider mt-1">SMS Trimise (Coming Soon)</div>
+                <div class="flex items-baseline space-x-2">
+                    <div class="text-4xl font-black text-slate-800"><?php echo $stats['sms_lifetime']; ?></div>
+                    <div class="text-amber-600 font-bold text-sm">+<?php echo $stats['sms_today']; ?> azi</div>
+                </div>
+                <div class="text-slate-500 font-bold uppercase text-xs tracking-wider mt-1">SMS Trimise</div>
             </div>
         </div>
     </div>
@@ -110,11 +116,17 @@
                     </div>
                     <span class="font-bold text-slate-700">Health Check</span>
                 </a>
-                <a href="/admin/email-templates" class="flex items-center p-4 bg-slate-50 hover:bg-amber-50 rounded-2xl border border-slate-100 hover:border-amber-200 transition-all group">
-                    <div class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center mr-3 group-hover:bg-amber-500 group-hover:text-white transition-all text-slate-500">
+                <a href="/admin/email-logs" class="flex items-center p-4 bg-slate-50 hover:bg-emerald-50 rounded-2xl border border-slate-100 hover:border-emerald-200 transition-all group">
+                    <div class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center mr-3 group-hover:bg-emerald-500 group-hover:text-white transition-all text-slate-500">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                     </div>
                     <span class="font-bold text-slate-700">Email Logs</span>
+                </a>
+                <a href="/admin/sms-logs" class="flex items-center p-4 bg-slate-50 hover:bg-amber-50 rounded-2xl border border-slate-100 hover:border-amber-200 transition-all group">
+                    <div class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center mr-3 group-hover:bg-amber-500 group-hover:text-white transition-all text-slate-500">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                    </div>
+                    <span class="font-bold text-slate-700">SMS Gateway</span>
                 </a>
                 <a href="/admin/settings" class="flex items-center p-4 bg-slate-50 hover:bg-slate-200 rounded-2xl border border-slate-100 hover:border-slate-300 transition-all group">
                     <div class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center mr-3 group-hover:bg-slate-800 group-hover:text-white transition-all text-slate-500">
