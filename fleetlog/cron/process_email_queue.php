@@ -21,8 +21,9 @@ set_time_limit(50);
 echo "[" . date('Y-m-d H:i:s') . "] Starting Email Queue processing...\n";
 
 try {
-    $processed = EmailService::processQueue(5);
+    $processed = EmailService::processQueue(20);
     echo "[" . date('Y-m-d H:i:s') . "] Successfully processed $processed emails.\n";
 } catch (Exception $e) {
     echo "[" . date('Y-m-d H:i:s') . "] Error processing queue: " . $e->getMessage() . "\n";
 }
+echo "Done.\n";
