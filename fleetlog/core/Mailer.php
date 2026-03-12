@@ -9,6 +9,15 @@ class Mailer
 {
     private static ?array $settings = null;
 
+    private static function getEnv(string $key)
+    {
+        $val = getenv($key);
+        if ($val === false || $val === "") {
+            $val = $_ENV[$key] ?? $_SERVER[$key] ?? null;
+        }
+        return $val;
+    }
+
     public static function getSettings(): array
     {
         if (self::$settings === null) {
@@ -19,14 +28,14 @@ class Mailer
             }
             
             // Sensitive data from .env overrides DB
-            if (\getenv('SMTP_PASS')) {
-                self::$settings['smtp_pass'] = \getenv('SMTP_PASS');
+            if ($val = self::getEnv('SMTP_PASS')) {
+                self::$settings['smtp_pass'] = $val;
             }
-            if (\getenv('SMTP_USER')) {
-                self::$settings['smtp_user'] = \getenv('SMTP_USER');
+            if ($val = self::getEnv('SMTP_USER')) {
+                self::$settings['smtp_user'] = $val;
             }
-            if (\getenv('SMTP_HOST')) {
-                self::$settings['smtp_host'] = \getenv('SMTP_HOST');
+            if ($val = self::getEnv('SMTP_HOST')) {
+                self::$settings['smtp_host'] = $val;
             }
         }
         return self::$settings;

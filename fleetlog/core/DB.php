@@ -9,13 +9,22 @@ class DB
 {
     private static ?PDO $instance = null;
 
+    private static function getEnv(string $key, $default = null)
+    {
+        $val = getenv($key);
+        if ($val === false || $val === "") {
+            $val = $_ENV[$key] ?? $_SERVER[$key] ?? $default;
+        }
+        return $val;
+    }
+
     public static function getInstance(): PDO
     {
         if (self::$instance === null) {
-            $host = getenv('DB_HOST') ?: 'localhost';
-            $db   = getenv('DB_NAME');
-            $user = getenv('DB_USER');
-            $pass = getenv('DB_PASS');
+            $host = self::getEnv('DB_HOST', 'localhost');
+            $db   = self::getEnv('DB_NAME');
+            $user = self::getEnv('DB_USER');
+            $pass = self::getEnv('DB_PASS');
             $charset = 'utf8mb4';
 
             $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
