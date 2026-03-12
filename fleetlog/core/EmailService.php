@@ -36,17 +36,19 @@ class EmailService
         $mail->Encoding   = 'quoted-printable';
 
         // Recipients
-        $fromEmail = $settings['smtp_from_email'] ?: 'fleet@' . (getenv('HTTP_HOST') ?: $_SERVER['HTTP_HOST'] ?? 'daserdesign.ro');
-        $fromName  = $settings['smtp_from_name'] ?: 'FleetLog';
+        $fromEmail = $settings['smtp_from_email'] ?: 'fleet@daserdesign.ro';
+        $fromName  = $settings['smtp_from_name'] ?: 'FleetLog Notifications';
+        
         $mail->setFrom($fromEmail, $fromName);
-        $mail->Sender = $fromEmail; // Explicit Return-Path
+        $mail->addReplyTo($fromEmail, $fromName);
+        $mail->Sender = $fromEmail; // Set Return-Path (Critical for SPF/Yahoo)
 
         // Content
         $mail->isHTML(true);
         
-        // Remove ALL priority headers
-        $mail->Priority = null;
-        $mail->XMailer  = ' '; // Neutral X-Mailer
+        // Yahoo & Gmail deliverability headers
+        $mail->Priority = 3; // 3 = Normal, explicitly set
+        $mail->XMailer  = ' '; // Mask the PHP origin to avoid spam hits
         
         return $mail;
     }
