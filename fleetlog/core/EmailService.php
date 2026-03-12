@@ -36,7 +36,7 @@ class EmailService
         $mail->Encoding   = 'quoted-printable';
 
         // Recipients
-        $fromEmail = $settings['smtp_from_email'] ?: 'noreply@' . ($_SERVER['HTTP_HOST'] ?? 'daserdesign.ro');
+        $fromEmail = $settings['smtp_from_email'] ?: 'fleet@' . (getenv('HTTP_HOST') ?: $_SERVER['HTTP_HOST'] ?? 'daserdesign.ro');
         $fromName  = $settings['smtp_from_name'] ?: 'FleetLog';
         $mail->setFrom($fromEmail, $fromName);
         $mail->Sender = $fromEmail; // Explicit Return-Path
@@ -48,9 +48,6 @@ class EmailService
         $mail->Priority = null;
         $mail->XMailer  = ' '; // Neutral X-Mailer
         
-        // Add List-Unsubscribe
-        $mail->addCustomHeader('List-Unsubscribe', '<mailto:' . $fromEmail . '?subject=unsubscribe>, <https://' . ($_SERVER['HTTP_HOST'] ?? 'daserdesign.ro') . '/unsubscribe>');
-
         return $mail;
     }
 
@@ -175,7 +172,8 @@ class EmailService
      */
     public static function wrapHtml(string $title, string $content): string
     {
-        $host = $_SERVER['HTTP_HOST'] ?? 'daserdesign.ro';
+        $settings = Mailer::getSettings();
+        $host = $_SERVER['HTTP_HOST'] ?? 'fleet.daserdesign.ro';
         return "
 <!DOCTYPE html>
 <html lang='ro'>

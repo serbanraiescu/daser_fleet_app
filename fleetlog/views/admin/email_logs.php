@@ -93,9 +93,9 @@
                                     <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase <?php echo $statusClass; ?>">
                                         <?php echo $statusLabel; ?>
                                     </span>
-                                    <?php if ($log['error_message']): ?>
-                                        <div class="text-[9px] text-red-500 mt-1 truncate max-w-[100px]" title="<?php echo htmlspecialchars($log['error_message']); ?>">
-                                            <?php echo htmlspecialchars($log['error_message']); ?>
+                                    <?php if ($log['error_message'] || $log['provider_response']): ?>
+                                        <div class="text-[9px] text-slate-400 mt-1 truncate max-w-[150px]" title="<?php echo htmlspecialchars($log['error_message'] . ' ' . $log['provider_response']); ?>">
+                                            <?php echo htmlspecialchars($log['error_message'] ?: $log['provider_response']); ?>
                                         </div>
                                     <?php endif; ?>
                                 </td>
