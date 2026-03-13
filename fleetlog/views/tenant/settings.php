@@ -24,6 +24,15 @@
         </div>
 
         <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Interface Language</label>
+            <select name="language" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                <option value="ro" <?php echo ($tenant['language'] ?? 'ro') === 'ro' ? 'selected' : ''; ?>>Română</option>
+                <option value="en" <?php echo ($tenant['language'] ?? 'ro') === 'en' ? 'selected' : ''; ?>>English</option>
+            </select>
+            <p class="mt-1 text-xs text-slate-500 italic">The administrative interface will use this language.</p>
+        </div>
+
+        <div>
             <label class="block text-sm font-medium text-slate-700 mb-1">Custom Trip Types</label>
             <textarea name="trip_types" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="CURSE, NAVETA, SERVICE, ALTE"><?php echo \htmlspecialchars($tenant['trip_types'] ?? ''); ?></textarea>
             <p class="mt-1 text-xs text-slate-500 italic">Separate types with commas.</p>

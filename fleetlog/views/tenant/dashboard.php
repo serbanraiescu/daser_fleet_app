@@ -2,7 +2,7 @@
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
         <div class="flex items-center justify-between mb-2">
-            <span class="text-slate-500 text-sm font-bold uppercase tracking-wider">Costs (Current Month)</span>
+            <span class="text-slate-500 text-sm font-bold uppercase tracking-wider"><?php echo __('monthly_expenses'); ?></span>
             <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             </div>
@@ -13,7 +13,7 @@
 
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
         <div class="flex items-center justify-between mb-2">
-            <span class="text-slate-500 text-sm font-bold uppercase tracking-wider">Distance (Current Month)</span>
+            <span class="text-slate-500 text-sm font-bold uppercase tracking-wider"><?php echo __('monthly_km'); ?></span>
             <div class="p-2 bg-green-50 text-green-600 rounded-lg">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L16 4m0 13V4m-6 3l6-3"></path></svg>
             </div>
@@ -24,7 +24,7 @@
 
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
         <div class="flex items-center justify-between mb-2">
-            <span class="text-slate-500 text-sm font-bold uppercase tracking-wider">Active Trips</span>
+            <span class="text-slate-500 text-sm font-bold uppercase tracking-wider"><?php echo __('active_trips'); ?></span>
             <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
             </div>
@@ -35,7 +35,7 @@
 
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
         <div class="flex items-center justify-between mb-2">
-            <span class="text-slate-500 text-sm font-bold uppercase tracking-wider">Fleet Status</span>
+            <span class="text-slate-500 text-sm font-bold uppercase tracking-wider"><?php echo __('total_vehicles'); ?></span>
             <div class="p-2 bg-amber-50 text-amber-600 rounded-lg">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
             </div>
@@ -64,7 +64,7 @@
             <div class="p-5 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
                 <h2 class="text-base font-bold text-slate-800 flex items-center">
                     <svg class="w-5 h-5 text-orange-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                    Service Due Soon
+                    <?php echo __('service_due'); ?>
                 </h2>
                 <span class="bg-white px-2 py-0.5 rounded text-[10px] font-black text-slate-400 uppercase border border-slate-200"><?php echo count($serviceDue); ?> ALERTĂ</span>
             </div>
@@ -102,7 +102,7 @@
             <div class="p-5 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
                 <h2 class="text-base font-bold text-slate-800 flex items-center">
                     <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    Expiring Documents
+                    <?php echo __('expiring_docs'); ?>
                 </h2>
                 <span class="bg-white px-2 py-0.5 rounded text-[10px] font-black text-slate-400 uppercase border border-slate-200">Next 30 Days</span>
             </div>

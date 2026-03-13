@@ -320,13 +320,14 @@ class TenantController extends BaseController
     {
         $tenantId = Auth::tenantId();
         $timezone = $_POST['timezone'] ?? 'Europe/Bucharest';
+        $language = $_POST['language'] ?? 'ro';
         $tripTypes = $_POST['trip_types'] ?? '';
         $contactPhone = $_POST['contact_phone'] ?? null;
         $notificationPhone = $_POST['notification_phone'] ?? null;
         $notificationEmails = $_POST['notification_emails'] ?? null;
 
-        DB::query("UPDATE tenants SET timezone = ?, trip_types = ?, contact_phone = ?, notification_phone = ?, notification_emails = ? WHERE id = ?", [
-            $timezone, $tripTypes, $contactPhone, $notificationPhone, $notificationEmails, $tenantId
+        DB::query("UPDATE tenants SET timezone = ?, language = ?, trip_types = ?, contact_phone = ?, notification_phone = ?, notification_emails = ? WHERE id = ?", [
+            $timezone, $language, $tripTypes, $contactPhone, $notificationPhone, $notificationEmails, $tenantId
         ]);
 
         $this->redirect('/tenant/settings?success=1');

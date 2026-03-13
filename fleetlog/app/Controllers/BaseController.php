@@ -7,6 +7,21 @@ use FleetLog\Core\RBAC;
 
 abstract class BaseController
 {
+    public function __construct()
+    {
+        $tenantId = Auth::tenantId();
+        $lang = 'ro'; // Default
+
+        if ($tenantId !== null) {
+            // Cache language in session for performance if needed, 
+            // but for now fetch it or use a session-stored value if we update Auth
+            $tenant = DB::fetch("SELECT language FROM tenants WHERE id = ?", [$tenantId]);
+            $lang = $tenant['language'] ?? 'ro';
+        }
+
+        \FleetLog\Core\LanguageService::load($lang);
+    }
+
     protected function render(string $view, array $data = []): void
     {
         $viewPath = dirname(dirname(__DIR__)) . '/views/' . $view . '.php';
