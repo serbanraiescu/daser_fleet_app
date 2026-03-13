@@ -151,7 +151,7 @@
 
         <div x-show="!showPinForm" class="flex items-center text-slate-400 italic text-xs">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-            <?php echo !empty(Auth::user()['pin']) ? 'PIN is set and active.' : 'No PIN set yet.'; ?>
+            <?php echo !empty(\FleetLog\Core\Auth::user()['pin']) ? 'PIN is set and active.' : 'No PIN set yet.'; ?>
         </div>
     </div>
 </div>
