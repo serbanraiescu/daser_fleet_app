@@ -112,4 +112,46 @@
             </div>
         </div>
     <?php endif; ?>
+
+    <!-- Security Settings (PIN) -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200" x-data="{ showPinForm: false }">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider">Security Settings</h3>
+            <button @click="showPinForm = !showPinForm" class="text-xs text-blue-600 font-bold uppercase">
+                <span x-show="!showPinForm">Set/Change PIN</span>
+                <span x-show="showPinForm">Cancel</span>
+            </button>
+        </div>
+
+        <?php if (isset($_SESSION['flash_success'])): ?>
+            <div class="mb-4 p-3 bg-green-50 text-green-700 text-xs rounded-lg border border-green-100">
+                <?php echo $_SESSION['flash_success']; unset($_SESSION['flash_success']); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['flash_error'])): ?>
+            <div class="mb-4 p-3 bg-red-50 text-red-700 text-xs rounded-lg border border-red-100">
+                <?php echo $_SESSION['flash_error']; unset($_SESSION['flash_error']); ?>
+            </div>
+        <?php endif; ?>
+
+        <div x-show="showPinForm" x-cloak>
+            <form action="/driver/set-pin" method="POST" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">New Login PIN (4-6 digits)</label>
+                    <input type="text" name="pin" inputmode="numeric" pattern="[0-9]*" maxlength="6" required
+                           class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-center text-2xl tracking-[1em] focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <button type="submit" class="w-full py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-all">
+                    Save Secure PIN
+                </button>
+                <p class="text-[10px] text-slate-400 text-center">Șoferii pot folosi acest PIN pentru o logare mai rapidă pe telefon.</p>
+            </form>
+        </div>
+
+        <div x-show="!showPinForm" class="flex items-center text-slate-400 italic text-xs">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            <?php echo !empty(Auth::user()['pin']) ? 'PIN is set and active.' : 'No PIN set yet.'; ?>
+        </div>
+    </div>
 </div>

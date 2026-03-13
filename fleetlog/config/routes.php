@@ -94,6 +94,7 @@ $router->add('GET', '/driver/fueling', 'FuelingController@show', $driverMiddlewa
 $router->add('POST', '/driver/fueling', 'FuelingController@store', $driverMiddleware);
 $router->add('GET', '/driver/report-damage', 'DamageController@showReport', $driverMiddleware);
 $router->add('POST', '/driver/report-damage', 'DamageController@store', $driverMiddleware);
+$router->add('POST', '/driver/set-pin', 'DriverController@setPin', $driverMiddleware);
 
 // QR Generation
 $router->add('GET', '/qr/generate', 'QrController@generate');

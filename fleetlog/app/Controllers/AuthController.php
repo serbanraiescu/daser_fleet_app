@@ -18,14 +18,22 @@ class AuthController extends BaseController
     {
         $email = $_POST['email'] ?? '';
         $password = $_POST['password'] ?? '';
+        $pin = $_POST['pin'] ?? '';
         $remember = isset($_POST['remember']);
 
-        if (Auth::login($email, $password, $remember)) {
+        $success = false;
+        if (!empty($pin)) {
+            $success = Auth::loginWithPin($email, $pin, $remember);
+        } else {
+            $success = Auth::login($email, $password, $remember);
+        }
+
+        if ($success) {
             $this->redirectByRole();
         } else {
             $this->render('auth/login', [
                 'title' => 'Login - FleetLog',
-                'error' => 'Invalid email or password.'
+                'error' => 'Invalid email, password or PIN.'
             ]);
         }
     }

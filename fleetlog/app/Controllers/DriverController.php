@@ -59,5 +59,26 @@ class DriverController extends BaseController
                 'error' => 'Failed to save profile. Please try again.'
             ]);
         }
+        }
+    }
+
+    public function setPin(): void
+    {
+        $pin = $_POST['pin'] ?? '';
+        if (!preg_match('/^[0-9]{4,6}$/', $pin)) {
+            $_SESSION['flash_error'] = "PIN-ul trebuie să fie format din 4 până la 6 cifre.";
+            $this->redirect('/driver/dashboard');
+        }
+
+        $repo = new \FleetLog\App\Repositories\UserRepository();
+        $user = Auth::user();
+
+        if ($repo->updatePin($user['id'], $pin)) {
+            $_SESSION['flash_success'] = "PIN-ul a fost setat cu succes! Acum îl poți folosi la login.";
+        } else {
+            $_SESSION['flash_error'] = "Eroare la salvarea PIN-ului.";
+        }
+
+        $this->redirect('/driver/dashboard');
     }
 }

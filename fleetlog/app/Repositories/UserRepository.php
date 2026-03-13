@@ -46,10 +46,11 @@ class UserRepository extends BaseRepository
             'id_expiry'      => $input['id_expiry'] ?? null,
             'license_series' => $input['license_series'] ?? null,
             'license_expiry' => $input['license_expiry'] ?? null,
+            'pin'            => isset($input['pin']) ? password_hash($input['pin'], PASSWORD_DEFAULT) : null,
         ];
         
-        $sql = "INSERT INTO users (tenant_id, name, email, phone, password, role, active, cnp, id_expiry, license_series, license_expiry) 
-                VALUES (:tenant_id, :name, :email, :phone, :password, :role, :active, :cnp, :id_expiry, :license_series, :license_expiry)";
+        $sql = "INSERT INTO users (tenant_id, name, email, phone, password, pin, role, active, cnp, id_expiry, license_series, license_expiry) 
+                VALUES (:tenant_id, :name, :email, :phone, :password, :pin, :role, :active, :cnp, :id_expiry, :license_series, :license_expiry)";
         
         return DB::query($sql, $data)->rowCount() > 0;
     }
@@ -84,6 +85,7 @@ class UserRepository extends BaseRepository
             'id_expiry'      => $input['id_expiry'] ?? $currentUser['id_expiry'],
             'license_series' => $input['license_series'] ?? $currentUser['license_series'],
             'license_expiry' => $input['license_expiry'] ?? $currentUser['license_expiry'],
+            'pin'            => $input['pin'] ?? $currentUser['pin'],
         ];
 
         // If password wasn't provided in $input, we still have it in $data but we don't need it in SQL
@@ -100,9 +102,16 @@ class UserRepository extends BaseRepository
                 cnp = :cnp,
                 id_expiry = :id_expiry,
                 license_series = :license_series,
-                license_expiry = :license_expiry
+                license_expiry = :license_expiry,
+                pin = :pin
                 WHERE id = :id AND tenant_id = :tenant_id";
         
         return DB::query($sql, $data)->rowCount() > 0;
+    }
+
+    public function updatePin(int $id, string $pin): bool
+    {
+        $hashedPin = password_hash($pin, PASSWORD_DEFAULT);
+        return DB::query("UPDATE users SET pin = ? WHERE id = ?", [$hashedPin, $id])->rowCount() > 0;
     }
 }

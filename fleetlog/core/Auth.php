@@ -36,6 +36,34 @@ class Auth
         return false;
     }
 
+    public static function loginWithPin(string $email, string $pin, bool $remember = false): bool
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $userRepo = new UserRepository();
+        $user = $userRepo->findByEmail($email);
+
+        // Verify PIN if it exists and matches
+        if ($user && !empty($user['pin']) && password_verify($pin, $user['pin'])) {
+            if (!$user['active']) {
+                return false;
+            }
+            
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['tenant_id'] = $user['tenant_id'];
+            $_SESSION['role'] = $user['role'];
+
+            if ($remember) {
+                self::setRememberMeCookie($user['id']);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
     public static function logout(): void
     {
         self::clearRememberMeCookie();
