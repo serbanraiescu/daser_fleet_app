@@ -59,7 +59,6 @@ class DriverController extends BaseController
                 'error' => 'Failed to save profile. Please try again.'
             ]);
         }
-        }
     }
 
     public function setPin(): void
