@@ -6,7 +6,10 @@ use FleetLog\App\Repositories\UserRepository;
 
 class Auth
 {
-    public static function login(string $email, string $password): bool
+    private const REMEMBER_ME_COOKIE = 'fleetlog_remember';
+    private const REMEMBER_ME_EXPIRY = 2592000; // 30 days
+
+    public static function login(string $email, string $password, bool $remember = false): bool
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
@@ -18,9 +21,15 @@ class Auth
             if (!$user['active']) {
                 return false;
             }
+            
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['tenant_id'] = $user['tenant_id'];
             $_SESSION['role'] = $user['role'];
+
+            if ($remember) {
+                self::setRememberMeCookie($user['id']);
+            }
+
             return true;
         }
 
@@ -29,6 +38,7 @@ class Auth
 
     public static function logout(): void
     {
+        self::clearRememberMeCookie();
         session_destroy();
     }
 
@@ -37,7 +47,83 @@ class Auth
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        return isset($_SESSION['user_id']);
+
+        if (isset($_SESSION['user_id'])) {
+            return true;
+        }
+
+        return self::checkRememberMeCookie();
+    }
+
+    private static function setRememberMeCookie(int $userId): void
+    {
+        $selector = \bin2hex(\random_bytes(6));
+        $validator = \bin2hex(\random_bytes(32));
+        $hashedValidator = \hash('sha256', $validator);
+        $expires = \date('Y-m-d H:i:s', \time() + self::REMEMBER_ME_EXPIRY);
+
+        DB::query(
+            "INSERT INTO user_remember_tokens (user_id, selector, hashed_validator, expires_at) VALUES (?, ?, ?, ?)",
+            [$userId, $selector, $hashedValidator, $expires]
+        );
+
+        $cookieValue = $selector . ':' . $validator;
+        \setcookie(self::REMEMBER_ME_COOKIE, $cookieValue, \time() + self::REMEMBER_ME_EXPIRY, '/', '', false, true);
+    }
+
+    private static function checkRememberMeCookie(): bool
+    {
+        $cookie = $_COOKIE[self::REMEMBER_ME_COOKIE] ?? '';
+        if (empty($cookie)) {
+            return false;
+        }
+
+        $parts = \explode(':', $cookie);
+        if (\count($parts) !== 2) {
+            return false;
+        }
+
+        list($selector, $validator) = $parts;
+        $hashedValidator = \hash('sha256', $validator);
+
+        $token = DB::fetch(
+            "SELECT * FROM user_remember_tokens WHERE selector = ? AND expires_at > NOW()",
+            [$selector]
+        );
+
+        if ($token && \hash_equals($token['hashed_validator'], $hashedValidator)) {
+            $userRepo = new UserRepository();
+            $user = $userRepo->find($token['user_id']);
+
+            if ($user && $user['active']) {
+                if (session_status() === PHP_SESSION_NONE) {
+                    session_start();
+                }
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['tenant_id'] = $user['tenant_id'];
+                $_SESSION['role'] = $user['role'];
+                
+                // Security: Rotate token on successful persistent login
+                self::clearRememberMeCookie(); // Clear old
+                self::setRememberMeCookie($user['id']); // Set new
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function clearRememberMeCookie(): void
+    {
+        $cookie = $_COOKIE[self::REMEMBER_ME_COOKIE] ?? '';
+        if ($cookie) {
+            $parts = \explode(':', $cookie);
+            if (\count($parts) === 2) {
+                DB::query("DELETE FROM user_remember_tokens WHERE selector = ?", [$parts[0]]);
+            }
+        }
+        \setcookie(self::REMEMBER_ME_COOKIE, '', \time() - 3600, '/', '', false, true);
     }
 
     public static function user(): ?array

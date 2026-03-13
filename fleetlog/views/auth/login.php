@@ -25,6 +25,12 @@
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password</label>
                 <input class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" name="password" type="password" required>
             </div>
+            <div class="mb-6 flex items-center">
+                <input id="remember" name="remember" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                <label for="remember" class="ml-2 block text-sm text-gray-900">
+                    Ține-mă minte (30 zile)
+                </label>
+            </div>
             <div class="flex items-center justify-between">
                 <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full" type="submit">
                     Sign In

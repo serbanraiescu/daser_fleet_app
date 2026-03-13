@@ -18,8 +18,9 @@ class AuthController extends BaseController
     {
         $email = $_POST['email'] ?? '';
         $password = $_POST['password'] ?? '';
+        $remember = isset($_POST['remember']);
 
-        if (Auth::login($email, $password)) {
+        if (Auth::login($email, $password, $remember)) {
             $this->redirectByRole();
         } else {
             $this->render('auth/login', [
