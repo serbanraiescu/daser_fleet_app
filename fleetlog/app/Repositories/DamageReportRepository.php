@@ -43,8 +43,9 @@ class DamageReportRepository extends BaseRepository
         return DB::fetchAll("SELECT * FROM damage_photos WHERE damage_report_id = ? AND tenant_id = ?", [$reportId, $tenantId]);
     }
 
-    public function getNewCount(int $tenantId): int
+    public function getNewCount(?int $tenantId): int
     {
+        if ($tenantId === null) return 0;
         $result = DB::fetch("SELECT COUNT(*) as total FROM damage_reports WHERE tenant_id = ? AND status = 'new'", [$tenantId]);
         return (int) ($result['total'] ?? 0);
     }

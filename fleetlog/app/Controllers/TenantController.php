@@ -10,6 +10,12 @@ class TenantController extends BaseController
     public function dashboard(): void
     {
         $tenantId = Auth::tenantId();
+        
+        if ($tenantId === null) {
+            error_log("Dashboard access attempted but Auth::tenantId() is NULL. User ID: " . ($_SESSION['user_id'] ?? 'none'));
+            $this->redirect('/login?error=session_error');
+        }
+
         $expenseRepo = new \FleetLog\App\Repositories\ExpenseRepository();
         
         // 1. Service Due Soon (within 1000km)

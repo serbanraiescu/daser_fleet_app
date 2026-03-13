@@ -211,10 +211,11 @@ class SuperAdminController extends BaseController
             $name, $email, $cui, $contact_phone, $notification_phone
         ]);
         $tenantId = (int)DB::lastInsertId();
+        error_log("SuperAdminController::storeTenant - Created Tenant ID: " . $tenantId);
 
         // 2. Create Admin User for this tenant
         $userRepo = new \FleetLog\App\Repositories\UserRepository();
-        $userRepo->create([
+        $created = $userRepo->create([
             'tenant_id' => $tenantId,
             'name' => $adminName,
             'email' => $email,
@@ -223,6 +224,7 @@ class SuperAdminController extends BaseController
             'role' => 'tenant_admin',
             'active' => 1
         ]);
+        error_log("SuperAdminController::storeTenant - Created Admin User: " . ($created ? 'YES' : 'NO'));
 
         $this->redirect('/admin/tenants?success=tenant_added');
     }

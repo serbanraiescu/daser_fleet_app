@@ -29,8 +29,9 @@ class FuelingRepository extends BaseRepository
         return DB::query($sql, $data)->rowCount() > 0;
     }
 
-    public function getByTenant(int $tenantId): array
+    public function getByTenant(?int $tenantId): array
     {
+        if ($tenantId === null) return [];
         return DB::fetchAll("SELECT f.*, v.license_plate, u.name as driver_name 
                             FROM fuelings f 
                             JOIN vehicles v ON f.vehicle_id = v.id 

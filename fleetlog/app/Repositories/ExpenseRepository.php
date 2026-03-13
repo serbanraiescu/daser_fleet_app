@@ -88,8 +88,9 @@ class ExpenseRepository extends BaseRepository
         ])->rowCount() > 0;
     }
     
-    public function getServiceDueVehicles(int $tenantId, int $warningThreshold = 1000): array
+    public function getServiceDueVehicles(?int $tenantId, int $warningThreshold = 1000): array
     {
+        if ($tenantId === null) return [];
         // Returns vehicles that are within the warning threshold of their next service or past due.
         // Also includes vehicles where next_service_km is strictly > 0 to avoid triggering on unconfigured vehicles.
         return DB::fetchAll("
@@ -103,8 +104,9 @@ class ExpenseRepository extends BaseRepository
         ", [$tenantId, $warningThreshold]);
     }
 
-    public function getTotalExpensesByTenantAndDateRange(int $tenantId, string $startDate, string $endDate): string
+    public function getTotalExpensesByTenantAndDateRange(?int $tenantId, string $startDate, string $endDate): string
     {
+        if ($tenantId === null) return '0.00';
         $result = DB::fetch("
             SELECT SUM(cost) as total 
             FROM vehicle_expenses 
