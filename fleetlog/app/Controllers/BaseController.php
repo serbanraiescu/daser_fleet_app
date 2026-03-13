@@ -4,6 +4,7 @@ namespace FleetLog\App\Controllers;
 
 use FleetLog\Core\Auth;
 use FleetLog\Core\RBAC;
+use FleetLog\Core\DB;
 
 abstract class BaseController
 {
