@@ -9,9 +9,20 @@ class DamageReportRepository extends BaseRepository
 {
     protected string $table = 'damage_reports';
 
-    public function create(array $data): int|false
+    public function create(array $input): int|false
     {
-        $data = $this->prepareData($data);
+        $input = $this->prepareData($input);
+        
+        $data = [
+            'tenant_id'   => $input['tenant_id'],
+            'vehicle_id'  => $input['vehicle_id'],
+            'driver_id'   => $input['driver_id'],
+            'datetime'    => $input['datetime'] ?? date('Y-m-d H:i:s'),
+            'category'    => $input['category'] ?? 'others',
+            'severity'    => $input['severity'] ?? 'low',
+            'description' => $input['description'] ?? ''
+        ];
+
         $sql = "INSERT INTO damage_reports (tenant_id, vehicle_id, driver_id, datetime, category, severity, description, status) 
                 VALUES (:tenant_id, :vehicle_id, :driver_id, :datetime, :category, :severity, :description, 'new')";
         
@@ -43,11 +54,22 @@ class DamageReportRepository extends BaseRepository
         return DB::query("UPDATE damage_reports SET status = 'seen' WHERE tenant_id = ? AND status = 'new'", [$tenantId])->rowCount() > 0;
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $input): bool
     {
         $tenantId = Auth::tenantId();
-        $data['id'] = $id;
-        $data['tenant_id'] = $tenantId;
+        $input['id'] = $id;
+        $input['tenant_id'] = $tenantId;
+
+        $current = DB::fetch("SELECT * FROM damage_reports WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+        if (!$current) return false;
+
+        $data = [
+            'id'          => $id,
+            'tenant_id'   => $tenantId,
+            'status'      => $input['status'] ?? $current['status'],
+            'repair_cost' => $input['repair_cost'] ?? $current['repair_cost'],
+            'admin_notes' => $input['admin_notes'] ?? $current['admin_notes']
+        ];
 
         $sql = "UPDATE damage_reports SET 
                 status = :status,

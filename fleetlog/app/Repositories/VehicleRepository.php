@@ -9,9 +9,31 @@ class VehicleRepository extends BaseRepository
 {
     protected string $table = 'vehicles';
 
-    public function create(array $data): bool
+    public function create(array $input): bool
     {
-        $data = $this->prepareData($data);
+        $input = $this->prepareData($input);
+        
+        $data = [
+            'tenant_id'           => $input['tenant_id'],
+            'license_plate'       => $input['license_plate'] ?? '',
+            'make'                => $input['make'] ?? null,
+            'model'               => $input['model'] ?? null,
+            'expiry_rca'          => $input['expiry_rca'] ?? null,
+            'expiry_itp'          => $input['expiry_itp'] ?? null,
+            'expiry_rovigneta'    => $input['expiry_rovigneta'] ?? null,
+            'status'              => $input['status'] ?? 'active',
+            'current_odometer'    => $input['current_odometer'] ?? 0,
+            'qr_code'             => $input['qr_code'] ?? null,
+            'has_triangles'       => $input['has_triangles'] ?? 0,
+            'has_vest'            => $input['has_vest'] ?? 0,
+            'has_jack'            => $input['has_jack'] ?? 0,
+            'medical_kit_expiry'  => $input['medical_kit_expiry'] ?? null,
+            'has_tow_rope'        => $input['has_tow_rope'] ?? 0,
+            'has_jumper_cables'   => $input['has_jumper_cables'] ?? 0,
+            'extinguisher_expiry' => $input['extinguisher_expiry'] ?? null,
+            'has_spare_wheel'     => $input['has_spare_wheel'] ?? 0
+        ];
+
         $sql = "INSERT INTO vehicles (tenant_id, license_plate, make, model, expiry_rca, expiry_itp, expiry_rovigneta, status, current_odometer, qr_code, has_triangles, has_vest, has_jack, medical_kit_expiry, has_tow_rope, has_jumper_cables, extinguisher_expiry, has_spare_wheel) 
                 VALUES (:tenant_id, :license_plate, :make, :model, :expiry_rca, :expiry_itp, :expiry_rovigneta, :status, :current_odometer, :qr_code, :has_triangles, :has_vest, :has_jack, :medical_kit_expiry, :has_tow_rope, :has_jumper_cables, :extinguisher_expiry, :has_spare_wheel)";
         
@@ -35,11 +57,36 @@ class VehicleRepository extends BaseRepository
         return DB::fetch("SELECT * FROM vehicles WHERE license_plate = ? AND tenant_id = ?", [$plate, $tenantId]);
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $input): bool
     {
-        $data['id'] = $id;
-        $data['tenant_id'] = Auth::tenantId();
+        $input['id'] = $id;
+        $input['tenant_id'] = Auth::tenantId();
+
+        $current = $this->find($id);
+        if (!$current) return false;
         
+        $data = [
+            'id'                  => $id,
+            'tenant_id'           => $input['tenant_id'],
+            'license_plate'       => $input['license_plate'] ?? $current['license_plate'],
+            'make'                => $input['make'] ?? $current['make'],
+            'model'               => $input['model'] ?? $current['model'],
+            'expiry_rca'          => $input['expiry_rca'] ?? $current['expiry_rca'],
+            'expiry_itp'          => $input['expiry_itp'] ?? $current['expiry_itp'],
+            'expiry_rovigneta'    => $input['expiry_rovigneta'] ?? $current['expiry_rovigneta'],
+            'status'              => $input['status'] ?? $current['status'],
+            'current_odometer'    => $input['current_odometer'] ?? $current['current_odometer'],
+            'qr_code'             => $input['qr_code'] ?? $current['qr_code'],
+            'has_triangles'       => $input['has_triangles'] ?? $current['has_triangles'],
+            'has_vest'            => $input['has_vest'] ?? $current['has_vest'],
+            'has_jack'            => $input['has_jack'] ?? $current['has_jack'],
+            'medical_kit_expiry'  => $input['medical_kit_expiry'] ?? $current['medical_kit_expiry'],
+            'has_tow_rope'        => $input['has_tow_rope'] ?? $current['has_tow_rope'],
+            'has_jumper_cables'   => $input['has_jumper_cables'] ?? $current['has_jumper_cables'],
+            'extinguisher_expiry' => $input['extinguisher_expiry'] ?? $current['extinguisher_expiry'],
+            'has_spare_wheel'     => $input['has_spare_wheel'] ?? $current['has_spare_wheel']
+        ];
+
         $sql = "UPDATE vehicles SET 
                 license_plate = :license_plate,
                 make = :make,

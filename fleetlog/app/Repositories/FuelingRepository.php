@@ -8,8 +8,21 @@ class FuelingRepository extends BaseRepository
 {
     protected string $table = 'fuelings';
 
-    public function create(array $data): bool
+    public function create(array $input): bool
     {
+        $input = $this->prepareData($input);
+        
+        $data = [
+            'tenant_id'     => $input['tenant_id'],
+            'vehicle_id'    => $input['vehicle_id'],
+            'user_id'       => $input['user_id'],
+            'odometer'      => $input['odometer'] ?? 0,
+            'liters'        => $input['liters'] ?? 0,
+            'total_price'   => $input['total_price'] ?? 0,
+            'is_full'       => $input['is_full'] ?? 0,
+            'receipt_photo' => $input['receipt_photo'] ?? null
+        ];
+
         $sql = "INSERT INTO fuelings (tenant_id, vehicle_id, user_id, odometer, liters, total_price, is_full, receipt_photo) 
                 VALUES (:tenant_id, :vehicle_id, :user_id, :odometer, :liters, :total_price, :is_full, :receipt_photo)";
         

@@ -217,7 +217,8 @@ class SuperAdminController extends BaseController
         $userRepo->create([
             'tenant_id' => $tenantId,
             'name' => $adminName,
-            'email' => $email, // Using same email as tenant contact by default
+            'email' => $email,
+            'phone' => $contact_phone,
             'password' => $password,
             'role' => 'tenant_admin',
             'active' => 1

@@ -25,13 +25,25 @@ class TripRepository extends BaseRepository
         return DB::fetch($sql, [$driverId]);
     }
 
-    public function startTrip(array $data): int|false
+    public function startTrip(array $input): int|false
     {
-        if ($this->hasOpenTrip($data['driver_id'])) {
+        if ($this->hasOpenTrip($input['driver_id'])) {
             return false;
         }
 
-        $data = $this->prepareData($data);
+        $input = $this->prepareData($input);
+        
+        $data = [
+            'tenant_id'    => $input['tenant_id'],
+            'vehicle_id'   => $input['vehicle_id'],
+            'driver_id'    => $input['driver_id'],
+            'type'         => $input['type'] ?? 'business',
+            'start_time'   => $input['start_time'] ?? date('Y-m-d H:i:s'),
+            'start_km'     => $input['start_km'] ?? 0,
+            'needs_review' => $input['needs_review'] ?? 0,
+            'notes'        => $input['notes'] ?? null
+        ];
+
         $sql = "INSERT INTO trips (tenant_id, vehicle_id, driver_id, type, start_time, start_km, status, needs_review, notes) 
                 VALUES (:tenant_id, :vehicle_id, :driver_id, :type, :start_time, :start_km, 'open', :needs_review, :notes)";
         
