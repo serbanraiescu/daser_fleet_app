@@ -13,6 +13,7 @@ class DamageController extends BaseController
 
     public function __construct()
     {
+        parent::__construct();
         $this->damageRepo = new DamageReportRepository();
         $this->vehicleRepo = new VehicleRepository();
     }
