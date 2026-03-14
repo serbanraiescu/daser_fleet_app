@@ -520,4 +520,127 @@ class SuperAdminController extends BaseController
         }
         $this->redirect('/admin/email-logs');
     }
+
+    public function downloadMediaArchive(): void
+    {
+        $rootPath = dirname(__DIR__, 3);
+        $uploadsRoot = $rootPath . '/public/uploads';
+        
+        if (!is_dir($uploadsRoot)) {
+            // Check fallback for server config where uploads is in root
+            $uploadsRoot = $rootPath . '/uploads';
+        }
+
+        if (!is_dir($uploadsRoot)) {
+            $_SESSION['flash_error'] = "Nu există fișiere în folderul de upload.";
+            $this->redirect('/admin/settings');
+        }
+
+        $cutoffDate = new \DateTime();
+        $cutoffDate->modify('-3 months');
+        
+        $zipFile = tempnam(sys_get_temp_dir(), 'media_') . '.zip';
+        $zip = new \ZipArchive();
+        
+        if ($zip->open($zipFile, \ZipArchive::CREATE) !== TRUE) {
+            $_SESSION['flash_error'] = "Nu s-a putut crea arhiva ZIP.";
+            $this->redirect('/admin/settings');
+        }
+
+        $filesFound = 0;
+        $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($uploadsRoot));
+        
+        foreach ($it as $file) {
+            if ($file->isDir()) continue;
+            
+            // Check folder naming pattern YYYY-MM
+            $path = $file->getPath();
+            if (preg_match('/(\d{4})-(\d{2})$/', $path, $matches)) {
+                $fileDate = \DateTime::createFromFormat('Y-m', $matches[1] . '-' . $matches[2]);
+                if ($fileDate < $cutoffDate) {
+                    $zip->addFile($file->getRealPath(), substr($file->getRealPath(), strlen($uploadsRoot) + 1));
+                    $filesFound++;
+                }
+            }
+        }
+
+        $zip->close();
+
+        if ($filesFound === 0) {
+            @unlink($zipFile);
+            $_SESSION['flash_error'] = "Nu au fost găsite poze mai vechi de 3 luni.";
+            $this->redirect('/admin/settings');
+        }
+
+        header('Content-Type: application/zip');
+        header('Content-Disposition: attachment; filename="media_archive_' . date('Y-m-d') . '.zip"');
+        header('Content-Length: ' . filesize($zipFile));
+        readfile($zipFile);
+        @unlink($zipFile);
+        exit;
+    }
+
+    public function deleteOldMedia(): void
+    {
+        $rootPath = dirname(__DIR__, 3);
+        $uploadsRoot = $rootPath . '/public/uploads';
+        
+        if (!is_dir($uploadsRoot)) {
+            $uploadsRoot = $rootPath . '/uploads';
+        }
+
+        if (!is_dir($uploadsRoot)) {
+            $_SESSION['flash_error'] = "Nu există fișiere de șters.";
+            $this->redirect('/admin/settings');
+        }
+
+        $cutoffDate = new \DateTime();
+        $cutoffDate->modify('-3 months');
+        
+        $deletedCount = 0;
+        
+        // Use recursive scan but filter by YYYY-MM folders
+        $tenantsDir = $uploadsRoot . '/tenants';
+        if (!is_dir($tenantsDir)) {
+             $_SESSION['flash_error'] = "Structura de directoare nu este inițializată.";
+             $this->redirect('/admin/settings');
+        }
+
+        $tenantFolders = scandir($tenantsDir);
+        foreach ($tenantFolders as $tf) {
+            if ($tf === '.' || $tf === '..') continue;
+            
+            $fuelingsDir = $tenantsDir . '/' . $tf . '/fuelings';
+            if (is_dir($fuelingsDir)) {
+                $monthFolders = scandir($fuelingsDir);
+                foreach ($monthFolders as $mf) {
+                    if (preg_match('/^(\d{4})-(\d{2})$/', $mf, $matches)) {
+                        $folderDate = \DateTime::createFromFormat('Y-m', $mf);
+                        if ($folderDate < $cutoffDate) {
+                            $this->deleteDirectory($fuelingsDir . '/' . $mf);
+                            $deletedCount++;
+                        }
+                    }
+                }
+            }
+        }
+
+        if ($deletedCount > 0) {
+            $_SESSION['flash_success'] = "S-au șters $deletedCount foldere cu poze vechi.";
+        } else {
+            $_SESSION['flash_error'] = "Nu au fost găsite foldere mai vechi de 3 luni pentru ștergere.";
+        }
+        
+        $this->redirect('/admin/settings');
+    }
+
+    private function deleteDirectory($dir): bool {
+        if (!file_exists($dir)) return true;
+        if (!is_dir($dir)) return unlink($dir);
+        foreach (scandir($dir) as $item) {
+            if ($item == '.' || $item == '..') continue;
+            if (!$this->deleteDirectory($dir . DIRECTORY_SEPARATOR . $item)) return false;
+        }
+        return rmdir($dir);
+    }
 }

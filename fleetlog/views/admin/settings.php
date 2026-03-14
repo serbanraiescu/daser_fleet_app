@@ -141,6 +141,26 @@
                 <li><strong>Server:</strong> mail.daserdesign.ro</li>
             </ul>
         </div>
+
+        <div class="bg-red-50 rounded-2xl p-6 border border-red-100 shadow-sm">
+            <h3 class="font-bold text-red-800 mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 3.472A2 2 0 0116.183 12H7.817a2 2 0 01-1.95-1.528L5 7m5 4v6m4-6v6M1 10V4a1 1 0 011-1h20a1 1 0 011 1v6a1 1 0 01-1 1H2a1 1 0 01-1-1z"></path></svg>
+                Media Management & Cleanup
+            </h3>
+            <p class="text-xs text-red-600 mb-4 italic">Unelte pentru gestionarea spațiului pe disc (poze alimentar de peste 3 luni).</p>
+            
+            <div class="space-y-3">
+                <a href="/admin/media/download" class="w-full py-3 bg-slate-800 text-white text-sm font-bold rounded-lg hover:bg-slate-900 transition-all shadow-sm flex items-center justify-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Download Archive (> 3 mo)
+                </a>
+
+                <button onclick="if(confirm('Ești sigur că vrei să ȘTERGI DEFINITIV toate pozele mai vechi de 3 luni? Această acțiune este ireversibilă!')) window.location='/admin/media/delete'" class="w-full py-3 bg-red-600 text-white text-sm font-bold rounded-lg hover:bg-red-700 transition-all shadow-sm flex items-center justify-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 3.472A2 2 0 0116.183 12H7.817a2 2 0 01-1.95-1.528L5 7m5 4v6m4-6v6M1 10V4a1 1 0 011-1h20a1 1 0 011 1v6a1 1 0 01-1 1H2a1 1 0 01-1-1z"></path></svg>
+                    Delete Old Photos (> 3 mo)
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 </div>
