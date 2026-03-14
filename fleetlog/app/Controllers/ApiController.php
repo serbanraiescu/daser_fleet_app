@@ -180,7 +180,12 @@ class ApiController extends BaseController
             return;
         }
 
+        // Handle both JSON and Form-Data (for photos)
         $data = json_decode(file_get_contents('php://input'), true);
+        if (!$data) {
+            $data = $_POST;
+        }
+
         $vehicleId = $data['vehicle_id'] ?? null;
         $liters = $data['liters'] ?? null;
         $cost = $data['cost'] ?? null;
@@ -191,17 +196,40 @@ class ApiController extends BaseController
             return;
         }
 
-        $sql = "INSERT INTO fuelings (tenant_id, driver_id, vehicle_id, liters, cost, odometer, date, is_full) 
-                VALUES (:tenant_id, :driver_id, :vehicle_id, :liters, :cost, :odometer, NOW(), :is_full)";
+        $receiptPhoto = null;
+
+        // Unified image upload handling (identical to FuelingController)
+        if (isset($_FILES['receipt_photo']) && $_FILES['receipt_photo']['error'] === UPLOAD_ERR_OK) {
+            $tenantId = $_SESSION['tenant_id'];
+            $publicRelativePath = "uploads/tenants/{$tenantId}/fuelings/" . date('Y-m');
+            
+            $docRoot = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\');
+            $uploadDir = $docRoot . '/' . $publicRelativePath;
+            
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            
+            $extension = pathinfo($_FILES['receipt_photo']['name'], PATHINFO_EXTENSION);
+            $filename = uniqid('receipt_') . '.' . $extension;
+            
+            if (move_uploaded_file($_FILES['receipt_photo']['tmp_name'], $uploadDir . '/' . $filename)) {
+                $receiptPhoto = $publicRelativePath . '/' . $filename;
+            }
+        }
+
+        $sql = "INSERT INTO fuelings (tenant_id, user_id, vehicle_id, liters, cost, odometer, created_at, is_full, receipt_photo) 
+                VALUES (:tenant_id, :user_id, :vehicle_id, :liters, :cost, :odometer, NOW(), :is_full, :receipt_photo)";
         
         DB::query($sql, [
             'tenant_id' => $_SESSION['tenant_id'],
-            'driver_id' => $_SESSION['user_id'],
-            'vehicle_id' => $vehicleId,
-            'liters' => $liters,
-            'cost' => $cost,
-            'odometer' => $odometer,
-            'is_full' => $data['is_full'] ?? 1
+            'user_id' => $_SESSION['user_id'],
+            'vehicle_id' => (int)$vehicleId,
+            'liters' => (float)$liters,
+            'cost' => (float)$cost,
+            'odometer' => (int)$odometer,
+            'is_full' => isset($data['is_full']) ? (int)$data['is_full'] : 1,
+            'receipt_photo' => $receiptPhoto
         ]);
 
         $this->jsonResponse(['success' => true, 'message' => 'Fueling logged']);

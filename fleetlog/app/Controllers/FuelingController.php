@@ -55,17 +55,23 @@ class FuelingController extends BaseController
             'receipt_photo' => null
         ];
 
-        // Basic image upload handling
+        // Unified image upload handling
         if (isset($_FILES['receipt_photo']) && $_FILES['receipt_photo']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = dirname(dirname(dirname(__DIR__))) . '/public/uploads/receipts/';
+            $tenantId = Auth::tenantId();
+            $publicRelativePath = "uploads/tenants/{$tenantId}/fuelings/" . date('Y-m');
+            
+            $docRoot = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\');
+            $uploadDir = $docRoot . '/' . $publicRelativePath;
+            
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0755, true);
             }
             
             $extension = pathinfo($_FILES['receipt_photo']['name'], PATHINFO_EXTENSION);
             $filename = uniqid('receipt_') . '.' . $extension;
-            if (move_uploaded_file($_FILES['receipt_photo']['tmp_name'], $uploadDir . $filename)) {
-                $data['receipt_photo'] = 'uploads/receipts/' . $filename;
+            
+            if (move_uploaded_file($_FILES['receipt_photo']['tmp_name'], $uploadDir . '/' . $filename)) {
+                $data['receipt_photo'] = $publicRelativePath . '/' . $filename;
             }
         }
 

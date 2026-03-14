@@ -49,4 +49,16 @@ class FuelingRepository extends BaseRepository
                             WHERE f.vehicle_id = ? AND f.tenant_id = ? 
                             ORDER BY f.created_at DESC", [$vehicleId, $tenantId]);
     }
+
+    public function getByPeriod(int $tenantId, int $month, int $year): array
+    {
+        return DB::fetchAll("SELECT f.*, v.license_plate, u.name as driver_name 
+                            FROM fuelings f 
+                            JOIN vehicles v ON f.vehicle_id = v.id 
+                            JOIN users u ON f.user_id = u.id 
+                            WHERE f.tenant_id = ? 
+                            AND MONTH(f.created_at) = ? 
+                            AND YEAR(f.created_at) = ?
+                            ORDER BY f.created_at DESC", [$tenantId, $month, $year]);
+    }
 }

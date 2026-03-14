@@ -444,13 +444,35 @@ class TenantController extends BaseController
 
     public function fuelings(): void
     {
+        $tenantId = Auth::tenantId();
+        $month = (int)($_GET['month'] ?? date('m'));
+        $year = (int)($_GET['year'] ?? date('Y'));
 
         $fuelingRepo = new \FleetLog\App\Repositories\FuelingRepository();
-        $fuelings = $fuelingRepo->getByTenant(Auth::tenantId());
+        $fuelings = $fuelingRepo->getByPeriod($tenantId, $month, $year);
 
         $this->render('tenant/fuelings/index', [
             'title' => 'Fueling Logs',
-            'fuelings' => $fuelings
+            'fuelings' => $fuelings,
+            'selected_month' => $month,
+            'selected_year' => $year
+        ]);
+    }
+
+    public function fuelingReport(): void
+    {
+        $tenantId = Auth::tenantId();
+        $month = (int)($_GET['month'] ?? date('m'));
+        $year = (int)($_GET['year'] ?? date('Y'));
+
+        $fuelingRepo = new \FleetLog\App\Repositories\FuelingRepository();
+        $fuelings = $fuelingRepo->getByPeriod($tenantId, $month, $year);
+
+        $this->render('tenant/fuelings/report', [
+            'title' => 'Fueling Report - ' . date('F Y', mktime(0, 0, 0, $month, 1, $year)),
+            'fuelings' => $fuelings,
+            'month' => $month,
+            'year' => $year
         ]);
     }
 
