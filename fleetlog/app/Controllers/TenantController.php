@@ -669,4 +669,15 @@ class TenantController extends BaseController
             $this->redirect('/tenant/expenses?error=save_failed');
         }
     }
+    public function qrPrint(): void
+    {
+        $tenantId = Auth::tenantId();
+        $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
+        $vehicles = $vehicleRepo->getActiveByTenant($tenantId);
+
+        $this->render('tenant/vehicles/qr_print', [
+            'title' => 'Print QR Codes',
+            'vehicles' => $vehicles
+        ]);
+    }
 }

@@ -6,10 +6,16 @@ $archivedVehicles = $archivedVehicles ?? [];
 
 <div class="mb-6 flex justify-between items-center">
     <h1 class="text-2xl font-bold text-slate-800">Fleet Vehicles</h1>
-    <a href="/tenant/vehicles/add" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow flex items-center">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-        Add Vehicle
-    </a>
+    <div class="flex items-center space-x-3">
+        <a href="/tenant/vehicles/qr-print" target="_blank" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors shadow flex items-center font-bold">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1l7 7m0 0l-7 7m7-7H3"></path></svg>
+            Print All QR Codes
+        </a>
+        <a href="/tenant/vehicles/add" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            Add Vehicle
+        </a>
+    </div>
 </div>
 
 <?php if (isset($_GET['success'])): ?>

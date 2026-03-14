@@ -49,8 +49,8 @@ abstract class BaseController
         require $viewPath;
         $content = ob_get_clean();
 
-        // Check if layout should be used (e.g., skip for login/home/reports)
-        if (strpos($view, 'auth/') === 0 || $view === 'home' || strpos($view, 'report') !== false || strpos($view, 'receipts') !== false) {
+        // Check if layout should be used (e.g., skip for login/home/reports/qr-print)
+        if (strpos($view, 'auth/') === 0 || $view === 'home' || strpos($view, 'report') !== false || strpos($view, 'receipts') !== false || strpos($view, 'qr_print') !== false) {
             echo $content;
             return;
         }
