@@ -162,9 +162,21 @@ $eventIcons = [
                             <!-- Right Side (Main card on mobile, occupied on desktop based on parity) -->
                             <div class="w-full pl-16 md:pl-0 md:w-[45%] <?php echo !$isEven ? 'text-right pr-8' : 'text-left pl-8'; ?>">
                                 <?php if (!$isEven): ?>
+                                    <!-- Desktop metadata -->
                                     <div class="hidden md:block">
                                         <div class="text-sm font-bold text-slate-500 mb-1"><?php echo date('d M Y', $eventDate); ?></div>
                                         <h3 class="text-lg font-bold text-slate-900"><?php echo htmlspecialchars($event['event_subtype'] ?: ucfirst($event['event_type'])); ?></h3>
+                                    </div>
+                                    <!-- Mobile card (because Left Side is hidden on mobile) -->
+                                    <div class="md:hidden bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                                        <div class="border-b border-slate-100 pb-3 mb-3">
+                                            <div class="text-sm font-bold text-slate-500 mb-1"><?php echo date('d M Y', $eventDate); ?></div>
+                                            <h3 class="text-lg font-bold text-slate-900 flex items-center">
+                                                <span class="<?php echo $styleClass; ?> border px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider mr-2"><?php echo $event['event_type']; ?></span>
+                                                <?php echo htmlspecialchars($event['event_subtype'] ?: ucfirst($event['event_type'])); ?>
+                                            </h3>
+                                        </div>
+                                        <?php include __DIR__ . '/timeline_card_content.php'; ?>
                                     </div>
                                 <?php else: ?>
                                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
