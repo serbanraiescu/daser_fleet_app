@@ -61,6 +61,12 @@ class DB
         return self::query($sql, $params)->fetchAll();
     }
 
+    public static function getSetting(string $key, $default = null)
+    {
+        $res = self::fetch("SELECT value FROM system_settings WHERE `key` = ?", [$key]);
+        return $res ? $res['value'] : $default;
+    }
+
     public static function lastInsertId(): string
     {
         return self::getInstance()->lastInsertId();

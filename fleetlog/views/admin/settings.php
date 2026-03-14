@@ -102,6 +102,28 @@
                     </div>
                 </div>
 
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800 border-b pb-2 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        Feature Toggles
+                    </h2>
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                        <label class="flex items-center cursor-pointer group">
+                            <div class="relative">
+                                <input type="hidden" name="settings[enable_fueling_photos]" value="0">
+                                <input type="checkbox" name="settings[enable_fueling_photos]" value="1" 
+                                       <?php echo ($settings['enable_fueling_photos'] ?? '1') === '1' ? 'checked' : ''; ?>
+                                       class="sr-only peer">
+                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </div>
+                            <div class="ml-4">
+                                <span class="text-sm font-bold text-slate-700 group-hover:text-slate-900 transition-colors">Enable Fueling Receipt Upload</span>
+                                <p class="text-xs text-slate-500">Dacă este dezactivat, șoferii nu vor mai vedea opțiunea de a adăuga poze cu bonul la alimentare.</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
                 <div class="pt-6 border-t flex items-center justify-end">
                     <button type="submit" class="px-10 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all shadow-md">
                         Save System Settings

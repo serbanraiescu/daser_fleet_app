@@ -75,7 +75,10 @@ class ApiController extends BaseController
 
         $this->jsonResponse([
             'active_trip' => $activeTrip,
-            'vehicles' => $vehicles
+            'vehicles' => $vehicles,
+            'settings' => [
+                'enable_fueling_photos' => \FleetLog\Core\DB::getSetting('enable_fueling_photos', '1') === '1'
+            ]
         ]);
     }
 

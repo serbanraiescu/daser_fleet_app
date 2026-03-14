@@ -107,6 +107,7 @@
                 <label for="is_full" class="text-sm font-bold text-blue-800">S-a făcut plinul? (Full Tank)</label>
             </div>
 
+            <?php if (\FleetLog\Core\DB::getSetting('enable_fueling_photos', '1') === '1'): ?>
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-1">Receipt Photo (Optional)</label>
                 <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-xl hover:border-blue-400 transition-colors cursor-pointer relative"
@@ -140,6 +141,7 @@
                     </div>
                 </div>
             </div>
+            <?php endif; ?>
         </div>
 
         <button type="submit" class="w-full p-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg hover:bg-blue-700 transition-all active:scale-95 flex items-center justify-center space-x-2">
