@@ -147,7 +147,7 @@ $eventIcons = [
                                     <h3 class="text-lg font-bold text-slate-900"><?php echo htmlspecialchars($event['event_subtype'] ?: ucfirst($event['event_type'])); ?></h3>
                                 <?php else: ?>
                                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
-                                        <?php include 'timeline_card_content.php'; ?>
+                                        <?php include __DIR__ . '/timeline_card_content.php'; ?>
                                     </div>
                                 <?php endif; ?>
                             </div>
@@ -177,7 +177,7 @@ $eventIcons = [
                                             </h3>
                                         </div>
                                         <!-- Shared Card Content -->
-                                        <?php include 'timeline_card_content.php'; ?>
+                                        <?php include __DIR__ . '/timeline_card_content.php'; ?>
                                     </div>
                                 <?php endif; ?>
                             </div>
