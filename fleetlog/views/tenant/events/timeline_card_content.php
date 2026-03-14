@@ -2,16 +2,16 @@
     <div>
         <!-- Desktop Badge -->
         <span class="hidden md:inline-block <?php echo $styleClass; ?> border px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider mb-2">
-            <?php echo $event['is_fueling'] ? 'Fueling' : $event['event_type']; ?>
+            <?php echo $event['is_fueling'] ? __('fueling_event') : __('filter_' . $event['event_type']); ?>
         </span>
         
         <?php if (!empty($event['cost']) && $event['cost'] > 0): ?>
             <p class="text-xs font-semibold text-slate-500 bg-slate-100 rounded border border-slate-200 px-2 py-1 inline-block uppercase tracking-wide">
-                Cost: <span class="text-slate-700"><?php echo number_format($event['cost'], 2, ',', '.'); ?> RON</span>
+                <?php echo __('cost_label'); ?> <span class="text-slate-700"><?php echo number_format($event['cost'], 2, ',', '.'); ?> RON</span>
             </p>
         <?php elseif (!empty($event['total_price']) && $event['total_price'] > 0): ?>
             <p class="text-xs font-semibold text-slate-500 bg-slate-100 rounded border border-slate-200 px-2 py-1 inline-block uppercase tracking-wide">
-                Cost: <span class="text-slate-700"><?php echo number_format($event['total_price'], 2, ',', '.'); ?> RON</span>
+                <?php echo __('cost_label'); ?> <span class="text-slate-700"><?php echo number_format($event['total_price'], 2, ',', '.'); ?> RON</span>
             </p>
         <?php endif; ?>
     </div>
@@ -40,14 +40,14 @@
                     status: '<?php echo $event['status']; ?>'
                 }); open = false" class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center">
                     <svg class="w-4 h-4 mr-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                    Edit Event
+                    <?php echo __('edit_event'); ?>
                 </button>
-                <form action="/tenant/vehicle-events/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this event?');">
+                <form action="/tenant/vehicle-events/delete" method="POST" onsubmit="return confirm('<?php echo htmlspecialchars(__('confirm_delete_event'), ENT_QUOTES); ?>');">
                     <input type="hidden" name="event_id" value="<?php echo $event['id']; ?>">
                     <input type="hidden" name="vehicle_id" value="<?php echo $event['vehicle_id']; ?>">
                     <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center font-medium">
                         <svg class="w-4 h-4 mr-2 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                        Delete Event
+                        <?php echo __('delete_event'); ?>
                     </button>
                 </form>
             </div>
@@ -65,11 +65,11 @@
             </div>
             <?php if (!empty($event['total_price']) && $event['liters'] > 0): ?>
                 <div class="text-slate-500 text-xs">
-                    Price/L: <?php echo number_format($event['total_price'] / $event['liters'], 2, ',', '.'); ?> RON
+                    <?php echo __('price_per_l'); ?> <?php echo number_format($event['total_price'] / $event['liters'], 2, ',', '.'); ?> RON
                 </div>
             <?php endif; ?>
             <?php if ($event['is_full']): ?>
-                <span class="bg-lime-200 text-lime-900 px-2 py-0.5 rounded text-[10px] font-bold uppercase">Full Tank</span>
+                <span class="bg-lime-200 text-lime-900 px-2 py-0.5 rounded text-[10px] font-bold uppercase"><?php echo __('full_tank'); ?></span>
             <?php endif; ?>
         </div>
     </div>
@@ -97,7 +97,7 @@
                         ($event['status'] === 'in_progress' ? 'bg-yellow-500' : 'bg-slate-400'); 
                 ?>">
             </span>
-            <?php echo ucfirst(str_replace('_', ' ', $event['status'])); ?>
+            <?php echo __('status_' . $event['status']); ?>
         </div>
     <?php endif; ?>
     

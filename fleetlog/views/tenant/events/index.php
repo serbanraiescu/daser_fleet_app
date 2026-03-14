@@ -28,16 +28,16 @@ $eventIcons = [
                 <svg class="w-8 h-8 mr-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                Vehicle Timeline <span class="ml-3 px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-700 rounded-full border border-blue-200">BETA</span>
+                <?php echo __('vehicle_timeline'); ?> <span class="ml-3 px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-700 rounded-full border border-blue-200">BETA</span>
             </h1>
-            <p class="text-slate-500 mt-1">Unified history of services, damages, expenses, and fuelings.</p>
+            <p class="text-slate-500 mt-1"><?php echo __('timeline_desc'); ?></p>
         </div>
 
         <!-- Vehicle Selector -->
         <div class="w-full md:w-72">
             <form action="" method="GET" x-ref="vehicleForm">
                 <select name="vehicle_id" @change="$refs.vehicleForm.submit()" class="w-full border-slate-300 rounded-xl shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-white hover:bg-slate-50 transition-colors py-2.5">
-                    <option value="">All Vehicles (Global View)</option>
+                    <option value=""><?php echo __('all_vehicles_global'); ?></option>
                     <?php foreach ($vehicles as $v): ?>
                         <option value="<?php echo $v['id']; ?>" <?php echo (isset($selectedVehicle['id']) && $selectedVehicle['id'] == $v['id']) ? 'selected' : ''; ?>>
                             <?php echo htmlspecialchars($v['license_plate'] . ' - ' . $v['make'] . ' ' . $v['model']); ?>
@@ -52,29 +52,29 @@ $eventIcons = [
     <div class="flex flex-col md:flex-row justify-between items-center bg-white rounded-xl shadow-sm border border-slate-200 p-2 mb-8 sticky top-0 z-20">
         <div class="flex overflow-x-auto w-full md:w-auto p-1 gap-2 no-scrollbar">
             <button @click="filter = 'all'" :class="{'bg-slate-800 text-white': filter === 'all', 'text-slate-600 hover:bg-slate-100': filter !== 'all'}" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap">
-                All Events
+                <?php echo __('all_events'); ?>
             </button>
             <button @click="filter = 'service'" :class="{'bg-blue-100 text-blue-800': filter === 'service', 'text-slate-600 hover:bg-slate-100': filter !== 'service'}" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex items-center">
-                <span class="w-2 h-2 rounded-full bg-blue-500 mr-2"></span> Service
+                <span class="w-2 h-2 rounded-full bg-blue-500 mr-2"></span> <?php echo __('filter_service'); ?>
             </button>
             <button @click="filter = 'fueling'" :class="{'bg-lime-100 text-lime-800': filter === 'fueling', 'text-slate-600 hover:bg-slate-100': filter !== 'fueling'}" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex items-center">
-                <span class="w-2 h-2 rounded-full bg-lime-500 mr-2"></span> Fueling
+                <span class="w-2 h-2 rounded-full bg-lime-500 mr-2"></span> <?php echo __('filter_fueling'); ?>
             </button>
             <button @click="filter = 'damage'" :class="{'bg-red-100 text-red-800': filter === 'damage', 'text-slate-600 hover:bg-slate-100': filter !== 'damage'}" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex items-center">
-                <span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span> Damage
+                <span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span> <?php echo __('filter_damage'); ?>
             </button>
             <button @click="filter = 'expense'" :class="{'bg-orange-100 text-orange-800': filter === 'expense', 'text-slate-600 hover:bg-slate-100': filter !== 'expense'}" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex items-center">
-                <span class="w-2 h-2 rounded-full bg-orange-500 mr-2"></span> Expense
+                <span class="w-2 h-2 rounded-full bg-orange-500 mr-2"></span> <?php echo __('filter_expense'); ?>
             </button>
         </div>
         
         <?php if ($selectedVehicle): ?>
             <button @click="openModal('add')" class="mt-4 md:mt-0 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors shadow-shadow-sm flex items-center w-full md:w-auto justify-center">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                Add Event
+                <?php echo __('add_event'); ?>
             </button>
         <?php else: ?>
-            <div class="px-4 py-2 text-xs text-slate-400 italic">Select a vehicle to add events</div>
+            <div class="px-4 py-2 text-xs text-slate-400 italic"><?php echo __('select_vehicle_add_event'); ?></div>
         <?php endif; ?>
     </div>
 
@@ -94,12 +94,12 @@ $eventIcons = [
                 
                 <div class="flex gap-8">
                     <div class="text-center bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/10">
-                        <p class="text-slate-300 text-sm font-medium mb-1 uppercase tracking-wider">Current Odometer</p>
+                        <p class="text-slate-300 text-sm font-medium mb-1 uppercase tracking-wider"><?php echo __('current_odometer'); ?></p>
                         <p class="text-2xl font-bold font-mono"><?php echo number_format($selectedVehicle['current_odometer'] ?? 0, 0, ',', '.'); ?> <span class="text-sm font-normal opacity-70">km</span></p>
                     </div>
                     <?php if (!empty($selectedVehicle['next_service_km']) && $selectedVehicle['next_service_km'] > 0): ?>
                         <div class="text-center bg-blue-500/20 rounded-xl p-4 backdrop-blur-sm border border-blue-400/30">
-                            <p class="text-blue-200 text-sm font-medium mb-1 uppercase tracking-wider">Next Service Due At</p>
+                            <p class="text-blue-200 text-sm font-medium mb-1 uppercase tracking-wider"><?php echo __('next_service_due'); ?></p>
                             <p class="text-2xl font-bold font-mono text-blue-100"><?php echo number_format($selectedVehicle['next_service_km'], 0, ',', '.'); ?> <span class="text-sm font-normal opacity-70">km</span></p>
                         </div>
                     <?php endif; ?>
@@ -115,8 +115,8 @@ $eventIcons = [
                  <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
              </div>
              <div>
-                 <h2 class="text-xl font-bold text-slate-800">Global Fleet Report</h2>
-                 <p class="text-sm text-slate-500">Showing events for all active vehicles.</p>
+                 <h2 class="text-xl font-bold text-slate-800"><?php echo __('global_fleet_report'); ?></h2>
+                 <p class="text-sm text-slate-500"><?php echo __('showing_events_all'); ?></p>
              </div>
         </div>
     <?php endif; ?>
@@ -128,7 +128,7 @@ $eventIcons = [
         
         <?php if (empty($events)): ?>
             <div class="text-center py-12 text-slate-500 relative z-10 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
-                <p>No events recorded yet.</p>
+                <p><?php echo __('no_events_recorded'); ?></p>
             </div>
         <?php else: ?>
             <div class="space-y-8">
@@ -163,7 +163,7 @@ $eventIcons = [
                                     <?php endif; ?>
                                     <?php echo date('d M Y', $eventDate); ?>
                                 </div>
-                                <h3 class="text-lg font-bold text-slate-900"><?php echo htmlspecialchars($event['is_fueling'] ? 'Fueling' : ($event['event_subtype'] ?: ucfirst($event['event_type']))); ?></h3>
+                                <h3 class="text-lg font-bold text-slate-900"><?php echo htmlspecialchars($event['is_fueling'] ? __('fueling_event') : ($event['event_subtype'] ?: __('type_' . $event['event_type']))); ?></h3>
                             <?php else: ?>
                                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
                                     <?php include __DIR__ . '/timeline_card_content.php'; ?>
@@ -189,7 +189,7 @@ $eventIcons = [
                                         <?php endif; ?>
                                         <?php echo date('d M Y', $eventDate); ?>
                                     </div>
-                                    <h3 class="text-lg font-bold text-slate-900"><?php echo htmlspecialchars($event['is_fueling'] ? 'Fueling' : ($event['event_subtype'] ?: ucfirst($event['event_type']))); ?></h3>
+                                    <h3 class="text-lg font-bold text-slate-900"><?php echo htmlspecialchars($event['is_fueling'] ? __('fueling_event') : ($event['event_subtype'] ?: __('type_' . $event['event_type']))); ?></h3>
                                 </div>
                                 <!-- Mobile card (because Left Side is hidden on mobile) -->
                                 <div class="md:hidden bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
@@ -201,8 +201,8 @@ $eventIcons = [
                                             <?php echo date('d M Y', $eventDate); ?>
                                         </div>
                                         <h3 class="text-lg font-bold text-slate-900 flex items-center">
-                                            <span class="<?php echo $styleClass; ?> border px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider mr-2"><?php echo $event['event_type']; ?></span>
-                                            <?php echo htmlspecialchars($event['is_fueling'] ? 'Fueling' : ($event['event_subtype'] ?: ucfirst($event['event_type']))); ?>
+                                            <span class="<?php echo $styleClass; ?> border px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider mr-2"><?php echo __('filter_' . $event['event_type']); ?></span>
+                                            <?php echo htmlspecialchars($event['is_fueling'] ? __('fueling_event') : ($event['event_subtype'] ?: __('type_' . $event['event_type']))); ?>
                                         </h3>
                                     </div>
                                     <?php include __DIR__ . '/timeline_card_content.php'; ?>
@@ -218,8 +218,8 @@ $eventIcons = [
                                             <?php echo date('d M Y', $eventDate); ?>
                                         </div>
                                         <h3 class="text-lg font-bold text-slate-900 flex items-center">
-                                            <span class="<?php echo $styleClass; ?> border px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider mr-2"><?php echo $event['event_type']; ?></span>
-                                            <?php echo htmlspecialchars($event['is_fueling'] ? 'Fueling' : ($event['event_subtype'] ?: ucfirst($event['event_type']))); ?>
+                                            <span class="<?php echo $styleClass; ?> border px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider mr-2"><?php echo __('filter_' . $event['event_type']); ?></span>
+                                            <?php echo htmlspecialchars($event['is_fueling'] ? __('fueling_event') : ($event['event_subtype'] ?: __('type_' . $event['event_type']))); ?>
                                         </h3>
                                     </div>
                                     <!-- Shared Card Content -->
@@ -252,7 +252,7 @@ $eventIcons = [
                                 <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                                 </div>
-                                <span x-text="modalMode === 'add' ? 'Add Vehicle Event' : 'Edit Event'"></span>
+                                <span x-text="modalMode === 'add' ? '<?php echo addslashes(__('add_vehicle_event')); ?>' : '<?php echo addslashes(__('edit_event')); ?>'"></span>
                             </h3>
                             <button type="button" @click="closeModal()" class="text-slate-400 hover:text-slate-500 focus:outline-none">
                                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -262,38 +262,38 @@ $eventIcons = [
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <!-- Type -->
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Event Type *</label>
+                                <label class="block text-sm font-medium text-slate-700 mb-1"><?php echo __('event_type'); ?></label>
                                 <select name="event_type" x-model="formData.event_type" required class="w-full border-slate-300 rounded-xl shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2.5">
-                                    <option value="service" class="font-medium">Service / Maintenance</option>
-                                    <option value="damage">Damage / Accident</option>
-                                    <option value="expense">General Expense</option>
-                                    <option value="inspection">Inspection</option>
-                                    <option value="insurance">Insurance / RCA</option>
-                                    <option value="itp">ITP</option>
+                                    <option value="service" class="font-medium"><?php echo __('type_service'); ?></option>
+                                    <option value="damage"><?php echo __('type_damage'); ?></option>
+                                    <option value="expense"><?php echo __('type_expense'); ?></option>
+                                    <option value="inspection"><?php echo __('type_inspection'); ?></option>
+                                    <option value="insurance"><?php echo __('type_insurance'); ?></option>
+                                    <option value="itp"><?php echo __('type_itp'); ?></option>
                                 </select>
                             </div>
 
                             <!-- Subtype -->
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Subtype / Title</label>
-                                <input type="text" name="event_subtype" x-model="formData.event_subtype" placeholder="e.g. Oil Change, Front Bumper" class="w-full border-slate-300 rounded-xl shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2.5">
+                                <label class="block text-sm font-medium text-slate-700 mb-1"><?php echo __('event_subtype'); ?></label>
+                                <input type="text" name="event_subtype" x-model="formData.event_subtype" placeholder="<?php echo htmlspecialchars(__('event_subtype_placeholder'), ENT_QUOTES); ?>" class="w-full border-slate-300 rounded-xl shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2.5">
                             </div>
 
                             <!-- Date -->
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Date *</label>
+                                <label class="block text-sm font-medium text-slate-700 mb-1"><?php echo __('event_date'); ?></label>
                                 <input type="date" name="event_date" x-model="formData.event_date" required class="w-full border-slate-300 rounded-xl shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2.5">
                             </div>
 
                             <!-- Odometer -->
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Odometer at Event (km)</label>
+                                <label class="block text-sm font-medium text-slate-700 mb-1"><?php echo __('odometer_at_event'); ?></label>
                                 <input type="number" name="odometer" x-model="formData.odometer" value="<?php echo $selectedVehicle['current_odometer'] ?? ''; ?>" class="w-full border-slate-300 rounded-xl shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2.5">
                             </div>
 
                             <!-- Cost -->
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Cost (RON)</label>
+                                <label class="block text-sm font-medium text-slate-700 mb-1"><?php echo __('cost_ron'); ?></label>
                                 <div class="relative rounded-md shadow-sm">
                                     <input type="number" step="0.01" name="cost" x-model="formData.cost" placeholder="0.00" class="w-full border-slate-300 rounded-xl shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2.5 pl-4 pr-12">
                                     <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
@@ -304,43 +304,43 @@ $eventIcons = [
                             
                             <!-- Status -->
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Status</label>
+                                <label class="block text-sm font-medium text-slate-700 mb-1"><?php echo __('event_status'); ?></label>
                                 <select name="status" x-model="formData.status" class="w-full border-slate-300 rounded-xl shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2.5">
-                                    <option value="open">Open / Pending</option>
-                                    <option value="in_progress">In Progress</option>
-                                    <option value="closed">Closed / Resolved</option>
+                                    <option value="open"><?php echo __('status_open'); ?></option>
+                                    <option value="in_progress"><?php echo __('status_in_progress'); ?></option>
+                                    <option value="closed"><?php echo __('status_closed'); ?></option>
                                 </select>
                             </div>
 
                             <!-- Description (Full width) -->
                             <div class="md:col-span-2">
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Description / Notes</label>
-                                <textarea name="description" x-model="formData.description" rows="3" class="w-full border-slate-300 rounded-xl shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2.5" placeholder="Details about the event, replaced parts, etc..."></textarea>
+                                <label class="block text-sm font-medium text-slate-700 mb-1"><?php echo __('description_notes'); ?></label>
+                                <textarea name="description" x-model="formData.description" rows="3" class="w-full border-slate-300 rounded-xl shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2.5" placeholder="<?php echo htmlspecialchars(__('description_placeholder'), ENT_QUOTES); ?>"></textarea>
                             </div>
 
                             <!-- Service Specific: Next Service KM -->
                             <div x-show="formData.event_type === 'service'" class="md:col-span-2 bg-blue-50 p-4 rounded-xl border border-blue-100 flex items-start">
                                 <svg class="w-5 h-5 text-blue-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 <div class="w-full">
-                                    <label class="block text-sm font-bold text-blue-900 mb-1">Update "Next Service Due At" (KM)</label>
-                                    <p class="text-xs text-blue-700 mb-2">If you changed the oil/filters, enter at what mileage the next service is required.</p>
+                                    <label class="block text-sm font-bold text-blue-900 mb-1"><?php echo __('update_next_service_km'); ?></label>
+                                    <p class="text-xs text-blue-700 mb-2"><?php echo __('update_next_service_help'); ?></p>
                                     <input type="number" name="next_service_km" class="w-full md:w-1/2 border-white rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2" placeholder="e.g. <?php echo ($selectedVehicle['current_odometer'] ?? 0) + 15000; ?>">
                                 </div>
                             </div>
 
                             <!-- Photos Input -->
                             <div class="md:col-span-2">
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Attach Photos (Optional)</label>
+                                <label class="block text-sm font-medium text-slate-700 mb-1"><?php echo __('attach_photos'); ?></label>
                                 <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-xl hover:bg-slate-50 transition-colors">
                                     <div class="space-y-1 text-center">
                                         <svg class="mx-auto h-12 w-12 text-slate-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
                                         <div class="flex text-sm text-slate-600 justify-center">
                                             <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none px-1">
-                                                <span>Upload files</span>
+                                                <span><?php echo __('upload_files'); ?></span>
                                                 <input id="file-upload" name="photos[]" type="file" class="sr-only" multiple accept="image/*">
                                             </label>
                                         </div>
-                                        <p class="text-xs text-slate-500">PNG, JPG up to 5MB (Max 6)</p>
+                                        <p class="text-xs text-slate-500"><?php echo __('photo_requirements'); ?></p>
                                     </div>
                                 </div>
                             </div>
@@ -349,10 +349,10 @@ $eventIcons = [
                     
                     <div class="bg-gray-50 px-6 py-4 sm:px-8 sm:flex sm:flex-row-reverse rounded-b-2xl border-t border-slate-200">
                         <button type="submit" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-6 py-2.5 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm transition-colors">
-                            <span x-text="modalMode === 'add' ? 'Save Event' : 'Update Event'"></span>
+                            <span x-text="modalMode === 'add' ? '<?php echo addslashes(__('save_event')); ?>' : '<?php echo addslashes(__('update_event_btn')); ?>'"></span>
                         </button>
                         <button type="button" @click="closeModal()" class="mt-3 w-full inline-flex justify-center rounded-xl border border-slate-300 shadow-sm px-6 py-2.5 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
-                            Cancel
+                            <?php echo __('cancel'); ?>
                         </button>
                     </div>
                 </form>
