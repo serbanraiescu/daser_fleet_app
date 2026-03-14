@@ -93,14 +93,43 @@ class ApiService {
     required double cost,
     required int odometer,
     int isFull = 1,
+    String? photoPath, // New parameter for photo
   }) async {
-    await _post('/driver/fueling', {
-      'vehicle_id': vehicleId,
-      'liters': liters,
-      'cost': cost,
-      'odometer': odometer,
-      'is_full': isFull,
+    if (photoPath == null) {
+      await _post('/driver/fueling', {
+        'vehicle_id': vehicleId,
+        'liters': liters,
+        'cost': cost,
+        'odometer': odometer,
+        'is_full': isFull,
+      });
+      return;
+    }
+
+    // Handle Multipart for Photo
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/driver/fueling'));
+    request.headers.addAll({
+      'Cookie': 'PHPSESSID=$token',
     });
+
+    request.fields['vehicle_id'] = vehicleId.toString();
+    request.fields['liters'] = liters.toString();
+    request.fields['cost'] = cost.toString();
+    request.fields['odometer'] = odometer.toString();
+    request.fields['is_full'] = isFull.toString();
+
+    request.files.add(await http.MultipartFile.fromPath('receipt_photo', photoPath));
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
+    if (response.statusCode != 200) {
+      final errorData = jsonDecode(response.body);
+      throw Exception(errorData['error'] ?? 'Eroare upload bon (${response.statusCode})');
+    }
   }
 
   Future<void> reportDamage(int vehicleId, String description) async {

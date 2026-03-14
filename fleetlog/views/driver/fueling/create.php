@@ -8,7 +8,9 @@
     </div>
 
     <form action="/driver/fueling" method="POST" enctype="multipart/form-data" class="space-y-4" x-data="{ 
-        selectedVehicleId: '<?php echo htmlspecialchars($selectedVehicleId ?? '', ENT_QUOTES, 'UTF-8'); ?>'
+        selectedVehicleId: '<?php echo htmlspecialchars($selectedVehicleId ?? '', ENT_QUOTES, 'UTF-8'); ?>',
+        photoName: null,
+        photoPreview: null
     }">
         <?php $isLocked = $isLocked ?? false; ?>
         <?php if ($isLocked): ?>
@@ -107,14 +109,32 @@
 
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-1">Receipt Photo (Optional)</label>
-                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-xl hover:border-blue-400 transition-colors cursor-pointer relative">
-                    <div class="space-y-1 text-center">
+                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-xl hover:border-blue-400 transition-colors cursor-pointer relative"
+                     @click="$refs.photo.click()">
+                    
+                    <!-- Preview -->
+                    <div x-show="photoPreview" class="w-full">
+                        <img :src="photoPreview" class="w-full h-48 object-cover rounded-xl shadow-sm">
+                        <div class="mt-2 text-xs text-slate-500 font-bold flex justify-between">
+                            <span x-text="photoName"></span>
+                            <button type="button" @click.stop="photoPreview = null; photoName = null; $refs.photo.value = ''" class="text-red-500">Remove</button>
+                        </div>
+                    </div>
+
+                    <div x-show="!photoPreview" class="space-y-1 text-center">
                         <svg class="mx-auto h-12 w-12 text-slate-400" stroke="currentColor" fill="none" viewBox="0 0 48 48"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                        <div class="flex text-sm text-slate-600">
-                            <label class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500">
-                                <span>Upload a file</span>
-                                <input name="receipt_photo" type="file" class="sr-only" accept="image/*">
-                            </label>
+                        <div class="flex text-sm text-slate-600 justify-center">
+                            <span class="font-medium text-blue-600 hover:text-blue-500">Upload a file</span>
+                            <input name="receipt_photo" type="file" class="sr-only" accept="image/*" x-ref="photo"
+                                   @change="
+                                    const file = $event.target.files[0];
+                                    if (file) {
+                                        photoName = file.name;
+                                        const reader = new FileReader();
+                                        reader.onload = (e) => { photoPreview = e.target.result; };
+                                        reader.readAsDataURL(file);
+                                    }
+                                   ">
                         </div>
                         <p class="text-xs text-slate-500">PNG, JPG, GIF up to 10MB</p>
                     </div>
