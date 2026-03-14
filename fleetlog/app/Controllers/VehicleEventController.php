@@ -27,6 +27,12 @@ class VehicleEventController extends BaseController
     public function index(): void
     {
         $tenantId = Auth::tenantId();
+        
+        if ($tenantId === null) {
+            $this->redirect('/admin/dashboard?error=must_impersonate');
+            return;
+        }
+
         $vehicles = $this->vehicleRepo->getAllNonArchivedByTenant($tenantId);
         
         $selectedVehicleId = $_GET['vehicle_id'] ?? null;
@@ -98,6 +104,12 @@ class VehicleEventController extends BaseController
     public function store(): void
     {
         $tenantId = Auth::tenantId();
+        
+        if ($tenantId === null) {
+            $this->redirect('/admin/dashboard?error=must_impersonate');
+            return;
+        }
+
         $vehicleId = (int) $_POST['vehicle_id'];
         
         // Verify ownership
@@ -137,6 +149,12 @@ class VehicleEventController extends BaseController
     public function update(): void
     {
         $tenantId = Auth::tenantId();
+        
+        if ($tenantId === null) {
+            $this->redirect('/admin/dashboard?error=must_impersonate');
+            return;
+        }
+
         $eventId = (int) $_POST['event_id'];
         $vehicleId = (int) $_POST['vehicle_id'];
 
