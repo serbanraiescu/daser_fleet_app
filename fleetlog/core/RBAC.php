@@ -24,6 +24,24 @@ class RBAC
         return self::hasRole('driver');
     }
 
+    public static function requireRole($roles): void
+    {
+        if (!is_array($roles)) {
+            $roles = [$roles];
+        }
+
+        if (!Auth::check()) {
+            header('Location: /login');
+            exit;
+        }
+
+        $currentRole = Auth::role();
+        if (!in_array($currentRole, $roles)) {
+            http_response_code(403);
+            die("Access Denied. You do not have the required permissions to access this page.");
+        }
+    }
+
     public static function can(string $permission): bool
     {
         // Simple permission logic based on roles for V1
