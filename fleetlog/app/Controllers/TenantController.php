@@ -476,6 +476,23 @@ class TenantController extends BaseController
         ]);
     }
 
+    public function fuelingReceipts(): void
+    {
+        $tenantId = Auth::tenantId();
+        $month = (int)($_GET['month'] ?? date('m'));
+        $year = (int)($_GET['year'] ?? date('Y'));
+
+        $fuelingRepo = new \FleetLog\App\Repositories\FuelingRepository();
+        $fuelings = $fuelingRepo->getByPeriod($tenantId, $month, $year);
+
+        $this->render('tenant/fuelings/receipts', [
+            'title' => 'Fueling Receipts - ' . date('F Y', mktime(0, 0, 0, $month, 1, $year)),
+            'fuelings' => $fuelings,
+            'month' => $month,
+            'year' => $year
+        ]);
+    }
+
     public function showDamage(int $id): void
     {
         $tenantId = Auth::tenantId();

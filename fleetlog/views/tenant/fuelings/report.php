@@ -68,24 +68,6 @@
                 </tr>
             </tfoot>
         </table>
-
-        <!-- Receipt Photos Section -->
-        <div class="mt-12">
-            <h3 class="text-xl font-black text-slate-800 mb-6 uppercase border-b border-slate-200 pb-2">Receipt Gallery / Bonuri Fiscale</h3>
-            <div class="grid grid-cols-2 gap-6">
-                <?php foreach ($fuelings as $f): ?>
-                    <?php if ($f['receipt_photo']): ?>
-                        <div class="break-inside-avoid border border-slate-200 rounded-xl p-4 bg-slate-50">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase"><?php echo htmlspecialchars($f['license_plate']); ?> • <?php echo date('d.m.Y', strtotime($f['created_at'])); ?></span>
-                                <span class="text-[10px] font-black text-blue-600 uppercase"><?php echo number_format($f['total_price'], 2); ?> RON</span>
-                            </div>
-                            <img src="/<?php echo $f['receipt_photo']; ?>" class="w-full h-auto rounded-lg shadow-sm border border-slate-200" alt="Receipt">
-                        </div>
-                    <?php endif; ?>
-                <?php endforeach; ?>
-            </div>
-        </div>
     <?php endif; ?>
 
     <div class="mt-12 text-center text-[10px] text-slate-400 uppercase tracking-widest border-t border-slate-100 pt-6">
