@@ -79,6 +79,18 @@ class VehicleEventRepository extends BaseRepository
         ", [$vehicleId, $tenantId]);
     }
 
+    public function getAllByTenant(int $tenantId): array
+    {
+        return DB::fetchAll("
+            SELECT e.*, u.name as created_by_name, v.license_plate 
+            FROM vehicle_events e
+            LEFT JOIN users u ON e.created_by = u.id
+            JOIN vehicles v ON e.vehicle_id = v.id
+            WHERE e.tenant_id = ?
+            ORDER BY e.event_date DESC, e.id DESC
+        ", [$tenantId]);
+    }
+
     public function delete(int $id): bool
     {
         $tenantId = Auth::tenantId();

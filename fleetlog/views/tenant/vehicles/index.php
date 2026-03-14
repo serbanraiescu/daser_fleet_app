@@ -178,6 +178,10 @@ $archivedVehicles = $archivedVehicles ?? [];
                                 </div>
 
                                 <div class="flex items-center space-x-2">
+                                    <a href="/tenant/vehicle-events?vehicle_id=<?php echo $vehicle['id']; ?>" class="text-indigo-600 hover:text-white bg-indigo-50 hover:bg-indigo-600 px-3 py-1.5 rounded-xl border border-indigo-100 hover:border-indigo-600 transition-all font-black text-xs uppercase" title="View Timeline">
+                                        <svg class="w-4 h-4 mr-1 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        Timeline
+                                    </a>
                                     <a href="/tenant/vehicles/mechanic-report/<?php echo $vehicle['id']; ?>" class="text-slate-600 hover:text-slate-900 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors flex items-center font-black text-xs uppercase" title="Mechanic Report">
                                         <svg class="w-4 h-4 mr-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                         Report

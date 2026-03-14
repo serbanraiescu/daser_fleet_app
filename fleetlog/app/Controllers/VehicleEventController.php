@@ -7,11 +7,13 @@ use FleetLog\Core\DB;
 use FleetLog\Core\RBAC;
 use FleetLog\App\Repositories\VehicleRepository;
 use FleetLog\App\Repositories\VehicleEventRepository;
+use FleetLog\App\Repositories\FuelingRepository;
 
 class VehicleEventController extends BaseController
 {
     private VehicleEventRepository $eventRepo;
     private VehicleRepository $vehicleRepo;
+    private FuelingRepository $fuelingRepo;
 
     public function __construct()
     {
@@ -19,6 +21,7 @@ class VehicleEventController extends BaseController
         RBAC::requireRole(['tenant_admin', 'super_admin']);
         $this->eventRepo = new VehicleEventRepository();
         $this->vehicleRepo = new VehicleRepository();
+        $this->fuelingRepo = new FuelingRepository();
     }
 
     public function index(): void
@@ -27,14 +30,16 @@ class VehicleEventController extends BaseController
         $vehicles = $this->vehicleRepo->getAllNonArchivedByTenant($tenantId);
         
         $selectedVehicleId = $_GET['vehicle_id'] ?? null;
-        $events = [];
         $selectedVehicle = null;
+        $events = [];
+        $fuelings = [];
 
         if ($selectedVehicleId) {
             $selectedVehicle = $this->vehicleRepo->find((int)$selectedVehicleId);
             // Ensure vehicle belongs to tenant
             if ($selectedVehicle && $selectedVehicle['tenant_id'] == $tenantId) {
                 $events = $this->eventRepo->getByVehicle((int)$selectedVehicleId);
+                $fuelings = $this->fuelingRepo->getByVehicle((int)$selectedVehicleId, $tenantId);
                 
                 // Fetch photos for each event
                 foreach ($events as &$event) {
@@ -43,14 +48,51 @@ class VehicleEventController extends BaseController
             } else {
                 $selectedVehicle = null;
             }
+        } else {
+            // Global View
+            $events = $this->eventRepo->getAllByTenant($tenantId);
+            $fuelings = $this->fuelingRepo->getByTenant($tenantId);
+
+            // Fetch photos for each event
+            foreach ($events as &$event) {
+                $event['photos'] = $this->eventRepo->getPhotos($event['id']);
+            }
         }
+
+        $mergedTimeline = $this->mergeAndSortTimeline($events, $fuelings);
 
         $this->render('tenant/events/index', [
             'title' => 'Vehicle Timeline (BETA)',
             'vehicles' => $vehicles,
             'selectedVehicle' => $selectedVehicle,
-            'events' => $events
+            'events' => $mergedTimeline,
+            'isGlobal' => ($selectedVehicle === null)
         ]);
+    }
+
+    private function mergeAndSortTimeline(array $events, array $fuelings): array
+    {
+        $timeline = [];
+
+        foreach ($events as $event) {
+            $event['is_fueling'] = false;
+            $event['sort_date'] = $event['event_date'] . ' ' . date('H:i:s', strtotime($event['created_at']));
+            $timeline[] = $event;
+        }
+
+        foreach ($fuelings as $fueling) {
+            $fueling['is_fueling'] = true;
+            $fueling['event_type'] = 'fueling';
+            $fueling['event_date'] = date('Y-m-d', strtotime($fueling['created_at']));
+            $fueling['sort_date'] = $fueling['created_at'];
+            $timeline[] = $fueling;
+        }
+
+        usort($timeline, function($a, $b) {
+            return strcmp($b['sort_date'], $a['sort_date']);
+        });
+
+        return $timeline;
     }
 
     public function store(): void

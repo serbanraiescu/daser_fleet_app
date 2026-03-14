@@ -6,7 +6,8 @@ $eventColors = [
     'expense' => 'bg-orange-100 text-orange-800 border-orange-200',
     'inspection' => 'bg-green-100 text-green-800 border-green-200',
     'insurance' => 'bg-purple-100 text-purple-800 border-purple-200',
-    'itp' => 'bg-teal-100 text-teal-800 border-teal-200'
+    'itp' => 'bg-teal-100 text-teal-800 border-teal-200',
+    'fueling' => 'bg-lime-100 text-lime-800 border-lime-200'
 ];
 
 $eventIcons = [
@@ -15,7 +16,8 @@ $eventIcons = [
     'expense' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
     'inspection' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
     'insurance' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>',
-    'itp' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>'
+    'itp' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>',
+    'fueling' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>'
 ];
 ?>
 
@@ -83,28 +85,6 @@ $eventIcons = [
             </div>
         </div>
 
-        <!-- Toolbar & Filters -->
-        <div class="flex flex-col md:flex-row justify-between items-center bg-white rounded-xl shadow-sm border border-slate-200 p-2 mb-8 sticky top-0 z-20">
-            <div class="flex overflow-x-auto w-full md:w-auto p-1 gap-2 no-scrollbar">
-                <button @click="filter = 'all'" :class="{'bg-slate-800 text-white': filter === 'all', 'text-slate-600 hover:bg-slate-100': filter !== 'all'}" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap">
-                    All Events
-                </button>
-                <button @click="filter = 'service'" :class="{'bg-blue-100 text-blue-800': filter === 'service', 'text-slate-600 hover:bg-slate-100': filter !== 'service'}" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex items-center">
-                    <span class="w-2 h-2 rounded-full bg-blue-500 mr-2"></span> Service
-                </button>
-                <button @click="filter = 'damage'" :class="{'bg-red-100 text-red-800': filter === 'damage', 'text-slate-600 hover:bg-slate-100': filter !== 'damage'}" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex items-center">
-                    <span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span> Damage
-                </button>
-                <button @click="filter = 'expense'" :class="{'bg-orange-100 text-orange-800': filter === 'expense', 'text-slate-600 hover:bg-slate-100': filter !== 'expense'}" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex items-center">
-                    <span class="w-2 h-2 rounded-full bg-orange-500 mr-2"></span> Expense
-                </button>
-            </div>
-            
-            <button @click="openModal('add')" class="mt-4 md:mt-0 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors shadow-shadow-sm flex items-center w-full md:w-auto justify-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                Add Event
-            </button>
-        </div>
 
         <!-- Vertical Timeline -->
         <div class="relative max-w-4xl mx-auto">
@@ -143,8 +123,13 @@ $eventIcons = [
                             <!-- Left Side (Empty on mobile, occupied on desktop based on parity) -->
                             <div class="hidden md:block w-[45%] <?php echo $isEven ? 'text-right pr-8' : 'order-last text-left pl-8'; ?>">
                                 <?php if ($isEven): ?>
-                                    <div class="text-sm font-bold text-slate-500 mb-1"><?php echo date('d M Y', $eventDate); ?></div>
-                                    <h3 class="text-lg font-bold text-slate-900"><?php echo htmlspecialchars($event['event_subtype'] ?: ucfirst($event['event_type'])); ?></h3>
+                                    <div class="text-sm font-bold text-slate-500 mb-1">
+                                        <?php if ($isGlobal): ?>
+                                            <span class="bg-slate-800 text-white px-2 py-0.5 rounded mr-2"><?php echo htmlspecialchars($event['license_plate']); ?></span>
+                                        <?php endif; ?>
+                                        <?php echo date('d M Y', $eventDate); ?>
+                                    </div>
+                                    <h3 class="text-lg font-bold text-slate-900"><?php echo htmlspecialchars($event['is_fueling'] ? 'Fueling' : ($event['event_subtype'] ?: ucfirst($event['event_type']))); ?></h3>
                                 <?php else: ?>
                                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
                                         <?php include __DIR__ . '/timeline_card_content.php'; ?>
@@ -163,17 +148,28 @@ $eventIcons = [
                             <div class="w-full pl-16 md:pl-0 md:w-[45%] <?php echo !$isEven ? 'text-right pr-8' : 'text-left pl-8'; ?>">
                                 <?php if (!$isEven): ?>
                                     <!-- Desktop metadata -->
+                                    <!-- Desktop metadata -->
                                     <div class="hidden md:block">
-                                        <div class="text-sm font-bold text-slate-500 mb-1"><?php echo date('d M Y', $eventDate); ?></div>
-                                        <h3 class="text-lg font-bold text-slate-900"><?php echo htmlspecialchars($event['event_subtype'] ?: ucfirst($event['event_type'])); ?></h3>
+                                        <div class="text-sm font-bold text-slate-500 mb-1">
+                                            <?php if ($isGlobal): ?>
+                                                <span class="bg-slate-800 text-white px-2 py-0.5 rounded mr-2"><?php echo htmlspecialchars($event['license_plate']); ?></span>
+                                            <?php endif; ?>
+                                            <?php echo date('d M Y', $eventDate); ?>
+                                        </div>
+                                        <h3 class="text-lg font-bold text-slate-900"><?php echo htmlspecialchars($event['is_fueling'] ? 'Fueling' : ($event['event_subtype'] ?: ucfirst($event['event_type']))); ?></h3>
                                     </div>
                                     <!-- Mobile card (because Left Side is hidden on mobile) -->
                                     <div class="md:hidden bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
                                         <div class="border-b border-slate-100 pb-3 mb-3">
-                                            <div class="text-sm font-bold text-slate-500 mb-1"><?php echo date('d M Y', $eventDate); ?></div>
+                                            <div class="text-sm font-bold text-slate-500 mb-1">
+                                                <?php if ($isGlobal): ?>
+                                                    <span class="bg-slate-800 text-white px-2 py-0.5 rounded mr-2 text-[10px]"><?php echo htmlspecialchars($event['license_plate']); ?></span>
+                                                <?php endif; ?>
+                                                <?php echo date('d M Y', $eventDate); ?>
+                                            </div>
                                             <h3 class="text-lg font-bold text-slate-900 flex items-center">
                                                 <span class="<?php echo $styleClass; ?> border px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider mr-2"><?php echo $event['event_type']; ?></span>
-                                                <?php echo htmlspecialchars($event['event_subtype'] ?: ucfirst($event['event_type'])); ?>
+                                                <?php echo htmlspecialchars($event['is_fueling'] ? 'Fueling' : ($event['event_subtype'] ?: ucfirst($event['event_type']))); ?>
                                             </h3>
                                         </div>
                                         <?php include __DIR__ . '/timeline_card_content.php'; ?>
@@ -182,10 +178,15 @@ $eventIcons = [
                                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
                                         <!-- Mobile Header inside card -->
                                         <div class="md:hidden border-b border-slate-100 pb-3 mb-3">
-                                            <div class="text-sm font-bold text-slate-500 mb-1"><?php echo date('d M Y', $eventDate); ?></div>
+                                            <div class="text-sm font-bold text-slate-500 mb-1">
+                                                <?php if ($isGlobal): ?>
+                                                    <span class="bg-slate-800 text-white px-2 py-0.5 rounded mr-2 text-[10px]"><?php echo htmlspecialchars($event['license_plate']); ?></span>
+                                                <?php endif; ?>
+                                                <?php echo date('d M Y', $eventDate); ?>
+                                            </div>
                                             <h3 class="text-lg font-bold text-slate-900 flex items-center">
                                                 <span class="<?php echo $styleClass; ?> border px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider mr-2"><?php echo $event['event_type']; ?></span>
-                                                <?php echo htmlspecialchars($event['event_subtype'] ?: ucfirst($event['event_type'])); ?>
+                                                <?php echo htmlspecialchars($event['is_fueling'] ? 'Fueling' : ($event['event_subtype'] ?: ucfirst($event['event_type']))); ?>
                                             </h3>
                                         </div>
                                         <!-- Shared Card Content -->
