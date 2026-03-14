@@ -24,7 +24,7 @@ class VehicleEventController extends BaseController
     public function index(): void
     {
         $tenantId = Auth::tenantId();
-        $vehicles = $this->vehicleRepo->getByTenant($tenantId);
+        $vehicles = $this->vehicleRepo->getAllNonArchivedByTenant($tenantId);
         
         $selectedVehicleId = $_GET['vehicle_id'] ?? null;
         $events = [];
