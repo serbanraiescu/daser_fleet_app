@@ -30,14 +30,14 @@ $eventIcons = [
                 </svg>
                 Vehicle Timeline <span class="ml-3 px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-700 rounded-full border border-blue-200">BETA</span>
             </h1>
-            <p class="text-slate-500 mt-1">Unified history of services, damages, and expenses.</p>
+            <p class="text-slate-500 mt-1">Unified history of services, damages, expenses, and fuelings.</p>
         </div>
 
         <!-- Vehicle Selector -->
         <div class="w-full md:w-72">
             <form action="" method="GET" x-ref="vehicleForm">
                 <select name="vehicle_id" @change="$refs.vehicleForm.submit()" class="w-full border-slate-300 rounded-xl shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-white hover:bg-slate-50 transition-colors py-2.5">
-                    <option value="">Select a vehicle...</option>
+                    <option value="">All Vehicles (Global View)</option>
                     <?php foreach ($vehicles as $v): ?>
                         <option value="<?php echo $v['id']; ?>" <?php echo (isset($selectedVehicle['id']) && $selectedVehicle['id'] == $v['id']) ? 'selected' : ''; ?>>
                             <?php echo htmlspecialchars($v['license_plate'] . ' - ' . $v['make'] . ' ' . $v['model']); ?>
@@ -48,15 +48,37 @@ $eventIcons = [
         </div>
     </div>
 
-    <?php if (!$selectedVehicle): ?>
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center text-slate-500">
-            <svg class="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-            </svg>
-            <p class="text-lg">Please select a vehicle from the dropdown above to view its timeline.</p>
+    <!-- Toolbar & Filters -->
+    <div class="flex flex-col md:flex-row justify-between items-center bg-white rounded-xl shadow-sm border border-slate-200 p-2 mb-8 sticky top-0 z-20">
+        <div class="flex overflow-x-auto w-full md:w-auto p-1 gap-2 no-scrollbar">
+            <button @click="filter = 'all'" :class="{'bg-slate-800 text-white': filter === 'all', 'text-slate-600 hover:bg-slate-100': filter !== 'all'}" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap">
+                All Events
+            </button>
+            <button @click="filter = 'service'" :class="{'bg-blue-100 text-blue-800': filter === 'service', 'text-slate-600 hover:bg-slate-100': filter !== 'service'}" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex items-center">
+                <span class="w-2 h-2 rounded-full bg-blue-500 mr-2"></span> Service
+            </button>
+            <button @click="filter = 'fueling'" :class="{'bg-lime-100 text-lime-800': filter === 'fueling', 'text-slate-600 hover:bg-slate-100': filter !== 'fueling'}" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex items-center">
+                <span class="w-2 h-2 rounded-full bg-lime-500 mr-2"></span> Fueling
+            </button>
+            <button @click="filter = 'damage'" :class="{'bg-red-100 text-red-800': filter === 'damage', 'text-slate-600 hover:bg-slate-100': filter !== 'damage'}" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex items-center">
+                <span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span> Damage
+            </button>
+            <button @click="filter = 'expense'" :class="{'bg-orange-100 text-orange-800': filter === 'expense', 'text-slate-600 hover:bg-slate-100': filter !== 'expense'}" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex items-center">
+                <span class="w-2 h-2 rounded-full bg-orange-500 mr-2"></span> Expense
+            </button>
         </div>
-    <?php else: ?>
         
+        <?php if ($selectedVehicle): ?>
+            <button @click="openModal('add')" class="mt-4 md:mt-0 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors shadow-shadow-sm flex items-center w-full md:w-auto justify-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Add Event
+            </button>
+        <?php else: ?>
+            <div class="px-4 py-2 text-xs text-slate-400 italic">Select a vehicle to add events</div>
+        <?php endif; ?>
+    </div>
+
+    <?php if ($selectedVehicle): ?>
         <!-- Vehicle Header Card -->
         <div class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl shadow-lg p-6 mb-8 text-white relative overflow-hidden">
             <div class="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white opacity-5 rounded-full blur-2xl"></div>
@@ -84,45 +106,83 @@ $eventIcons = [
                 </div>
             </div>
         </div>
+    <?php endif; ?>
 
+    <!-- Horizontal line separator for global view header -->
+    <?php if (!$selectedVehicle): ?>
+        <div class="mb-8 p-6 bg-slate-50 border border-slate-200 rounded-2xl flex items-center">
+             <div class="w-12 h-12 bg-white rounded-xl shadow-sm border border-slate-200 flex items-center justify-center mr-4">
+                 <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+             </div>
+             <div>
+                 <h2 class="text-xl font-bold text-slate-800">Global Fleet Report</h2>
+                 <p class="text-sm text-slate-500">Showing events for all active vehicles.</p>
+             </div>
+        </div>
+    <?php endif; ?>
 
-        <!-- Vertical Timeline -->
-        <div class="relative max-w-4xl mx-auto">
-            <!-- Central Line -->
-            <div class="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-slate-200 transform md:-translate-x-1/2 z-0 hidden md:block"></div>
-            
-            <?php if (empty($events)): ?>
-                <div class="text-center py-12 text-slate-500 relative z-10 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
-                    <p>No events recorded for this vehicle yet.</p>
-                </div>
-            <?php else: ?>
-                <div class="space-y-8">
-                    <?php 
-                    $currentYearMonth = '';
-                    foreach ($events as $index => $event): 
-                        $eventDate = strtotime($event['event_date']);
-                        $yearMonth = date('F Y', $eventDate);
+    <!-- Vertical Timeline -->
+    <div class="relative max-w-4xl mx-auto">
+        <!-- Central Line -->
+        <div class="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-slate-200 transform md:-translate-x-1/2 z-0 hidden md:block"></div>
+        
+        <?php if (empty($events)): ?>
+            <div class="text-center py-12 text-slate-500 relative z-10 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
+                <p>No events recorded yet.</p>
+            </div>
+        <?php else: ?>
+            <div class="space-y-8">
+                <?php 
+                $currentYearMonth = '';
+                foreach ($events as $index => $event): 
+                    $eventDate = strtotime($event['event_date']);
+                    $yearMonth = date('F Y', $eventDate);
+                    
+                    $styleClass = $eventColors[$event['event_type']] ?? 'bg-slate-100 text-slate-800 border-slate-200';
+                    $iconSvg = $eventIcons[$event['event_type']] ?? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+                    
+                    $isEven = $index % 2 === 0;
+                ?>
+                    <!-- Month Separator (If changed) -->
+                    <?php if ($yearMonth !== $currentYearMonth): ?>
+                        <div class="relative z-10 flex justify-center w-full py-4 hidden md:flex" x-show="filter === 'all'">
+                            <span class="bg-white px-4 py-1.5 rounded-full text-xs font-bold tracking-wider text-slate-500 uppercase shadow-sm border border-slate-200"><?php echo $yearMonth; ?></span>
+                        </div>
+                        <?php $currentYearMonth = $yearMonth; ?>
+                    <?php endif; ?>
+
+                    <!-- Timeline Item -->
+                    <div class="relative z-10 flex flex-col md:flex-row items-center justify-between w-full group" x-show="filter === 'all' || filter === '<?php echo $event['event_type']; ?>'">
                         
-                        // Just an example style selection
-                        $styleClass = $eventColors[$event['event_type']] ?? 'bg-slate-100 text-slate-800 border-slate-200';
-                        $iconSvg = $eventIcons[$event['event_type']] ?? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
-                        
-                        $isEven = $index % 2 === 0;
-                    ?>
-                        <!-- Month Separator (If changed) -->
-                        <?php if ($yearMonth !== $currentYearMonth): ?>
-                            <div class="relative z-10 flex justify-center w-full py-4 hidden md:flex" x-show="filter === 'all'">
-                                <span class="bg-white px-4 py-1.5 rounded-full text-xs font-bold tracking-wider text-slate-500 uppercase shadow-sm border border-slate-200"><?php echo $yearMonth; ?></span>
-                            </div>
-                            <?php $currentYearMonth = $yearMonth; ?>
-                        <?php endif; ?>
+                        <!-- Left Side (Empty on mobile, occupied on desktop based on parity) -->
+                        <div class="hidden md:block w-[45%] <?php echo $isEven ? 'text-right pr-8' : 'order-last text-left pl-8'; ?>">
+                            <?php if ($isEven): ?>
+                                <div class="text-sm font-bold text-slate-500 mb-1">
+                                    <?php if ($isGlobal): ?>
+                                        <span class="bg-slate-800 text-white px-2 py-0.5 rounded mr-2"><?php echo htmlspecialchars($event['license_plate']); ?></span>
+                                    <?php endif; ?>
+                                    <?php echo date('d M Y', $eventDate); ?>
+                                </div>
+                                <h3 class="text-lg font-bold text-slate-900"><?php echo htmlspecialchars($event['is_fueling'] ? 'Fueling' : ($event['event_subtype'] ?: ucfirst($event['event_type']))); ?></h3>
+                            <?php else: ?>
+                                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+                                    <?php include __DIR__ . '/timeline_card_content.php'; ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
 
-                        <!-- Timeline Item -->
-                        <div class="relative z-10 flex flex-col md:flex-row items-center justify-between w-full group" x-show="filter === 'all' || filter === '<?php echo $event['event_type']; ?>'">
-                            
-                            <!-- Left Side (Empty on mobile, occupied on desktop based on parity) -->
-                            <div class="hidden md:block w-[45%] <?php echo $isEven ? 'text-right pr-8' : 'order-last text-left pl-8'; ?>">
-                                <?php if ($isEven): ?>
+                        <!-- Center Marker -->
+                        <div class="absolute left-4 md:left-1/2 transform -translate-x-1/2 w-10 h-10 rounded-full border-4 border-white shadow-sm flex items-center justify-center <?php echo explode(' ', $styleClass)[0]; ?> text-<?php echo explode('-', explode(' ', $styleClass)[1])[1]; ?>-600 z-20">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <?php echo $iconSvg; ?>
+                            </svg>
+                        </div>
+
+                        <!-- Right Side (Main card on mobile, occupied on desktop based on parity) -->
+                        <div class="w-full pl-16 md:pl-0 md:w-[45%] <?php echo !$isEven ? 'text-right pr-8' : 'text-left pl-8'; ?>">
+                            <?php if (!$isEven): ?>
+                                <!-- Desktop metadata -->
+                                <div class="hidden md:block">
                                     <div class="text-sm font-bold text-slate-500 mb-1">
                                         <?php if ($isGlobal): ?>
                                             <span class="bg-slate-800 text-white px-2 py-0.5 rounded mr-2"><?php echo htmlspecialchars($event['license_plate']); ?></span>
@@ -130,77 +190,48 @@ $eventIcons = [
                                         <?php echo date('d M Y', $eventDate); ?>
                                     </div>
                                     <h3 class="text-lg font-bold text-slate-900"><?php echo htmlspecialchars($event['is_fueling'] ? 'Fueling' : ($event['event_subtype'] ?: ucfirst($event['event_type']))); ?></h3>
-                                <?php else: ?>
-                                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
-                                        <?php include __DIR__ . '/timeline_card_content.php'; ?>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-
-                            <!-- Center Marker -->
-                            <div class="absolute left-4 md:left-1/2 transform -translate-x-1/2 w-10 h-10 rounded-full border-4 border-white shadow-sm flex items-center justify-center <?php echo explode(' ', $styleClass)[0]; ?> text-<?php echo explode('-', explode(' ', $styleClass)[1])[1]; ?>-600 z-20">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <?php echo $iconSvg; ?>
-                                </svg>
-                            </div>
-
-                            <!-- Right Side (Main card on mobile, occupied on desktop based on parity) -->
-                            <div class="w-full pl-16 md:pl-0 md:w-[45%] <?php echo !$isEven ? 'text-right pr-8' : 'text-left pl-8'; ?>">
-                                <?php if (!$isEven): ?>
-                                    <!-- Desktop metadata -->
-                                    <!-- Desktop metadata -->
-                                    <div class="hidden md:block">
+                                </div>
+                                <!-- Mobile card (because Left Side is hidden on mobile) -->
+                                <div class="md:hidden bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                                    <div class="border-b border-slate-100 pb-3 mb-3">
                                         <div class="text-sm font-bold text-slate-500 mb-1">
                                             <?php if ($isGlobal): ?>
-                                                <span class="bg-slate-800 text-white px-2 py-0.5 rounded mr-2"><?php echo htmlspecialchars($event['license_plate']); ?></span>
+                                                <span class="bg-slate-800 text-white px-2 py-0.5 rounded mr-2 text-[10px]"><?php echo htmlspecialchars($event['license_plate']); ?></span>
                                             <?php endif; ?>
                                             <?php echo date('d M Y', $eventDate); ?>
                                         </div>
-                                        <h3 class="text-lg font-bold text-slate-900"><?php echo htmlspecialchars($event['is_fueling'] ? 'Fueling' : ($event['event_subtype'] ?: ucfirst($event['event_type']))); ?></h3>
+                                        <h3 class="text-lg font-bold text-slate-900 flex items-center">
+                                            <span class="<?php echo $styleClass; ?> border px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider mr-2"><?php echo $event['event_type']; ?></span>
+                                            <?php echo htmlspecialchars($event['is_fueling'] ? 'Fueling' : ($event['event_subtype'] ?: ucfirst($event['event_type']))); ?>
+                                        </h3>
                                     </div>
-                                    <!-- Mobile card (because Left Side is hidden on mobile) -->
-                                    <div class="md:hidden bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-                                        <div class="border-b border-slate-100 pb-3 mb-3">
-                                            <div class="text-sm font-bold text-slate-500 mb-1">
-                                                <?php if ($isGlobal): ?>
-                                                    <span class="bg-slate-800 text-white px-2 py-0.5 rounded mr-2 text-[10px]"><?php echo htmlspecialchars($event['license_plate']); ?></span>
-                                                <?php endif; ?>
-                                                <?php echo date('d M Y', $eventDate); ?>
-                                            </div>
-                                            <h3 class="text-lg font-bold text-slate-900 flex items-center">
-                                                <span class="<?php echo $styleClass; ?> border px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider mr-2"><?php echo $event['event_type']; ?></span>
-                                                <?php echo htmlspecialchars($event['is_fueling'] ? 'Fueling' : ($event['event_subtype'] ?: ucfirst($event['event_type']))); ?>
-                                            </h3>
+                                    <?php include __DIR__ . '/timeline_card_content.php'; ?>
+                                </div>
+                            <?php else: ?>
+                                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+                                    <!-- Mobile Header inside card -->
+                                    <div class="md:hidden border-b border-slate-100 pb-3 mb-3">
+                                        <div class="text-sm font-bold text-slate-500 mb-1">
+                                            <?php if ($isGlobal): ?>
+                                                <span class="bg-slate-800 text-white px-2 py-0.5 rounded mr-2 text-[10px]"><?php echo htmlspecialchars($event['license_plate']); ?></span>
+                                            <?php endif; ?>
+                                            <?php echo date('d M Y', $eventDate); ?>
                                         </div>
-                                        <?php include __DIR__ . '/timeline_card_content.php'; ?>
+                                        <h3 class="text-lg font-bold text-slate-900 flex items-center">
+                                            <span class="<?php echo $styleClass; ?> border px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider mr-2"><?php echo $event['event_type']; ?></span>
+                                            <?php echo htmlspecialchars($event['is_fueling'] ? 'Fueling' : ($event['event_subtype'] ?: ucfirst($event['event_type']))); ?>
+                                        </h3>
                                     </div>
-                                <?php else: ?>
-                                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
-                                        <!-- Mobile Header inside card -->
-                                        <div class="md:hidden border-b border-slate-100 pb-3 mb-3">
-                                            <div class="text-sm font-bold text-slate-500 mb-1">
-                                                <?php if ($isGlobal): ?>
-                                                    <span class="bg-slate-800 text-white px-2 py-0.5 rounded mr-2 text-[10px]"><?php echo htmlspecialchars($event['license_plate']); ?></span>
-                                                <?php endif; ?>
-                                                <?php echo date('d M Y', $eventDate); ?>
-                                            </div>
-                                            <h3 class="text-lg font-bold text-slate-900 flex items-center">
-                                                <span class="<?php echo $styleClass; ?> border px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider mr-2"><?php echo $event['event_type']; ?></span>
-                                                <?php echo htmlspecialchars($event['is_fueling'] ? 'Fueling' : ($event['event_subtype'] ?: ucfirst($event['event_type']))); ?>
-                                            </h3>
-                                        </div>
-                                        <!-- Shared Card Content -->
-                                        <?php include __DIR__ . '/timeline_card_content.php'; ?>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
+                                    <!-- Shared Card Content -->
+                                    <?php include __DIR__ . '/timeline_card_content.php'; ?>
+                                </div>
+                            <?php endif; ?>
                         </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-        </div>
-
-    <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
 
     <!-- Modal for Add/Edit -->
     <div x-show="isModalOpen" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
