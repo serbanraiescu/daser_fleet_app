@@ -97,10 +97,13 @@
                         <svg class="w-5 h-5 mr-3 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                         <?php echo __('damages'); ?>
                     </a>
+                    <!-- Legacy Expenses hid in favor of Timeline/Documents -->
+                    <!--
                     <a href="/tenant/expenses" class="flex items-center px-4 py-2 hover:bg-slate-800 rounded-lg group">
                         <svg class="w-5 h-5 mr-3 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                         <?php echo __('expenses'); ?>
                     </a>
+                    -->
                     <!-- New Timeline Dropdown/Link -->
                     <a href="/tenant/vehicle-events" class="flex items-center px-4 py-2 hover:bg-slate-800 rounded-lg group">
                         <svg class="w-5 h-5 mr-3 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
