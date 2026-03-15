@@ -57,6 +57,13 @@ class DocumentRepository
 
     public function createHandover(array $data): int
     {
-        return DB::insert("vehicle_handover_reports", $data);
+        $keys = array_keys($data);
+        $fields = implode(', ', $keys);
+        $placeholders = implode(', ', array_fill(0, count($keys), '?'));
+        
+        $sql = "INSERT INTO vehicle_handover_reports ($fields) VALUES ($placeholders)";
+        DB::query($sql, array_values($data));
+        
+        return (int)DB::lastInsertId();
     }
 }
