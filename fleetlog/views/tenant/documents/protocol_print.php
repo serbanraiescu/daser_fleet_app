@@ -89,57 +89,57 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <div class="grid grid-cols-2 gap-4 mb-4">
             <!-- Vehicle Info -->
-            <div class="space-y-6">
-                <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-2">DATE VEHICUL</h3>
-                <div class="space-y-4">
-                    <div class="flex justify-between">
-                        <span class="text-sm text-slate-500">Număr Înmatriculare</span>
-                        <span class="text-sm font-black text-slate-900"><?php echo htmlspecialchars((string)$report['vehicle_plate']); ?></span>
+            <div>
+                <h3 class="text-[10px] font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-1 mb-1">DATE VEHICUL</h3>
+                <div class="space-y-1">
+                    <div class="flex justify-between text-[11px]">
+                        <span class="text-slate-500">Nr. Înmatriculare</span>
+                        <span class="font-black text-slate-900"><?php echo htmlspecialchars((string)$report['vehicle_plate']); ?></span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-sm text-slate-500">Marcă / Model</span>
-                        <span class="text-sm font-black text-slate-900"><?php echo htmlspecialchars((string)$report['vehicle_model']); ?></span>
+                    <div class="flex justify-between text-[11px]">
+                        <span class="text-slate-500">Marcă / Model</span>
+                        <span class="font-black text-slate-900"><?php echo htmlspecialchars((string)$report['vehicle_model']); ?></span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-sm text-slate-500">Kilometraj (Odometru)</span>
-                        <span class="text-sm font-black text-slate-900"><?php echo number_format($report['odometer'], 0, ',', '.'); ?> KM</span>
+                    <div class="flex justify-between text-[11px]">
+                        <span class="text-slate-500">Kilometraj</span>
+                        <span class="font-black text-slate-900"><?php echo number_format($report['odometer'], 0, ',', '.'); ?> KM</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-sm text-slate-500">Nivel Combustibil</span>
-                        <span class="text-sm font-black text-slate-900 uppercase"><?php echo __("fuel_" . $report['fuel_level']); ?></span>
+                    <div class="flex justify-between text-[11px]">
+                        <span class="text-slate-500">Combustibil</span>
+                        <span class="font-black text-slate-900 uppercase"><?php echo __("fuel_" . $report['fuel_level']); ?></span>
                     </div>
                 </div>
             </div>
 
             <!-- Driver Info -->
-            <div class="space-y-6">
-                <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-2">DATE ȘOFER</h3>
-                <div class="space-y-4">
-                    <div class="flex justify-between">
-                        <span class="text-sm text-slate-500">Nume și Prenume</span>
-                        <span class="text-sm font-black text-slate-900"><?php echo htmlspecialchars((string)$report['driver_name']); ?></span>
+            <div>
+                <h3 class="text-[10px] font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-1 mb-1">DATE ȘOFER</h3>
+                <div class="space-y-1">
+                    <div class="flex justify-between text-[11px]">
+                        <span class="text-slate-500">Nume și Prenume</span>
+                        <span class="font-black text-slate-900"><?php echo htmlspecialchars((string)$report['driver_name']); ?></span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-sm text-slate-500">CNP</span>
-                        <span class="text-sm font-black text-slate-900"><?php echo htmlspecialchars($report['cnp'] ?: 'N/A'); ?></span>
+                    <div class="flex justify-between text-[11px]">
+                        <span class="text-slate-500">CNP</span>
+                        <span class="font-black text-slate-900"><?php echo htmlspecialchars($report['cnp'] ?: 'N/A'); ?></span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-sm text-slate-500">Serie Permis</span>
-                        <span class="text-sm font-black text-slate-900"><?php echo htmlspecialchars($report['license_series'] ?: 'N/A'); ?></span>
+                    <div class="flex justify-between text-[11px]">
+                        <span class="text-slate-500">Serie Permis</span>
+                        <span class="font-black text-slate-900"><?php echo htmlspecialchars($report['license_series'] ?: 'N/A'); ?></span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-sm text-slate-500">Expirare Permis</span>
-                        <span class="text-sm font-black text-slate-900"><?php echo $report['license_expiry'] ? date('d.m.Y', strtotime($report['license_expiry'])) : 'N/A'; ?></span>
+                    <div class="flex justify-between text-[11px]">
+                        <span class="text-slate-500">Exp. Permis</span>
+                        <span class="font-black text-slate-900"><?php echo $report['license_expiry'] ? date('d.m.Y', strtotime($report['license_expiry'])) : 'N/A'; ?></span>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Inventory / Documents -->
-        <div class="mb-8">
-            <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-2 mb-2">DOCUMENTE PREZENTE ÎN VEHICUL</h3>
+        <div class="mb-4">
+            <h3 class="text-[10px] font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-1 mb-1">DOCUMENTE PREZENTE ÎN VEHICUL</h3>
             <div class="grid grid-cols-4 gap-2">
                 <?php 
                 $docs = [
@@ -162,7 +162,7 @@
         </div>
 
         <!-- Condition -->
-        <div class="grid grid-cols-2 gap-4 mb-8">
+        <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
                 <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-1 mb-1">STARE ESTETICĂ</h3>
                 <div class="p-2 rounded-lg border border-slate-200">
@@ -178,9 +178,9 @@
         </div>
 
         <?php if ($report['notes']): ?>
-        <div class="mb-8">
-            <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-2 mb-2">OBSERVAȚII / NOTE</h3>
-            <div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 text-sm text-slate-700 italic leading-relaxed">
+        <div class="mb-4">
+            <h3 class="text-[10px] font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-1 mb-1">OBSERVAȚII / NOTE</h3>
+            <div class="p-3 rounded-lg bg-slate-50 border border-slate-100 text-[11px] text-slate-700 italic leading-snug">
                 <?php echo nl2br(htmlspecialchars((string)$report['notes'])); ?>
             </div>
         </div>
