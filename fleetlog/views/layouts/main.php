@@ -26,7 +26,7 @@
 
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
-        <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transition-transform duration-300 transform lg:translate-x-0 lg:static lg:inset-0">
+        <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transition-transform duration-300 transform lg:translate-x-0 lg:static lg:inset-0 flex flex-col">
             <div class="flex items-center justify-between px-6 py-4">
                 <span class="text-2xl font-black uppercase tracking-tighter text-white">DASER <span class="text-blue-500">FLEET</span></span>
                 <button @click="sidebarOpen = false" class="lg:hidden">
@@ -34,7 +34,7 @@
                 </button>
             </div>
             
-            <nav class="mt-4 px-4 space-y-1">
+            <nav class="mt-4 px-4 space-y-1 flex-1 flex flex-col overflow-y-auto">
                 <?php if (\FleetLog\Core\RBAC::isSuperAdmin() && !\FleetLog\Core\Auth::isImpersonating()): ?>
                     <a href="/admin/dashboard" class="flex items-center px-4 py-2 hover:bg-slate-800 rounded-lg group">
                         <svg class="w-5 h-5 mr-3 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
