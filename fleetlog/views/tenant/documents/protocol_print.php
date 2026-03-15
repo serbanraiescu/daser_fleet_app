@@ -22,10 +22,12 @@
                 width: 100% !important;
                 max-width: none !important;
             }
+            .signature-section { margin-top: 2rem !important; }
+            .footer-section { margin-top: 1rem !important; }
         }
         @page {
             size: A4;
-            margin: 2cm;
+            margin: 1cm 1.5cm;
         }
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -185,7 +187,7 @@
         <?php endif; ?>
 
         <!-- Signatures -->
-        <div class="mt-12 grid grid-cols-2 gap-12">
+        <div class="signature-section mt-12 grid grid-cols-2 gap-12">
             <div class="text-center pt-8 border-t border-slate-300">
                 <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1"><?php echo __('signature_company'); ?></div>
                 <div class="h-12"></div>
@@ -199,7 +201,7 @@
         </div>
 
         <!-- Footer -->
-        <div class="mt-8 text-center text-[10px] text-slate-300 font-bold uppercase tracking-widest">
+        <div class="footer-section mt-8 text-center text-[10px] text-slate-300 font-bold uppercase tracking-widest">
             Generat automat de FleetLog &copy; <?php echo date('Y'); ?>
         </div>
     </div>
