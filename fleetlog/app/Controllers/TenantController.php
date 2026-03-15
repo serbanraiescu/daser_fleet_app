@@ -680,4 +680,92 @@ class TenantController extends BaseController
             'vehicles' => $vehicles
         ]);
     }
+
+    public function inventoryShoppingList(): void
+    {
+        $tenantId = Auth::tenantId();
+        $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
+        $vehicles = $vehicleRepo->getActiveByTenant($tenantId);
+
+        $shoppingList = [];
+        $summary = [
+            'triangles' => 0,
+            'vests' => 0,
+            'jacks' => 0,
+            'tow_ropes' => 0,
+            'jumper_cables' => 0,
+            'spare_wheels' => 0,
+            'med_kits' => 0,
+            'extinguishers' => 0
+        ];
+
+        foreach ($vehicles as $vehicle) {
+            $missing = [];
+            
+            // Triangles (need 2)
+            $triCount = (int)($vehicle['has_triangles'] ?? 0);
+            if ($triCount < 2) {
+                $missingCount = 2 - $triCount;
+                $missing[] = "Triunghiuri: Lipsește $missingCount buc.";
+                $summary['triangles'] += $missingCount;
+            }
+
+            // Vests (need 1)
+            if ((int)($vehicle['has_vest'] ?? 0) < 1) {
+                $missing[] = "Vestă Reflectorizantă";
+                $summary['vests']++;
+            }
+
+            // Jack
+            if (empty($vehicle['has_jack'])) {
+                $missing[] = "Cric";
+                $summary['jacks']++;
+            }
+
+            // Tow Rope
+            if (empty($vehicle['has_tow_rope'])) {
+                $missing[] = "Șufă Tractare";
+                $summary['tow_ropes']++;
+            }
+
+            // Jumper Cables
+            if (empty($vehicle['has_jumper_cables'])) {
+                $missing[] = "Cabluri Curent";
+                $summary['jumper_cables']++;
+            }
+
+            // Spare Wheel
+            if (isset($vehicle['has_spare_wheel']) && !$vehicle['has_spare_wheel']) {
+                $missing[] = "Roată Rezervă";
+                $summary['spare_wheels']++;
+            }
+
+            // Med Kit
+            if (empty($vehicle['medical_kit_expiry']) || $vehicle['medical_kit_expiry'] < date('Y-m-d')) {
+                $status = empty($vehicle['medical_kit_expiry']) ? "Lipsă" : "Expirată (" . date('d.m.y', strtotime($vehicle['medical_kit_expiry'])) . ")";
+                $missing[] = "Trusă Medicală ($status)";
+                $summary['med_kits']++;
+            }
+
+            // Extinguisher
+            if (empty($vehicle['extinguisher_expiry']) || $vehicle['extinguisher_expiry'] < date('Y-m-d')) {
+                $status = empty($vehicle['extinguisher_expiry']) ? "Lipsă" : "Expirat (" . date('d.m.y', strtotime($vehicle['extinguisher_expiry'])) . ")";
+                $missing[] = "Stingător ($status)";
+                $summary['extinguishers']++;
+            }
+
+            if (!empty($missing)) {
+                $shoppingList[] = [
+                    'vehicle' => $vehicle['make'] . ' ' . $vehicle['model'] . ' (' . $vehicle['license_plate'] . ')',
+                    'missing' => $missing
+                ];
+            }
+        }
+
+        $this->render('tenant/reports/inventory_shopping_list', [
+            'title' => 'Inventory Shopping List',
+            'shoppingList' => $shoppingList,
+            'summary' => $summary
+        ]);
+    }
 }

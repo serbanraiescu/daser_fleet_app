@@ -11,6 +11,10 @@ $archivedVehicles = $archivedVehicles ?? [];
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1l7 7m0 0l-7 7m7-7H3"></path></svg>
             Print All QR Codes
         </a>
+        <a href="/tenant/reports/inventory-shopping-list" class="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors shadow flex items-center font-bold">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+            Shopping List
+        </a>
         <a href="/tenant/vehicles/add" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow flex items-center">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
             Add Vehicle
@@ -47,7 +51,7 @@ $archivedVehicles = $archivedVehicles ?? [];
                 class="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
         </div>
     </div>
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200">
         <table class="min-w-full divide-y divide-slate-200" id="vehiclesTable">
             <thead class="bg-slate-50">
                 <tr>
@@ -142,6 +146,14 @@ $archivedVehicles = $archivedVehicles ?? [];
                                 <!-- Spare Wheel -->
                                 <div title="Roată Rezervă: <?php echo (isset($vehicle['has_spare_wheel']) ? (bool)$vehicle['has_spare_wheel'] : true) ? 'Da' : 'Nu'; ?>" class="w-10 h-10 rounded-lg flex items-center justify-center <?php echo (isset($vehicle['has_spare_wheel']) ? (bool)$vehicle['has_spare_wheel'] : true) ? 'bg-indigo-50 text-indigo-600 border border-indigo-100' : 'bg-slate-50 text-slate-300 border border-slate-100'; ?>">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="2" /><path stroke-linecap="round" d="M12 3v6M12 15v6M3 12h6M15 12h6" /></svg>
+                                </div>
+                                <!-- Tow Rope -->
+                                <div title="Șufă Tractare: <?php echo !empty($vehicle['has_tow_rope']) ? 'Da' : 'Nu'; ?>" class="w-10 h-10 rounded-lg flex items-center justify-center <?php echo !empty($vehicle['has_tow_rope']) ? 'bg-cyan-50 text-cyan-600 border border-cyan-100' : 'bg-slate-50 text-slate-300 border border-slate-100'; ?>">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /><path d="M9 3h6M9 21h6" stroke-width="1"/></svg>
+                                </div>
+                                <!-- Jumper Cables -->
+                                <div title="Cabluri Curent: <?php echo !empty($vehicle['has_jumper_cables']) ? 'Da' : 'Nu'; ?>" class="w-10 h-10 rounded-lg flex items-center justify-center <?php echo !empty($vehicle['has_jumper_cables']) ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'bg-slate-50 text-slate-300 border border-slate-100'; ?>">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9h14M5 15h14" /></svg>
                                 </div>
                             </div>
                         </td>
