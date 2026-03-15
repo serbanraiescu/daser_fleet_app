@@ -90,7 +90,7 @@ return [
 
     // Timeline / Events
     'vehicle_timeline' => 'Registru Activitate & Costuri',
-    'timeline_desc' => 'Istoric unificat pentru revizii, daune, cheltuieli, alimentări și documente (PV).',
+    'timeline_desc' => 'DASER FLEET: Istoric unificat pentru revizii, daune, cheltuieli, alimentări și documente (PV).',
     'all_vehicles_global' => 'Toate Vehiculele (Vedere Globală)',
     'all_events' => 'Toate Evenimentele',
     'filter_service' => 'Service',

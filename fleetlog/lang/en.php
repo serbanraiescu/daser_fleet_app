@@ -88,7 +88,7 @@ return [
 
     // Timeline / Events
     'vehicle_timeline' => 'Activity & Expense Log',
-    'timeline_desc' => 'Unified history of services, damages, expenses, fuelings, and documents.',
+    'timeline_desc' => 'DASER FLEET: Unified history of services, damages, expenses, fuelings, and documents.',
     'all_vehicles_global' => 'All Vehicles (Global View)',
     'all_events' => 'All Events',
     'filter_service' => 'Service',

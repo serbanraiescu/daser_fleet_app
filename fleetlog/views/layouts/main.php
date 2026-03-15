@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $title ?? 'FleetLog'; ?></title>
+    <title><?php echo $title ?? 'DASER FLEET'; ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         [x-cloak] { display: none !important; }
@@ -28,7 +28,7 @@
         <!-- Sidebar -->
         <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transition-transform duration-300 transform lg:translate-x-0 lg:static lg:inset-0">
             <div class="flex items-center justify-between px-6 py-4">
-                <span class="text-2xl font-semibold uppercase tracking-wider">FleetLog</span>
+                <span class="text-2xl font-black uppercase tracking-tighter text-white">DASER <span class="text-blue-500">FLEET</span></span>
                 <button @click="sidebarOpen = false" class="lg:hidden">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
@@ -126,10 +126,21 @@
                     </a>
                 <?php endif; ?>
 
-                <a href="/logout" class="flex items-center px-4 py-2 hover:bg-red-800 rounded-lg group mt-10">
+                <a href="/logout" class="flex items-center px-4 py-2 hover:bg-red-800 rounded-lg group mt-6">
                     <svg class="w-5 h-5 mr-3 text-red-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                     <?php echo __('logout'); ?>
                 </a>
+
+                <!-- Sidebar Footer Branding -->
+                <div class="mt-auto pt-10 pb-6 border-t border-slate-800/50 px-4">
+                    <div class="flex flex-col items-center">
+                        <img src="/img/brand/logo.png" alt="Daser Technologies" class="h-8 mb-4 opacity-80 hover:opacity-100 transition-opacity">
+                        <div class="text-[10px] text-slate-500 text-center space-y-1">
+                            <p class="font-bold tracking-widest uppercase">&copy; <?php echo date('Y'); ?> DASER ENTERPRISE SRL</p>
+                            <a href="https://daserdesign.ro" target="_blank" class="text-blue-500 hover:text-blue-400 transition-colors">daserdesign.ro</a>
+                        </div>
+                    </div>
+                </div>
             </nav>
         </aside>
 

@@ -2,7 +2,7 @@
     <div class="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
         <div>
             <h1 class="text-3xl font-black text-slate-800 tracking-tight">System Overview</h1>
-            <p class="text-slate-500 mt-1">Global performance metrics for FleetLog platform.</p>
+            <p class="text-slate-500 mt-1">Global performance metrics for DASER FLEET platform.</p>
         </div>
         <div class="flex items-center space-x-2 bg-green-50 text-green-700 px-4 py-2 rounded-full font-bold text-sm">
             <span class="relative flex h-3 w-3">
