@@ -54,10 +54,10 @@
     </div>
 
     <!-- Document -->
-    <div class="document-container max-w-[210mm] mx-auto bg-white shadow-2xl p-12 md:p-20 relative overflow-hidden">
+    <div class="document-container max-w-[210mm] mx-auto bg-white shadow-2xl p-8 md:p-12 relative overflow-hidden">
         
         <!-- Header / Logo Area -->
-        <div class="flex justify-between items-start mb-12 border-b-4 border-indigo-600 pb-8">
+        <div class="flex justify-between items-start mb-8 border-b-4 border-indigo-600 pb-4">
             <div>
                 <h1 class="text-4xl font-black text-slate-900 uppercase tracking-tighter mb-2">PROCES VERBAL</h1>
                 <p class="text-indigo-600 font-bold uppercase tracking-widest text-sm">PREDARE-PRIMIRE AUTOVEHICUL</p>
@@ -76,7 +76,7 @@
         </div>
 
         <!-- Meta Info -->
-        <div class="grid grid-cols-2 gap-8 mb-12">
+        <div class="grid grid-cols-2 gap-8 mb-8">
             <div>
                 <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1"><?php echo __('document_number'); ?></div>
                 <div class="text-xl font-black text-slate-900"><?php echo htmlspecialchars((string)$report['document_number']); ?></div>
@@ -87,7 +87,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <!-- Vehicle Info -->
             <div class="space-y-6">
                 <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-2">DATE VEHICUL</h3>
@@ -136,8 +136,8 @@
         </div>
 
         <!-- Inventory / Documents -->
-        <div class="mb-12">
-            <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-2 mb-4">DOCUMENTE PREZENTE ÎN VEHICUL</h3>
+        <div class="mb-8">
+            <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-2 mb-2">DOCUMENTE PREZENTE ÎN VEHICUL</h3>
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <?php 
                 $docs = [
@@ -160,15 +160,15 @@
         </div>
 
         <!-- Condition -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div>
-                <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-2 mb-4">STARE ESTETICĂ</h3>
+                <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-2 mb-2">STARE ESTETICĂ</h3>
                 <div class="p-4 rounded-xl border border-slate-200">
                     <span class="text-sm font-black text-slate-900"><?php echo __("aesthetic_" . $report['aesthetic_condition']); ?></span>
                 </div>
             </div>
             <div>
-                <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-2 mb-4">STARE MECANICĂ</h3>
+                <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-2 mb-2">STARE MECANICĂ</h3>
                 <div class="p-4 rounded-xl border border-slate-200">
                     <span class="text-sm font-black text-slate-900"><?php echo __("mech_" . $report['mechanical_condition']); ?></span>
                 </div>
@@ -176,8 +176,8 @@
         </div>
 
         <?php if ($report['notes']): ?>
-        <div class="mb-12">
-            <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-2 mb-4">OBSERVAȚII / NOTE</h3>
+        <div class="mb-8">
+            <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-2 mb-2">OBSERVAȚII / NOTE</h3>
             <div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 text-sm text-slate-700 italic leading-relaxed">
                 <?php echo nl2br(htmlspecialchars((string)$report['notes'])); ?>
             </div>
@@ -185,7 +185,7 @@
         <?php endif; ?>
 
         <!-- Signatures -->
-        <div class="mt-24 grid grid-cols-2 gap-24">
+        <div class="mt-12 grid grid-cols-2 gap-12">
             <div class="text-center pt-8 border-t border-slate-300">
                 <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1"><?php echo __('signature_company'); ?></div>
                 <div class="h-12"></div>
@@ -199,7 +199,7 @@
         </div>
 
         <!-- Footer -->
-        <div class="mt-12 text-center text-[10px] text-slate-300 font-bold uppercase tracking-widest">
+        <div class="mt-8 text-center text-[10px] text-slate-300 font-bold uppercase tracking-widest">
             Generat automat de FleetLog &copy; <?php echo date('Y'); ?>
         </div>
     </div>
