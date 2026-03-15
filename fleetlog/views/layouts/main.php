@@ -130,19 +130,19 @@
                     <svg class="w-5 h-5 mr-3 text-red-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                     <?php echo __('logout'); ?>
                 </a>
+            </nav>
 
-                <!-- Sidebar Footer Branding -->
-                <div class="mt-auto pt-6 pb-6 border-t border-slate-800/50 px-4">
-                    <div class="flex flex-col items-center">
-                        <img src="/img/brand/logo.png" alt="Daser Technologies" class="h-8 mb-3 opacity-80 hover:opacity-100 transition-opacity">
-                        <div class="text-[10px] text-slate-500 text-center space-y-1">
-                            <p class="font-bold text-slate-600 mb-1">DASER FLEET v1.5.3</p>
-                            <p class="font-bold tracking-widest uppercase">&copy; <?php echo date('Y'); ?> DASER ENTERPRISE SRL</p>
-                            <a href="https://daserdesign.ro" target="_blank" class="text-blue-500 hover:text-blue-400 transition-colors">daserdesign.ro</a>
-                        </div>
+            <!-- Sidebar Footer Branding -->
+            <div class="mt-auto pt-6 pb-6 border-t border-slate-800/50 px-4">
+                <div class="flex flex-col items-center">
+                    <img src="/img/brand/logo.png" alt="Daser Technologies" class="h-8 mb-3 opacity-80 hover:opacity-100 transition-opacity">
+                    <div class="text-[10px] text-slate-500 text-center space-y-1">
+                        <p class="font-bold text-slate-600 mb-1">DASER FLEET v1.5.3</p>
+                        <p class="font-bold tracking-widest uppercase">&copy; <?php echo date('Y'); ?> DASER ENTERPRISE SRL</p>
+                        <a href="https://daserdesign.ro" target="_blank" class="text-blue-500 hover:text-blue-400 transition-colors">daserdesign.ro</a>
                     </div>
                 </div>
-            </nav>
+            </div>
         </aside>
 
         <div class="flex-1 flex flex-col overflow-hidden">
