@@ -75,6 +75,20 @@
     </div>
 <?php endif; ?>
 
+<!-- Handover Protocol Details -->
+<?php if ($event['is_handover']): ?>
+    <div class="bg-indigo-50 rounded-xl p-4 mb-3 border border-indigo-100 flex items-center justify-between">
+        <div>
+            <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1"><?php echo __('document_number'); ?></p>
+            <p class="text-sm font-black text-slate-900 font-mono"><?php echo $event['document_number']; ?></p>
+        </div>
+        <a href="/tenant/documents/handover/view/<?php echo $event['id']; ?>" target="_blank" class="px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-700 transition-colors flex items-center shadow-sm">
+            <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+            <?php echo __('view_protocol'); ?>
+        </a>
+    </div>
+<?php endif; ?>
+
 <?php if (!empty($event['description'])): ?>
     <p class="text-slate-600 text-sm mb-3">
         <?php echo nl2br(htmlspecialchars($event['description'])); ?>

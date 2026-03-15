@@ -8,12 +8,14 @@ use FleetLog\Core\RBAC;
 use FleetLog\App\Repositories\VehicleRepository;
 use FleetLog\App\Repositories\VehicleEventRepository;
 use FleetLog\App\Repositories\FuelingRepository;
+use FleetLog\App\Repositories\DocumentRepository;
 
 class VehicleEventController extends BaseController
 {
     private VehicleEventRepository $eventRepo;
     private VehicleRepository $vehicleRepo;
     private FuelingRepository $fuelingRepo;
+    private DocumentRepository $docRepo;
 
     public function __construct()
     {
@@ -22,6 +24,7 @@ class VehicleEventController extends BaseController
         $this->eventRepo = new VehicleEventRepository();
         $this->vehicleRepo = new VehicleRepository();
         $this->fuelingRepo = new FuelingRepository();
+        $this->docRepo = new DocumentRepository();
     }
 
     public function index(): void
@@ -39,6 +42,7 @@ class VehicleEventController extends BaseController
         $selectedVehicle = null;
         $events = [];
         $fuelings = [];
+        $handovers = [];
 
         if ($selectedVehicleId) {
             $selectedVehicle = $this->vehicleRepo->find((int)$selectedVehicleId);
@@ -46,6 +50,7 @@ class VehicleEventController extends BaseController
             if ($selectedVehicle && $selectedVehicle['tenant_id'] == $tenantId) {
                 $events = $this->eventRepo->getByVehicle((int)$selectedVehicleId);
                 $fuelings = $this->fuelingRepo->getByVehicle((int)$selectedVehicleId, $tenantId);
+                $handovers = $this->docRepo->getByVehicle((int)$selectedVehicleId);
                 
                 // Fetch photos for each event
                 foreach ($events as &$event) {
@@ -58,6 +63,7 @@ class VehicleEventController extends BaseController
             // Global View
             $events = $this->eventRepo->getAllByTenant($tenantId);
             $fuelings = $this->fuelingRepo->getByTenant($tenantId);
+            $handovers = $this->docRepo->getByTenant($tenantId);
 
             // Fetch photos for each event
             foreach ($events as &$event) {
@@ -65,7 +71,7 @@ class VehicleEventController extends BaseController
             }
         }
 
-        $mergedTimeline = $this->mergeAndSortTimeline($events, $fuelings);
+        $mergedTimeline = $this->mergeAndSortTimeline($events, $fuelings, $handovers);
 
         $this->render('tenant/events/index', [
             'title' => 'Vehicle Timeline (BETA)',
@@ -76,22 +82,33 @@ class VehicleEventController extends BaseController
         ]);
     }
 
-    private function mergeAndSortTimeline(array $events, array $fuelings): array
+    private function mergeAndSortTimeline(array $events, array $fuelings, array $handovers = []): array
     {
         $timeline = [];
 
         foreach ($events as $event) {
             $event['is_fueling'] = false;
+            $event['is_handover'] = false;
             $event['sort_date'] = $event['event_date'] . ' ' . date('H:i:s', strtotime($event['created_at']));
             $timeline[] = $event;
         }
 
         foreach ($fuelings as $fueling) {
             $fueling['is_fueling'] = true;
+            $fueling['is_handover'] = false;
             $fueling['event_type'] = 'fueling';
             $fueling['event_date'] = date('Y-m-d', strtotime($fueling['created_at']));
             $fueling['sort_date'] = $fueling['created_at'];
             $timeline[] = $fueling;
+        }
+
+        foreach ($handovers as $handover) {
+            $handover['is_fueling'] = false;
+            $handover['is_handover'] = true;
+            $handover['event_type'] = 'handover';
+            $handover['event_date'] = date('Y-m-d', strtotime($handover['created_at']));
+            $handover['sort_date'] = $handover['created_at'];
+            $timeline[] = $handover;
         }
 
         usort($timeline, function($a, $b) {

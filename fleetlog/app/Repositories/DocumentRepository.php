@@ -55,6 +55,30 @@ class DocumentRepository
         return $prefix . $next;
     }
 
+    public function getByVehicle(int $vehicleId): array
+    {
+        return DB::fetchAll("
+            SELECT d.*, v.license_plate, v.make, v.model, u.name as driver_name
+            FROM vehicle_handover_reports d
+            JOIN vehicles v ON d.vehicle_id = v.id
+            JOIN users u ON d.driver_id = u.id
+            WHERE d.vehicle_id = ?
+            ORDER BY d.created_at DESC
+        ", [$vehicleId]);
+    }
+
+    public function getByTenant(int $tenantId): array
+    {
+        return DB::fetchAll("
+            SELECT d.*, v.license_plate, v.make, v.model, u.name as driver_name
+            FROM vehicle_handover_reports d
+            JOIN vehicles v ON d.vehicle_id = v.id
+            JOIN users u ON d.driver_id = u.id
+            WHERE d.tenant_id = ?
+            ORDER BY d.created_at DESC
+        ", [$tenantId]);
+    }
+
     public function createHandover(array $data): int
     {
         $keys = array_keys($data);

@@ -7,7 +7,8 @@ $eventColors = [
     'inspection' => 'bg-green-100 text-green-800 border-green-200',
     'insurance' => 'bg-purple-100 text-purple-800 border-purple-200',
     'itp' => 'bg-teal-100 text-teal-800 border-teal-200',
-    'fueling' => 'bg-lime-100 text-lime-800 border-lime-200'
+    'fueling' => 'bg-lime-100 text-lime-800 border-lime-200',
+    'handover' => 'bg-indigo-100 text-indigo-800 border-indigo-200'
 ];
 
 $eventIcons = [
@@ -17,7 +18,8 @@ $eventIcons = [
     'inspection' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
     'insurance' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>',
     'itp' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>',
-    'fueling' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>'
+    'fueling' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>',
+    'handover' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>'
 ];
 ?>
 
@@ -65,6 +67,9 @@ $eventIcons = [
             </button>
             <button @click="filter = 'expense'" :class="{'bg-orange-100 text-orange-800': filter === 'expense', 'text-slate-600 hover:bg-slate-100': filter !== 'expense'}" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex items-center">
                 <span class="w-2 h-2 rounded-full bg-orange-500 mr-2"></span> <?php echo __('filter_expense'); ?>
+            </button>
+            <button @click="filter = 'handover'" :class="{'bg-indigo-100 text-indigo-800': filter === 'handover', 'text-slate-600 hover:bg-slate-100': filter !== 'handover'}" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex items-center">
+                <span class="w-2 h-2 rounded-full bg-indigo-500 mr-2"></span> <?php echo __('documents'); ?>
             </button>
         </div>
         
@@ -163,7 +168,10 @@ $eventIcons = [
                                     <?php endif; ?>
                                     <?php echo date('d M Y', $eventDate); ?>
                                 </div>
-                                <h3 class="text-lg font-bold text-slate-900"><?php echo htmlspecialchars($event['is_fueling'] ? __('fueling_event') : ($event['event_subtype'] ?: __('type_' . $event['event_type']))); ?></h3>
+                                <h3 class="text-lg font-bold text-slate-900"><?php echo htmlspecialchars($event['is_fueling'] ? __('fueling_event') : ($event['is_handover'] ? __('handover_protocol') : ($event['event_subtype'] ?: __('type_' . $event['event_type'])))); ?></h3>
+<?php if ($event['is_handover']): ?>
+                                    <p class="text-xs text-slate-500 font-mono mt-1"><?php echo $event['document_number']; ?></p>
+                                <?php endif; ?>
                             <?php else: ?>
                                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
                                     <?php include __DIR__ . '/timeline_card_content.php'; ?>
@@ -189,7 +197,10 @@ $eventIcons = [
                                         <?php endif; ?>
                                         <?php echo date('d M Y', $eventDate); ?>
                                     </div>
-                                    <h3 class="text-lg font-bold text-slate-900"><?php echo htmlspecialchars($event['is_fueling'] ? __('fueling_event') : ($event['event_subtype'] ?: __('type_' . $event['event_type']))); ?></h3>
+                                    <h3 class="text-lg font-bold text-slate-900"><?php echo htmlspecialchars($event['is_fueling'] ? __('fueling_event') : ($event['is_handover'] ? __('handover_protocol') : ($event['event_subtype'] ?: __('type_' . $event['event_type'])))); ?></h3>
+                                    <?php if ($event['is_handover']): ?>
+                                        <p class="text-xs text-slate-500 font-mono mt-1"><?php echo $event['document_number']; ?></p>
+                                    <?php endif; ?>
                                 </div>
                                 <!-- Mobile card (because Left Side is hidden on mobile) -->
                                 <div class="md:hidden bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
