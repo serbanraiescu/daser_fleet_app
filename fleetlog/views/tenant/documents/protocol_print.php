@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $report['document_number']; ?></title>
+    <title><?php echo htmlspecialchars((string)$report['document_number']); ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @media print {
@@ -44,10 +44,10 @@
                 <p class="text-indigo-600 font-bold uppercase tracking-widest text-sm">PREDARE-PRIMIRE AUTOVEHICUL</p>
             </div>
             <div class="text-right">
-                <div class="text-2xl font-black text-slate-900"><?php echo htmlspecialchars($report['tenant_name']); ?></div>
+                <div class="text-2xl font-black text-slate-900"><?php echo htmlspecialchars((string)$report['tenant_name']); ?></div>
                 <div class="text-xs text-slate-500 font-bold mt-1">
-                    CUI: <?php echo htmlspecialchars($report['tenant_cui']); ?><br>
-                    <?php echo nl2br(htmlspecialchars($report['tenant_address'])); ?>
+                    CUI: <?php echo htmlspecialchars((string)$report['tenant_cui']); ?><br>
+                    <?php echo nl2br(htmlspecialchars((string)$report['tenant_address'])); ?>
                 </div>
             </div>
         </div>
@@ -56,7 +56,7 @@
         <div class="grid grid-cols-2 gap-8 mb-12">
             <div>
                 <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1"><?php echo __('document_number'); ?></div>
-                <div class="text-xl font-black text-slate-900"><?php echo htmlspecialchars($report['document_number']); ?></div>
+                <div class="text-xl font-black text-slate-900"><?php echo htmlspecialchars((string)$report['document_number']); ?></div>
             </div>
             <div class="text-right">
                 <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1"><?php echo __('event_date'); ?></div>
@@ -71,11 +71,11 @@
                 <div class="space-y-4">
                     <div class="flex justify-between">
                         <span class="text-sm text-slate-500">Număr Înmatriculare</span>
-                        <span class="text-sm font-black text-slate-900"><?php echo htmlspecialchars($report['vehicle_plate']); ?></span>
+                        <span class="text-sm font-black text-slate-900"><?php echo htmlspecialchars((string)$report['vehicle_plate']); ?></span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-sm text-slate-500">Marcă / Model</span>
-                        <span class="text-sm font-black text-slate-900"><?php echo htmlspecialchars($report['vehicle_model']); ?></span>
+                        <span class="text-sm font-black text-slate-900"><?php echo htmlspecialchars((string)$report['vehicle_model']); ?></span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-sm text-slate-500">Kilometraj (Odometru)</span>
@@ -94,7 +94,7 @@
                 <div class="space-y-4">
                     <div class="flex justify-between">
                         <span class="text-sm text-slate-500">Nume și Prenume</span>
-                        <span class="text-sm font-black text-slate-900"><?php echo htmlspecialchars($report['driver_name']); ?></span>
+                        <span class="text-sm font-black text-slate-900"><?php echo htmlspecialchars((string)$report['driver_name']); ?></span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-sm text-slate-500">CNP</span>
@@ -156,7 +156,7 @@
         <div class="mb-12">
             <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-2 mb-4">OBSERVAȚII / NOTE</h3>
             <div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 text-sm text-slate-700 italic leading-relaxed">
-                <?php echo nl2br(htmlspecialchars($report['notes'])); ?>
+                <?php echo nl2br(htmlspecialchars((string)$report['notes'])); ?>
             </div>
         </div>
         <?php endif; ?>
@@ -170,7 +170,7 @@
             </div>
             <div class="text-center pt-8 border-t border-slate-300">
                 <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1"><?php echo __('signature_driver'); ?></div>
-                <div class="h-12 text-sm text-slate-900 font-bold"><?php echo htmlspecialchars($report['driver_name']); ?></div>
+                <div class="h-12 text-sm text-slate-900 font-bold"><?php echo htmlspecialchars((string)$report['driver_name']); ?></div>
                 <div class="text-xs text-slate-400">Am primit autovehiculul în starea descrisă mai sus.</div>
             </div>
         </div>
