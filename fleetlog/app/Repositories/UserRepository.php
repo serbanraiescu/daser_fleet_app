@@ -25,6 +25,11 @@ class UserRepository extends BaseRepository
         return DB::fetchAll("SELECT * FROM users WHERE tenant_id = ? AND role = 'driver' AND active = 1", [$tenantId]);
     }
 
+    public function getByTenantAndRole(int $tenantId, string $role): array
+    {
+        return DB::fetchAll("SELECT * FROM users WHERE tenant_id = ? AND role = ? AND active = 1", [$tenantId, $role]);
+    }
+
     public function create(array $input): bool
     {
         $input = $this->prepareData($input);
