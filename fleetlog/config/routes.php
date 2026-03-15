@@ -77,6 +77,12 @@ $router->add('POST', '/tenant/expenses/add/{id}', 'TenantController@storeExpense
 $router->add('GET', '/tenant/vehicles/mechanic-report/{id}', 'TenantController@mechanicReport', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('GET', '/tenant/reports/inventory-shopping-list', 'TenantController@inventoryShoppingList', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 
+// Documents & Handover Protocols
+$router->add('GET', '/tenant/documents', 'TenantController@documents', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('GET', '/tenant/documents/handover/add', 'TenantController@showHandoverForm', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('POST', '/tenant/documents/handover/add', 'TenantController@generateProtocol', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('GET', '/tenant/documents/handover/view/{id}', 'TenantController@viewProtocol', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+
 // Vehicle Events (BETA)
 $router->add('GET', '/tenant/vehicle-events', 'VehicleEventController@index', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('POST', '/tenant/vehicle-events/add', 'VehicleEventController@store', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);

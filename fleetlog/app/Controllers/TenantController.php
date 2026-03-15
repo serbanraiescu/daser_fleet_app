@@ -681,6 +681,82 @@ class TenantController extends BaseController
         ]);
     }
 
+    public function documents(): void
+    {
+        $tenantId = Auth::tenantId();
+        $docRepo = new \FleetLog\App\Repositories\DocumentRepository();
+        $reports = $docRepo->getAllHandoverByTenant($tenantId);
+
+        $this->render('tenant/documents/index', [
+            'title' => __('documents'),
+            'reports' => $reports
+        ]);
+    }
+
+    public function showHandoverForm(): void
+    {
+        $tenantId = Auth::tenantId();
+        $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
+        $userRepo = new \FleetLog\App\Repositories\UserRepository();
+
+        $vehicles = $vehicleRepo->getActiveByTenant($tenantId);
+        $drivers = $userRepo->getByTenantAndRole($tenantId, 'driver');
+
+        $this->render('tenant/documents/handover_create', [
+            'title' => __('new_handover'),
+            'vehicles' => $vehicles,
+            'drivers' => $drivers
+        ]);
+    }
+
+    public function generateProtocol(): void
+    {
+        $tenantId = Auth::tenantId();
+        $docRepo = new \FleetLog\App\Repositories\DocumentRepository();
+
+        $data = [
+            'tenant_id' => $tenantId,
+            'document_number' => $docRepo->generateDocumentNumber(),
+            'vehicle_id' => (int)$_POST['vehicle_id'],
+            'driver_id' => (int)$_POST['driver_id'],
+            'vehicle_plate' => $_POST['vehicle_plate'],
+            'vehicle_model' => $_POST['vehicle_model'],
+            'odometer' => (int)$_POST['odometer'],
+            'fuel_level' => $_POST['fuel_level'],
+            'doc_registration' => isset($_POST['doc_registration']) ? 1 : 0,
+            'doc_insurance' => isset($_POST['doc_insurance']) ? 1 : 0,
+            'doc_itp' => isset($_POST['doc_itp']) ? 1 : 0,
+            'doc_rovinieta' => isset($_POST['doc_rovinieta']) ? 1 : 0,
+            'aesthetic_condition' => $_POST['aesthetic_condition'],
+            'mechanical_condition' => $_POST['mechanical_condition'],
+            'notes' => $_POST['notes'] ?? ''
+        ];
+
+        $id = $docRepo->createHandover($data);
+
+        if ($id) {
+            $this->redirect("/tenant/documents/handover/view/$id");
+        } else {
+            $this->redirect('/tenant/documents/handover/add?error=failed_to_save');
+        }
+    }
+
+    public function viewProtocol(int $id): void
+    {
+        $tenantId = Auth::tenantId();
+        $docRepo = new \FleetLog\App\Repositories\DocumentRepository();
+        $report = $docRepo->findHandover($id, $tenantId);
+
+        if (!$report) {
+            $this->redirect('/tenant/documents');
+        }
+
+        $this->render('tenant/documents/protocol_print', [
+            'title' => $report['document_number'],
+            'report' => $report
+        ]);
+    }
+
     public function inventoryShoppingList(): void
     {
         $tenantId = Auth::tenantId();
