@@ -140,7 +140,7 @@
         <!-- Inventory / Documents -->
         <div class="mb-8">
             <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-2 mb-2">DOCUMENTE PREZENTE ÎN VEHICUL</h3>
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-4 gap-2">
                 <?php 
                 $docs = [
                     'doc_registration' => __('reg_cert'),
@@ -149,7 +149,7 @@
                     'doc_rovinieta' => __('rovinieta_label')
                 ];
                 foreach ($docs as $key => $label): ?>
-                <div class="flex items-center space-x-3 p-3 rounded-lg <?php echo $report[$key] ? 'bg-indigo-50 border border-indigo-100' : 'bg-slate-50 border border-slate-100 opacity-50'; ?>">
+                <div class="flex items-center space-x-2 p-2 rounded-lg <?php echo $report[$key] ? 'bg-indigo-50 border border-indigo-100' : 'bg-slate-50 border border-slate-100 opacity-50'; ?>">
                     <div class="w-5 h-5 rounded border border-slate-300 flex items-center justify-center <?php echo $report[$key] ? 'bg-indigo-600 border-indigo-600' : ''; ?>">
                         <?php if ($report[$key]): ?>
                             <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
@@ -162,17 +162,17 @@
         </div>
 
         <!-- Condition -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <div class="grid grid-cols-2 gap-4 mb-8">
             <div>
-                <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-2 mb-2">STARE ESTETICĂ</h3>
-                <div class="p-4 rounded-xl border border-slate-200">
-                    <span class="text-sm font-black text-slate-900"><?php echo __("aesthetic_" . $report['aesthetic_condition']); ?></span>
+                <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-1 mb-1">STARE ESTETICĂ</h3>
+                <div class="p-2 rounded-lg border border-slate-200">
+                    <span class="text-xs font-black text-slate-900"><?php echo __("aesthetic_" . $report['aesthetic_condition']); ?></span>
                 </div>
             </div>
             <div>
-                <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-2 mb-2">STARE MECANICĂ</h3>
-                <div class="p-4 rounded-xl border border-slate-200">
-                    <span class="text-sm font-black text-slate-900"><?php echo __("mech_" . $report['mechanical_condition']); ?></span>
+                <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-1 mb-1">STARE MECANICĂ</h3>
+                <div class="p-2 rounded-lg border border-slate-200">
+                    <span class="text-xs font-black text-slate-900"><?php echo __("mech_" . $report['mechanical_condition']); ?></span>
                 </div>
             </div>
         </div>
@@ -187,16 +187,16 @@
         <?php endif; ?>
 
         <!-- Signatures -->
-        <div class="signature-section mt-12 grid grid-cols-2 gap-12">
-            <div class="text-center pt-8 border-t border-slate-300">
+        <div class="signature-section mt-8 grid grid-cols-2 gap-8">
+            <div class="text-center pt-4 border-t border-slate-300">
                 <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1"><?php echo __('signature_company'); ?></div>
-                <div class="h-12"></div>
-                <div class="text-slate-200">L.S.</div>
+                <div class="h-8"></div>
+                <div class="text-slate-200 text-xs">L.S.</div>
             </div>
-            <div class="text-center pt-8 border-t border-slate-300">
+            <div class="text-center pt-4 border-t border-slate-300">
                 <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1"><?php echo __('signature_driver'); ?></div>
-                <div class="h-12 text-sm text-slate-900 font-bold"><?php echo htmlspecialchars((string)$report['driver_name']); ?></div>
-                <div class="text-xs text-slate-400">Am primit autovehiculul în starea descrisă mai sus.</div>
+                <div class="h-8 text-sm text-slate-900 font-bold"><?php echo htmlspecialchars((string)$report['driver_name']); ?></div>
+                <div class="text-[10px] text-slate-400">Am primit autovehiculul în starea descrisă mai sus.</div>
             </div>
         </div>
 
