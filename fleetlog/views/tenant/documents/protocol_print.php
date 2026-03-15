@@ -22,6 +22,13 @@
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen p-4 md:p-12">
+    <!-- Impersonation Warning (Non-Print) -->
+    <?php if (\FleetLog\Core\Auth::isImpersonating()): ?>
+    <div class="max-w-[210mm] mx-auto mb-4 bg-yellow-100 border border-yellow-200 p-3 rounded-lg text-yellow-800 text-xs font-bold no-print flex justify-between items-center">
+        <span>⚠️ MOD VIZUALIZARE (IMPERSONARE ADMIN)</span>
+        <a href="/admin/stop-impersonation" class="bg-yellow-800 text-white px-2 py-1 rounded hover:bg-yellow-900">Stop</a>
+    </div>
+    <?php endif; ?>
     <!-- Toolbar -->
     <div class="max-w-[210mm] mx-auto mb-8 flex items-center justify-between no-print">
         <a href="/tenant/documents" class="inline-flex items-center text-slate-600 hover:text-slate-900 transition-colors">
