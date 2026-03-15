@@ -7,9 +7,21 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @media print {
-            body { background: white; }
-            .no-print { display: none; }
+            body { 
+                background: white !important; 
+                padding: 0 !important; 
+                margin: 0 !important;
+            }
+            .no-print { display: none !important; }
             .print-break { page-break-after: always; }
+            .document-container {
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                max-width: none !important;
+            }
         }
         @page {
             size: A4;
@@ -21,7 +33,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen p-4 md:p-12">
+<body class="bg-slate-50 min-h-screen p-4 md:p-12 print:p-0">
     <!-- Impersonation Warning (Non-Print) -->
     <?php if (\FleetLog\Core\Auth::isImpersonating()): ?>
     <div class="max-w-[210mm] mx-auto mb-4 bg-yellow-100 border border-yellow-200 p-3 rounded-lg text-yellow-800 text-xs font-bold no-print flex justify-between items-center">
@@ -42,7 +54,7 @@
     </div>
 
     <!-- Document -->
-    <div class="max-w-[210mm] mx-auto bg-white shadow-2xl p-12 md:p-20 relative overflow-hidden">
+    <div class="document-container max-w-[210mm] mx-auto bg-white shadow-2xl p-12 md:p-20 relative overflow-hidden">
         
         <!-- Header / Logo Area -->
         <div class="flex justify-between items-start mb-12 border-b-4 border-indigo-600 pb-8">
