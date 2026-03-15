@@ -89,8 +89,8 @@ return [
     'any_specific_details' => 'Orice detalii specifice...',
 
     // Timeline / Events
-    'vehicle_timeline' => 'Istoric Vehicul',
-    'timeline_desc' => 'Istoric unificat pentru revizii, daune, cheltuieli și alimentări.',
+    'vehicle_timeline' => 'Registru Activitate & Costuri',
+    'timeline_desc' => 'Istoric unificat pentru revizii, daune, cheltuieli, alimentări și documente (PV).',
     'all_vehicles_global' => 'Toate Vehiculele (Vedere Globală)',
     'all_events' => 'Toate Evenimentele',
     'filter_service' => 'Service',

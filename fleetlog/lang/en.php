@@ -87,8 +87,8 @@ return [
     'any_specific_details' => 'Any specific details...',
 
     // Timeline / Events
-    'vehicle_timeline' => 'Vehicle Timeline',
-    'timeline_desc' => 'Unified history of services, damages, expenses, and fuelings.',
+    'vehicle_timeline' => 'Activity & Expense Log',
+    'timeline_desc' => 'Unified history of services, damages, expenses, fuelings, and documents.',
     'all_vehicles_global' => 'All Vehicles (Global View)',
     'all_events' => 'All Events',
     'filter_service' => 'Service',

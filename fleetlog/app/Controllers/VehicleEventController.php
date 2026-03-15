@@ -74,7 +74,7 @@ class VehicleEventController extends BaseController
         $mergedTimeline = $this->mergeAndSortTimeline($events, $fuelings, $handovers);
 
         $this->render('tenant/events/index', [
-            'title' => 'Vehicle Timeline (BETA)',
+            'title' => __('vehicle_timeline') . ' (BETA)',
             'vehicles' => $vehicles,
             'selectedVehicle' => $selectedVehicle,
             'events' => $mergedTimeline,
