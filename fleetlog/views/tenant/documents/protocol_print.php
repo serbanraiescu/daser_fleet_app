@@ -46,7 +46,11 @@
             <div class="text-right">
                 <div class="text-2xl font-black text-slate-900"><?php echo htmlspecialchars((string)$report['tenant_name']); ?></div>
                 <div class="text-xs text-slate-500 font-bold mt-1">
-                    CUI: <?php echo htmlspecialchars((string)$report['tenant_cui']); ?><br>
+                    CUI: <?php echo htmlspecialchars((string)$report['tenant_cui']); ?> 
+                    <?php if (!empty($report['tenant_reg_com'])): ?>
+                        | Reg. Com: <?php echo htmlspecialchars((string)$report['tenant_reg_com']); ?>
+                    <?php endif; ?><br>
+                    <?php echo htmlspecialchars((string)($report['tenant_city'] ?? '')); ?><?php echo !empty($report['tenant_county']) ? ', ' . htmlspecialchars((string)$report['tenant_county']) : ''; ?><br>
                     <?php echo nl2br(htmlspecialchars((string)$report['tenant_address'])); ?>
                 </div>
             </div>

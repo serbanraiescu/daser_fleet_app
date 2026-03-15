@@ -22,7 +22,7 @@ class DocumentRepository
     {
         return DB::fetch("
             SELECT d.*, v.license_plate, v.make, v.model, u.name as driver_name, u.cnp, u.license_series, u.license_expiry,
-                   t.name as tenant_name, t.cui as tenant_cui, t.address as tenant_address
+                   t.name as tenant_name, t.cui as tenant_cui, t.address as tenant_address, t.reg_com as tenant_reg_com, t.county as tenant_county, t.city as tenant_city
             FROM vehicle_handover_reports d
             JOIN vehicles v ON d.vehicle_id = v.id
             JOIN users u ON d.driver_id = u.id

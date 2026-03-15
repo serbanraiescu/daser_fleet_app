@@ -21,10 +21,42 @@
                        class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all">
             </div>
 
-            <div>
+            <div class="space-y-4">
                 <label class="block text-sm font-bold text-slate-700 mb-2">CUI / VAT Number</label>
-                <input type="text" name="cui" value="<?php echo $tenant['cui']; ?>" required
-                       class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all">
+                <div class="flex space-x-2">
+                    <input type="text" name="cui" id="cui_input" value="<?php echo $tenant['cui']; ?>" required
+                           class="flex-1 px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all">
+                    <button type="button" onclick="fetchAnafData()" id="anaf_btn"
+                            class="px-4 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-sm flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Preluare ANAF
+                    </button>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">Reg. Com.</label>
+                <input type="text" name="reg_com" id="reg_com" value="<?php echo $tenant['reg_com'] ?? ''; ?>"
+                       class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="J40/1234/2020">
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">Adresă Sediu Social</label>
+                <textarea name="address" id="address" rows="2"
+                          class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all"><?php echo $tenant['address'] ?? ''; ?></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Județ</label>
+                    <input type="text" name="county" id="county" value="<?php echo $tenant['county'] ?? ''; ?>"
+                           class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Localitate</label>
+                    <input type="text" name="city" id="city" value="<?php echo $tenant['city'] ?? ''; ?>"
+                           class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all">
+                </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -57,3 +89,44 @@
         </div>
     </form>
 </div>
+
+<script>
+async function fetchAnafData() {
+    const cuiInput = document.getElementById('cui_input');
+    const btn = document.getElementById('anaf_btn');
+    const cui = cuiInput.value.replace(/\D/g, '');
+
+    if (!cui) {
+        alert('Te rog introdu un CUI valid.');
+        return;
+    }
+
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Preluare...';
+
+    try {
+        const response = await fetch(`/admin/tenants/anaf-fetch?cui=${cui}`);
+        const data = await response.json();
+
+        if (data.success) {
+            document.querySelector('input[name="name"]').value = data.company_name;
+            document.getElementById('reg_com').value = data.reg_com;
+            document.getElementById('address').value = data.address;
+            document.getElementById('county').value = data.county;
+            document.getElementById('city').value = data.city;
+            
+            // Highlight success
+            btn.classList.replace('bg-indigo-600', 'bg-green-600');
+            setTimeout(() => btn.classList.replace('bg-green-600', 'bg-indigo-600'), 2000);
+        } else {
+            alert('Eroare ANAF: ' + (data.error || 'CUI negăsit.'));
+        }
+    } catch (e) {
+        alert('Eroare conexiune: ' + e.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+}
+</script>

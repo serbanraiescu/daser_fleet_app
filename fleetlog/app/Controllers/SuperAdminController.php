@@ -5,6 +5,7 @@ namespace FleetLog\App\Controllers;
 use FleetLog\Core\Auth;
 use FleetLog\Core\DB;
 use FleetLog\Core\EmailService;
+use FleetLog\App\Helpers\AnafHelper;
 
 class SuperAdminController extends BaseController
 {
@@ -166,9 +167,13 @@ class SuperAdminController extends BaseController
         $status = $_POST['status'];
         $contact_phone = $_POST['contact_phone'] ?? null;
         $notification_phone = $_POST['notification_phone'] ?? null;
+        $reg_com = $_POST['reg_com'] ?? null;
+        $address = $_POST['address'] ?? null;
+        $county = $_POST['county'] ?? null;
+        $city = $_POST['city'] ?? null;
 
-        DB::query("UPDATE tenants SET name = ?, email = ?, cui = ?, status = ?, contact_phone = ?, notification_phone = ? WHERE id = ?", [
-            $name, $email, $cui, $status, $contact_phone, $notification_phone, $id
+        DB::query("UPDATE tenants SET name = ?, email = ?, cui = ?, status = ?, contact_phone = ?, notification_phone = ?, reg_com = ?, address = ?, county = ?, city = ? WHERE id = ?", [
+            $name, $email, $cui, $status, $contact_phone, $notification_phone, $reg_com, $address, $county, $city, $id
         ]);
 
         $this->redirect('/admin/tenants?success=tenant_updated');
@@ -204,11 +209,14 @@ class SuperAdminController extends BaseController
         $adminName = $_POST['admin_name'];
         $password = $_POST['password'];
         $contact_phone = $_POST['contact_phone'] ?? null;
-        $notification_phone = $_POST['notification_phone'] ?? null;
+        $reg_com = $_POST['reg_com'] ?? null;
+        $address = $_POST['address'] ?? null;
+        $county = $_POST['county'] ?? null;
+        $city = $_POST['city'] ?? null;
 
         // 1. Create Tenant
-        DB::query("INSERT INTO tenants (name, email, cui, status, contact_phone, notification_phone) VALUES (?, ?, ?, 'active', ?, ?)", [
-            $name, $email, $cui, $contact_phone, $notification_phone
+        DB::query("INSERT INTO tenants (name, email, cui, status, contact_phone, notification_phone, reg_com, address, county, city) VALUES (?, ?, ?, 'active', ?, ?, ?, ?, ?, ?)", [
+            $name, $email, $cui, $contact_phone, $notification_phone, $reg_com, $address, $county, $city
         ]);
         $tenantId = (int)DB::lastInsertId();
         error_log("SuperAdminController::storeTenant - Created Tenant ID: " . $tenantId);
@@ -642,5 +650,17 @@ class SuperAdminController extends BaseController
             if (!$this->deleteDirectory($dir . DIRECTORY_SEPARATOR . $item)) return false;
         }
         return rmdir($dir);
+    }
+
+    public function ajaxFetchAnafData(): void
+    {
+        $cui = $_GET['cui'] ?? '';
+        if (empty($cui)) {
+            $this->json(['success' => false, 'error' => 'CUI is required'], 400);
+            return;
+        }
+
+        $data = AnafHelper::fetchData($cui);
+        $this->json($data);
     }
 }
