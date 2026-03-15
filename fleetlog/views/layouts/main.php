@@ -132,10 +132,11 @@
                 </a>
 
                 <!-- Sidebar Footer Branding -->
-                <div class="mt-auto pt-10 pb-6 border-t border-slate-800/50 px-4">
+                <div class="mt-auto pt-6 pb-6 border-t border-slate-800/50 px-4">
                     <div class="flex flex-col items-center">
-                        <img src="/img/brand/logo.png" alt="Daser Technologies" class="h-8 mb-4 opacity-80 hover:opacity-100 transition-opacity">
+                        <img src="/img/brand/logo.png" alt="Daser Technologies" class="h-8 mb-3 opacity-80 hover:opacity-100 transition-opacity">
                         <div class="text-[10px] text-slate-500 text-center space-y-1">
+                            <p class="font-bold text-slate-600 mb-1">DASER FLEET v1.5.3</p>
                             <p class="font-bold tracking-widest uppercase">&copy; <?php echo date('Y'); ?> DASER ENTERPRISE SRL</p>
                             <a href="https://daserdesign.ro" target="_blank" class="text-blue-500 hover:text-blue-400 transition-colors">daserdesign.ro</a>
                         </div>
