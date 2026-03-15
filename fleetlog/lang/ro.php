@@ -14,6 +14,8 @@ return [
     'logout' => 'Deconectare',
     'documents' => 'Documente',
     'handover_protocol' => 'Proces-Verbal Predare',
+    'view_protocol' => 'Vezi Protocol',
+    'filter_handover' => 'Documente',
     
     // Dashboard Stats
     'monthly_expenses' => 'Cheltuieli Lunare',

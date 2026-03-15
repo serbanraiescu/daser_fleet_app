@@ -29,16 +29,19 @@
                 x-transition:leave="transition ease-in duration-75"
                 x-transition:leave-start="transform opacity-100 scale-100"
                 x-transition:leave-end="transform opacity-0 scale-95">
-                <button @click="openModal('edit', {
-                    id: '<?php echo $event['id']; ?>',
-                    event_type: '<?php echo $event['event_type']; ?>',
-                    event_subtype: '<?php echo htmlspecialchars(addslashes($event['event_subtype'] ?? '')); ?>',
-                    event_date: '<?php echo $event['event_date']; ?>',
-                    odometer: '<?php echo $event['odometer']; ?>',
-                    cost: '<?php echo $event['cost']; ?>',
-                    description: `<?php echo htmlspecialchars(addslashes($event['description'] ?? '')); ?>`,
-                    status: '<?php echo $event['status']; ?>'
-                }); open = false" class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center">
+                <?php 
+                $editData = [
+                    'id' => $event['id'],
+                    'event_type' => $event['event_type'],
+                    'event_subtype' => $event['event_subtype'] ?? '',
+                    'event_date' => $event['event_date'],
+                    'odometer' => $event['odometer'] ?? '',
+                    'cost' => $event['cost'] ?? $event['total_price'] ?? '',
+                    'description' => $event['description'] ?? '',
+                    'status' => $event['status'] ?? ''
+                ];
+                ?>
+                <button @click="openModal('edit', <?php echo htmlspecialchars(json_encode($editData), ENT_QUOTES, 'UTF-8'); ?>); open = false" class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center">
                     <svg class="w-4 h-4 mr-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                     <?php echo __('edit_event'); ?>
                 </button>
@@ -103,7 +106,7 @@
         </div>
     <?php endif; ?>
 
-    <?php if (!$event['is_fueling']): ?>
+    <?php if (!$event['is_fueling'] && !$event['is_handover'] && !empty($event['status'])): ?>
         <div class="flex items-center text-xs text-slate-500 font-medium bg-slate-50 px-2 py-1 rounded-md border border-slate-200">
             <span class="w-2 h-2 rounded-full mr-1.5 
                 <?php 
