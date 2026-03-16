@@ -1,3 +1,4 @@
+<?php
 $vehicles = $vehicles ?? [];
 $archivedVehicles = $archivedVehicles ?? [];
 $eqConfig = json_decode($tenant['equipment_config'] ?? '{}', true);
