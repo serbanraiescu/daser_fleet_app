@@ -136,27 +136,28 @@ class SMSService
         $alertDays = array_map('trim', explode(',', $template['alert_days'] ?? '30,7,3,1'));
         $maxDays = max($alertDays);
 
-        // 2. Find expiring docs grouped by tenant
-        $expiring = DB::fetchAll("
-            SELECT v.id as vehicle_id, v.license_plate, v.expiry_rca, v.expiry_itp, v.expiry_rovigneta,
-                   t.id as tenant_id, t.name as tenant_name, t.contact_phone, t.notification_phone
+        // Fetch Tenant Configs
+        $tenantsRaw = DB::fetchAll("SELECT id, name, contact_phone, notification_phone, equipment_config FROM tenants");
+        $tenants = [];
+        foreach ($tenantsRaw as $t) {
+            $tenants[$t['id']] = [
+                'name' => $t['name'],
+                'phone' => !empty($t['notification_phone']) ? $t['notification_phone'] : $t['contact_phone'],
+                'config' => json_decode($t['equipment_config'] ?? '[]', true)
+            ];
+        }
+
+        // 2. Scan Vehicles
+        $expiringVehicles = DB::fetchAll("
+            SELECT v.id as vehicle_id, v.license_plate, v.expiry_rca, v.expiry_itp, v.expiry_rovigneta, 
+                   v.medical_kit_expiry, v.extinguisher_expiry, v.tenant_id
             FROM vehicles v
-            JOIN tenants t ON v.tenant_id = t.id
             WHERE v.status != 'archived'
-            AND (
-                (expiry_rca IS NOT NULL AND expiry_rca <= DATE_ADD(CURRENT_DATE(), INTERVAL ? DAY)) OR 
-                (expiry_itp IS NOT NULL AND expiry_itp <= DATE_ADD(CURRENT_DATE(), INTERVAL ? DAY)) OR 
-                (expiry_rovigneta IS NOT NULL AND expiry_rovigneta <= DATE_ADD(CURRENT_DATE(), INTERVAL ? DAY))
-            )
-        ", [$maxDays, $maxDays, $maxDays]);
+        ");
 
-        foreach ($expiring as $v) {
-            $recipientPhone = !empty($v['notification_phone']) ? $v['notification_phone'] : $v['contact_phone'];
-
-            if (empty($recipientPhone)) {
-                $skippedTenants[$v['tenant_id']] = $v['tenant_name'];
-                continue;
-            }
+        foreach ($expiringVehicles as $v) {
+            $t = $tenants[$v['tenant_id']] ?? null;
+            if (!$t || empty($t['phone'])) continue;
 
             $docTypes = [
                 'RCA' => $v['expiry_rca'],
@@ -164,49 +165,85 @@ class SMSService
                 'Rovigneta' => $v['expiry_rovigneta']
             ];
 
+            // Add equipment IF assigned to vehicle
+            if (($t['config']['medical_kit'] ?? 'vehicle') === 'vehicle') {
+                $docTypes['Trusă Medicală'] = $v['medical_kit_expiry'];
+            }
+            if (($t['config']['extinguisher'] ?? 'vehicle') === 'vehicle') {
+                $docTypes['Stingător'] = $v['extinguisher_expiry'];
+            }
+
             foreach ($docTypes as $type => $date) {
                 if (!$date) continue;
+                $this->processAlertMilestones($v['vehicle_id'], null, $type, $date, $v['license_plate'], 'Vehicul', $t, $alertDays, $enqueuedCount);
+            }
+        }
 
-                $expiryTimestamp = strtotime($date);
-                $daysLeft = ceil(($expiryTimestamp - time()) / 86400);
+        // 3. Scan Drivers
+        $expiringDrivers = DB::fetchAll("
+            SELECT u.id as user_id, u.name as driver_name, u.medical_kit_expiry, u.extinguisher_expiry, u.tenant_id
+            FROM users u
+            WHERE u.role = 'driver' AND u.active = 1
+        ");
 
-                // Check each milestone - Trigger ONLY on the exact day
-                foreach ($alertDays as $milestone) {
-                    if ($daysLeft == (int)$milestone) {
-                        // Check if already tracked for this SPECIFIC milestone + date
-                        $tracked = DB::fetch(
-                            "SELECT id FROM expiry_alerts_track WHERE vehicle_id = ? AND expiry_type = ? AND expiry_date = ? AND alert_day = ?",
-                            [$v['vehicle_id'], $type, $date, (int)$milestone]
-                        );
+        foreach ($expiringDrivers as $u) {
+            $t = $tenants[$u['tenant_id']] ?? null;
+            if (!$t || empty($t['phone'])) continue;
 
-                        if (!$tracked) {
-                            $data = [
-                                'expiry_type' => $type,
-                                'vehicle_plate' => $v['license_plate'],
-                                'expiry_date' => date('d.m.Y', $expiryTimestamp),
-                                'days_left' => $daysLeft,
-                                'vehicle_id' => $v['vehicle_id'],
-                                'driver_name' => $v['driver_name'] ?? 'N/A',
-                                'company_name' => $v['tenant_name'],
-                                'asset_name' => $v['license_plate'],
-                                'asset_type' => 'Vehicul',
-                                'phone_number' => $recipientPhone
-                            ];
+            $docTypes = [];
+            if (($t['config']['medical_kit'] ?? 'vehicle') === 'driver') {
+                $docTypes['Trusă Medicală'] = $u['medical_kit_expiry'];
+            }
+            if (($t['config']['extinguisher'] ?? 'vehicle') === 'driver') {
+                $docTypes['Stingător'] = $u['extinguisher_expiry'];
+            }
 
-                            if (self::enqueueFromTemplate($recipientPhone, 'universal_expiry', $data)) {
-                                DB::query(
-                                    "INSERT INTO expiry_alerts_track (tenant_id, vehicle_id, expiry_type, expiry_date, alert_day) VALUES (?, ?, ?, ?, ?)",
-                                    [$v['tenant_id'], $v['vehicle_id'], $type, $date, (int)$milestone]
-                                );
-                                $enqueuedCount++;
-                                break; // Only send the closest milestone SMS once per scan
-                            }
-                        }
-                    }
-                }
+            foreach ($docTypes as $type => $date) {
+                if (!$date) continue;
+                $this->processAlertMilestones(null, $u['user_id'], $type, $date, $u['driver_name'], 'Șofer', $t, $alertDays, $enqueuedCount);
             }
         }
 
         return [$enqueuedCount, array_unique($skippedTenants)];
+    }
+
+    private static function processAlertMilestones($vehicleId, $userId, $type, $date, $assetName, $assetType, $tenant, $alertDays, &$enqueuedCount): void
+    {
+        $expiryTimestamp = strtotime($date);
+        $daysLeft = ceil(($expiryTimestamp - time()) / 86400);
+
+        foreach ($alertDays as $milestone) {
+            if ($daysLeft == (int)$milestone) {
+                $sql = $vehicleId 
+                    ? "SELECT id FROM expiry_alerts_track WHERE vehicle_id = ? AND expiry_type = ? AND expiry_date = ? AND alert_day = ?"
+                    : "SELECT id FROM expiry_alerts_track WHERE user_id = ? AND expiry_type = ? AND expiry_date = ? AND alert_day = ?";
+                
+                $id = $vehicleId ?: $userId;
+                $tracked = DB::fetch($sql, [$id, $type, $date, (int)$milestone]);
+
+                if (!$tracked) {
+                    $data = [
+                        'expiry_type' => $type,
+                        'asset_name' => $assetName,
+                        'expiry_date' => date('d.m.Y', $expiryTimestamp),
+                        'days_left' => $daysLeft,
+                        'vehicle_id' => $vehicleId,
+                        'driver_name' => $assetType === 'Șofer' ? $assetName : 'N/A',
+                        'company_name' => $tenant['name'],
+                        'asset_type' => $assetType,
+                        'phone_number' => $tenant['phone']
+                    ];
+
+                    if (self::enqueueFromTemplate($tenant['phone'], 'universal_expiry', $data)) {
+                        DB::query(
+                            "INSERT INTO expiry_alerts_track (tenant_id, vehicle_id, user_id, expiry_type, expiry_date, alert_day) VALUES (?, ?, ?, ?, ?, ?)",
+                            [$tenant['id'], $vehicleId, $userId, $type, $date, (int)$milestone]
+                        );
+                        $enqueuedCount++;
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

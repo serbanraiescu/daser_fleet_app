@@ -42,8 +42,9 @@
                             <?php echo $driver['active'] ? 'Active' : 'Inactive'; ?>
                         </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="/tenant/drivers/edit/<?php echo $driver['id']; ?>" class="text-blue-600 hover:text-blue-900">Edit</a>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                        <a href="/tenant/documents/inventory/add?driver_id=<?php echo $driver['id']; ?>" class="text-blue-600 hover:text-blue-900 font-bold">Protocol Inventar</a>
+                        <a href="/tenant/drivers/edit/<?php echo $driver['id']; ?>" class="text-slate-400 hover:text-slate-600">Edit</a>
                     </td>
                 </tr>
             <?php endforeach; ?>

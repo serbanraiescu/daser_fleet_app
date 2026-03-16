@@ -56,6 +56,87 @@
             </div>
         </div>
 
+        <?php 
+            $anyDriverEq = in_array('driver', $equipment_config);
+        ?>
+        <?php if ($anyDriverEq): ?>
+        <div class="pt-4 border-t border-slate-100">
+            <div class="flex items-center mb-4">
+                <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Personal Inventory (Custody)</h3>
+                <span class="ml-2 bg-blue-100 text-blue-700 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">Per Tenant Rule</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <div class="space-y-4">
+                    <?php if (($equipment_config['triangles'] ?? 'vehicle') === 'driver'): ?>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-slate-700">Triunghiuri Refl.</span>
+                            <select name="has_triangles" class="text-xs border border-slate-300 rounded px-2 py-1">
+                                <option value="0">0 x</option>
+                                <option value="1">1 x</option>
+                                <option value="2" selected>2 x</option>
+                            </select>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if (($equipment_config['vest'] ?? 'vehicle') === 'driver'): ?>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-slate-700">Vestă Refl.</span>
+                            <select name="has_vest" class="text-xs border border-slate-300 rounded px-2 py-1">
+                                <option value="0">0 x</option>
+                                <option value="1" selected>1 x</option>
+                            </select>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if (($equipment_config['jack'] ?? 'vehicle') === 'driver'): ?>
+                        <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-white rounded-lg transition-colors">
+                            <input type="checkbox" name="has_jack" value="1" class="w-4 h-4 text-blue-600 border-slate-300 rounded">
+                            <span class="text-sm font-medium text-slate-700">Cric personal</span>
+                        </label>
+                    <?php endif; ?>
+
+                    <?php if (($equipment_config['spare_wheel'] ?? 'vehicle') === 'driver'): ?>
+                        <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-white rounded-lg transition-colors">
+                            <input type="checkbox" name="has_spare_wheel" value="1" class="w-4 h-4 text-blue-600 border-slate-300 rounded">
+                            <span class="text-sm font-medium text-slate-700">Roată rezervă</span>
+                        </label>
+                    <?php endif; ?>
+                </div>
+
+                <div class="space-y-4">
+                    <?php if (($equipment_config['tow_rope'] ?? 'vehicle') === 'driver'): ?>
+                        <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-white rounded-lg transition-colors">
+                            <input type="checkbox" name="has_tow_rope" value="1" class="w-4 h-4 text-blue-600 border-slate-300 rounded">
+                            <span class="text-sm font-medium text-slate-700">Șufă tractare</span>
+                        </label>
+                    <?php endif; ?>
+
+                    <?php if (($equipment_config['jumper_cables'] ?? 'vehicle') === 'driver'): ?>
+                        <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-white rounded-lg transition-colors">
+                            <input type="checkbox" name="has_jumper_cables" value="1" class="w-4 h-4 text-blue-600 border-slate-300 rounded">
+                            <span class="text-sm font-medium text-slate-700">Cabluri curent</span>
+                        </label>
+                    <?php endif; ?>
+
+                    <?php if (($equipment_config['medical_kit'] ?? 'vehicle') === 'driver'): ?>
+                        <div class="pt-2">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Expirare Trusă Medicală</label>
+                            <input type="date" name="medical_kit_expiry" class="w-full text-xs px-2 py-1.5 border border-slate-300 rounded">
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if (($equipment_config['extinguisher'] ?? 'vehicle') === 'driver'): ?>
+                        <div class="pt-2">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Expirare Stingător</label>
+                            <input type="date" name="extinguisher_expiry" class="w-full text-xs px-2 py-1.5 border border-slate-300 rounded">
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <div class="pt-4 border-t border-slate-100 flex justify-end">
             <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors">
                 Save Driver

@@ -68,53 +68,69 @@
             </h3>
             
             <div class="space-y-4">
-                <div class="flex items-center justify-between">
-                    <span class="text-sm font-medium text-slate-700">Triunghiuri Refl.</span>
-                    <select name="has_triangles" class="text-xs border border-slate-300 rounded px-2 py-1">
-                        <option value="0">0 x</option>
-                        <option value="1">1 x</option>
-                        <option value="2" selected>2 x</option>
-                    </select>
-                </div>
+                <?php if (($equipment_config['triangles'] ?? 'vehicle') === 'vehicle'): ?>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-slate-700">Triunghiuri Refl.</span>
+                        <select name="has_triangles" class="text-xs border border-slate-300 rounded px-2 py-1">
+                            <option value="0">0 x</option>
+                            <option value="1">1 x</option>
+                            <option value="2" selected>2 x</option>
+                        </select>
+                    </div>
+                <?php endif; ?>
 
-                <div class="flex items-center justify-between">
-                    <span class="text-sm font-medium text-slate-700">Veste Refl.</span>
-                    <select name="has_vest" class="text-xs border border-slate-300 rounded px-2 py-1">
-                        <option value="0">0 x</option>
-                        <option value="1" selected>1 x</option>
-                        <option value="2">2 x</option>
-                    </select>
-                </div>
+                <?php if (($equipment_config['vest'] ?? 'vehicle') === 'vehicle'): ?>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-slate-700">Veste Refl.</span>
+                        <select name="has_vest" class="text-xs border border-slate-300 rounded px-2 py-1">
+                            <option value="0">0 x</option>
+                            <option value="1" selected>1 x</option>
+                            <option value="2">2 x</option>
+                        </select>
+                    </div>
+                <?php endif; ?>
 
-                <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-slate-50 rounded-lg transition-colors">
-                    <input type="checkbox" name="has_jack" value="1" checked class="w-4 h-4 text-blue-600 border-slate-300 rounded">
-                    <span class="text-sm font-medium text-slate-700">Cric Functional</span>
-                </label>
+                <?php if (($equipment_config['jack'] ?? 'vehicle') === 'vehicle'): ?>
+                    <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-slate-50 rounded-lg transition-colors">
+                        <input type="checkbox" name="has_jack" value="1" checked class="w-4 h-4 text-blue-600 border-slate-300 rounded">
+                        <span class="text-sm font-medium text-slate-700">Cric Functional</span>
+                    </label>
+                <?php endif; ?>
 
-                <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-slate-50 rounded-lg transition-colors">
-                    <input type="checkbox" name="has_tow_rope" value="1" checked class="w-4 h-4 text-blue-600 border-slate-300 rounded">
-                    <span class="text-sm font-medium text-slate-700">Șufă Tractare</span>
-                </label>
+                <?php if (($equipment_config['tow_rope'] ?? 'vehicle') === 'vehicle'): ?>
+                    <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-slate-50 rounded-lg transition-colors">
+                        <input type="checkbox" name="has_tow_rope" value="1" checked class="w-4 h-4 text-blue-600 border-slate-300 rounded">
+                        <span class="text-sm font-medium text-slate-700">Șufă Tractare</span>
+                    </label>
+                <?php endif; ?>
 
-                <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-slate-50 rounded-lg transition-colors">
-                    <input type="checkbox" name="has_jumper_cables" value="1" checked class="w-4 h-4 text-blue-600 border-slate-300 rounded">
-                    <span class="text-sm font-medium text-slate-700">Cabluri Curent</span>
-                </label>
+                <?php if (($equipment_config['jumper_cables'] ?? 'vehicle') === 'vehicle'): ?>
+                    <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-slate-50 rounded-lg transition-colors">
+                        <input type="checkbox" name="has_jumper_cables" value="1" checked class="w-4 h-4 text-blue-600 border-slate-300 rounded">
+                        <span class="text-sm font-medium text-slate-700">Cabluri Curent</span>
+                    </label>
+                <?php endif; ?>
 
-                <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-slate-50 rounded-lg transition-colors">
-                    <input type="checkbox" name="has_spare_wheel" value="1" checked class="w-4 h-4 text-blue-600 border-slate-300 rounded">
-                    <span class="text-sm font-medium text-slate-700">Roată Rezervă</span>
-                </label>
+                <?php if (($equipment_config['spare_wheel'] ?? 'vehicle') === 'vehicle'): ?>
+                    <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-slate-50 rounded-lg transition-colors">
+                        <input type="checkbox" name="has_spare_wheel" value="1" checked class="w-4 h-4 text-blue-600 border-slate-300 rounded">
+                        <span class="text-sm font-medium text-slate-700">Roată Rezervă</span>
+                    </label>
+                <?php endif; ?>
 
-                <div class="pt-2">
-                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Expirare Trusă Medicală</label>
-                    <input type="date" name="medical_kit_expiry" class="w-full text-xs px-2 py-1.5 border border-slate-300 rounded">
-                </div>
+                <?php if (($equipment_config['medical_kit'] ?? 'vehicle') === 'vehicle'): ?>
+                    <div class="pt-2">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Expirare Trusă Medicală</label>
+                        <input type="date" name="medical_kit_expiry" class="w-full text-xs px-2 py-1.5 border border-slate-300 rounded">
+                    </div>
+                <?php endif; ?>
 
-                <div class="pt-2">
-                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Expirare Stingător</label>
-                    <input type="date" name="extinguisher_expiry" class="w-full text-xs px-2 py-1.5 border border-slate-300 rounded">
-                </div>
+                <?php if (($equipment_config['extinguisher'] ?? 'vehicle') === 'vehicle'): ?>
+                    <div class="pt-2">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Expirare Stingător</label>
+                        <input type="date" name="extinguisher_expiry" class="w-full text-xs px-2 py-1.5 border border-slate-300 rounded">
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>

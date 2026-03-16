@@ -26,10 +26,10 @@ class TenantController extends BaseController
         }
 
         // 2. Expiring Documents (RCA, ITP, Rovigneta, Medical Kit, Extinguisher within 30 days)
+        // Combined search for both vehicles AND drivers based on tenant equipment config
         $expiringDocs = DB::fetchAll("
-            SELECT id, license_plate, make, model, 
-                   expiry_rca, expiry_itp, expiry_rovigneta,
-                   medical_kit_expiry, extinguisher_expiry
+            SELECT 'vehicle' as source_type, id, license_plate as entity_label, make, model, 
+                   expiry_rca, expiry_itp, expiry_rovigneta, medical_kit_expiry, extinguisher_expiry
             FROM vehicles 
             WHERE tenant_id = ? 
             AND status != 'archived'
@@ -40,6 +40,15 @@ class TenantController extends BaseController
                 (medical_kit_expiry IS NOT NULL AND medical_kit_expiry <= DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY)) OR
                 (extinguisher_expiry IS NOT NULL AND extinguisher_expiry <= DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY))
             )
+            UNION ALL
+            SELECT 'driver' as source_type, id, name as entity_label, NULL as make, NULL as model,
+                   NULL as expiry_rca, NULL as expiry_itp, NULL as expiry_rovigneta, medical_kit_expiry, extinguisher_expiry
+            FROM users
+            WHERE tenant_id = ? AND role = 'driver' AND active = 1
+            AND (
+                (medical_kit_expiry IS NOT NULL AND medical_kit_expiry <= DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY)) OR
+                (extinguisher_expiry IS NOT NULL AND extinguisher_expiry <= DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY))
+            )
             ORDER BY GREATEST(
                 COALESCE(expiry_rca, '1970-01-01'), 
                 COALESCE(expiry_itp, '1970-01-01'), 
@@ -47,7 +56,7 @@ class TenantController extends BaseController
                 COALESCE(medical_kit_expiry, '1970-01-01'),
                 COALESCE(extinguisher_expiry, '1970-01-01')
             ) ASC
-        ", [$tenantId]);
+        ", [$tenantId, $tenantId]);
 
         // 5. Fleet Status Distribution
         $fleetStatus = DB::fetchAll("
@@ -100,8 +109,11 @@ class TenantController extends BaseController
             AND YEAR(end_time) = YEAR(CURRENT_DATE())
         ", [$tenantId])['total'] ?? 0;
 
+        $tenant = DB::fetch("SELECT * FROM tenants WHERE id = ?", [$tenantId]);
+
         $this->render('tenant/dashboard', [
             'title' => 'Admin Dashboard',
+            'tenant' => $tenant,
             'stats' => [
                 'monthly_expenses' => $currentMonthExpenses,
                 'monthly_km' => $monthlyKm,
@@ -220,7 +232,11 @@ class TenantController extends BaseController
 
     public function showAddVehicle(): void
     {
-        $this->render('tenant/vehicles/create', ['title' => 'Add New Vehicle']);
+        $tenant = DB::fetch("SELECT equipment_config FROM tenants WHERE id = ?", [Auth::tenantId()]);
+        $this->render('tenant/vehicles/create', [
+            'title' => 'Add New Vehicle',
+            'equipment_config' => json_decode($tenant['equipment_config'] ?? '[]', true)
+        ]);
     }
 
     public function storeVehicle(): void
@@ -255,7 +271,11 @@ class TenantController extends BaseController
 
     public function showAddDriver(): void
     {
-        $this->render('tenant/drivers/create', ['title' => 'Add New Driver']);
+        $tenant = DB::fetch("SELECT equipment_config FROM tenants WHERE id = ?", [Auth::tenantId()]);
+        $this->render('tenant/drivers/create', [
+            'title' => 'Add New Driver',
+            'equipment_config' => json_decode($tenant['equipment_config'] ?? '[]', true)
+        ]);
     }
 
     public function storeDriver(): void
@@ -271,7 +291,15 @@ class TenantController extends BaseController
             'cnp' => $_POST['cnp'] ?? null,
             'id_expiry' => !empty($_POST['id_expiry']) ? $_POST['id_expiry'] : null,
             'license_series' => $_POST['license_series'] ?? null,
-            'license_expiry' => !empty($_POST['license_expiry']) ? $_POST['license_expiry'] : null
+            'license_expiry' => !empty($_POST['license_expiry']) ? $_POST['license_expiry'] : null,
+            'has_triangles' => (int)($_POST['has_triangles'] ?? 0),
+            'has_vest' => (int)($_POST['has_vest'] ?? 0),
+            'has_jack' => isset($_POST['has_jack']) ? 1 : 0,
+            'medical_kit_expiry' => !empty($_POST['medical_kit_expiry']) ? $_POST['medical_kit_expiry'] : null,
+            'has_tow_rope' => isset($_POST['has_tow_rope']) ? 1 : 0,
+            'has_jumper_cables' => isset($_POST['has_jumper_cables']) ? 1 : 0,
+            'extinguisher_expiry' => !empty($_POST['extinguisher_expiry']) ? $_POST['extinguisher_expiry'] : null,
+            'has_spare_wheel' => isset($_POST['has_spare_wheel']) ? 1 : 0
         ];
 
         if ($repo->create($data)) {
@@ -325,9 +353,11 @@ class TenantController extends BaseController
         $contactPhone = $_POST['contact_phone'] ?? null;
         $notificationPhone = $_POST['notification_phone'] ?? null;
         $notificationEmails = $_POST['notification_emails'] ?? null;
+        $equipmentConfig = $_POST['equipment_config'] ?? [];
+        $equipmentJson = json_encode($equipmentConfig);
 
-        DB::query("UPDATE tenants SET timezone = ?, language = ?, trip_types = ?, contact_phone = ?, notification_phone = ?, notification_emails = ? WHERE id = ?", [
-            $timezone, $language, $tripTypes, $contactPhone, $notificationPhone, $notificationEmails, $tenantId
+        DB::query("UPDATE tenants SET timezone = ?, language = ?, trip_types = ?, contact_phone = ?, notification_phone = ?, notification_emails = ?, equipment_config = ? WHERE id = ?", [
+            $timezone, $language, $tripTypes, $contactPhone, $notificationPhone, $notificationEmails, $equipmentJson, $tenantId
         ]);
 
         $this->redirect('/tenant/settings?success=1');
@@ -342,9 +372,12 @@ class TenantController extends BaseController
             $this->redirect('/tenant/vehicles');
         }
 
+        $tenant = DB::fetch("SELECT equipment_config FROM tenants WHERE id = ?", [Auth::tenantId()]);
+
         $this->render('tenant/vehicles/edit', [
             'title' => 'Edit Vehicle',
-            'vehicle' => $vehicle
+            'vehicle' => $vehicle,
+            'equipment_config' => json_decode($tenant['equipment_config'] ?? '[]', true)
         ]);
     }
 
@@ -391,9 +424,12 @@ class TenantController extends BaseController
             $this->redirect('/tenant/drivers');
         }
 
+        $tenant = DB::fetch("SELECT equipment_config FROM tenants WHERE id = ?", [Auth::tenantId()]);
+
         $this->render('tenant/drivers/edit', [
             'title' => 'Edit Driver',
-            'driver' => $driver
+            'driver' => $driver,
+            'equipment_config' => json_decode($tenant['equipment_config'] ?? '[]', true)
         ]);
     }
 
@@ -408,7 +444,15 @@ class TenantController extends BaseController
             'cnp' => $_POST['cnp'] ?? null,
             'id_expiry' => !empty($_POST['id_expiry']) ? $_POST['id_expiry'] : null,
             'license_series' => $_POST['license_series'] ?? null,
-            'license_expiry' => !empty($_POST['license_expiry']) ? $_POST['license_expiry'] : null
+            'license_expiry' => !empty($_POST['license_expiry']) ? $_POST['license_expiry'] : null,
+            'has_triangles' => (int)($_POST['has_triangles'] ?? 0),
+            'has_vest' => (int)($_POST['has_vest'] ?? 0),
+            'has_jack' => isset($_POST['has_jack']) ? 1 : 0,
+            'medical_kit_expiry' => !empty($_POST['medical_kit_expiry']) ? $_POST['medical_kit_expiry'] : null,
+            'has_tow_rope' => isset($_POST['has_tow_rope']) ? 1 : 0,
+            'has_jumper_cables' => isset($_POST['has_jumper_cables']) ? 1 : 0,
+            'extinguisher_expiry' => !empty($_POST['extinguisher_expiry']) ? $_POST['extinguisher_expiry'] : null,
+            'has_spare_wheel' => isset($_POST['has_spare_wheel']) ? 1 : 0
         ];
 
         if (!empty($_POST['password'])) {
@@ -741,6 +785,78 @@ class TenantController extends BaseController
         }
     }
 
+    public function showInventoryProtocol(): void
+    {
+        $tenantId = Auth::tenantId();
+        $userRepo = new \FleetLog\App\Repositories\UserRepository();
+        $drivers = $userRepo->getByTenantAndRole($tenantId, 'driver');
+
+        $this->render('tenant/documents/inventory_create', [
+            'title' => 'Process Verbal Inventar (Șofer)',
+            'drivers' => $drivers
+        ]);
+    }
+
+    public function generateInventoryProtocol(): void
+    {
+        $tenantId = Auth::tenantId();
+        $docRepo = new \FleetLog\App\Repositories\DocumentRepository();
+        $userRepo = new \FleetLog\App\Repositories\UserRepository();
+        
+        $driverId = (int)$_POST['driver_id'];
+        $driver = $userRepo->find($driverId);
+
+        if (!$driver || (int)$driver['tenant_id'] !== $tenantId) {
+            $this->redirect('/tenant/documents/inventory/add?error=invalid_driver');
+        }
+
+        $data = [
+            'tenant_id' => $tenantId,
+            'document_number' => $docRepo->generateDocumentNumber('INV'),
+            'vehicle_id' => null,
+            'driver_id' => $driverId,
+            'report_type' => 'inventory',
+            'notes' => $_POST['notes'] ?? '',
+            'has_triangles' => $driver['has_triangles'] ?? 0,
+            'has_vest' => $driver['has_vest'] ?? 0,
+            'has_jack' => $driver['has_jack'] ?? 0,
+            'has_tow_rope' => $driver['has_tow_rope'] ?? 0,
+            'has_jumper_cables' => $driver['has_jumper_cables'] ?? 0,
+            'has_spare_wheel' => $driver['has_spare_wheel'] ?? 0,
+            'medical_kit_expiry' => $driver['medical_kit_expiry'] ?? null,
+            'extinguisher_expiry' => $driver['extinguisher_expiry'] ?? null,
+            'created_at' => date('Y-m-d H:i:s')
+        ];
+
+        $id = $docRepo->createHandover($data);
+
+        if ($id) {
+            $this->redirect("/tenant/documents/inventory/view/$id");
+        } else {
+            $this->redirect('/tenant/documents/inventory/add?error=failed_to_save');
+        }
+    }
+
+    public function viewInventoryProtocol(int $id): void
+    {
+        $tenantId = Auth::tenantId();
+        $docRepo = new \FleetLog\App\Repositories\DocumentRepository();
+        $report = $docRepo->findHandover($id, $tenantId);
+
+        if (!$report || $report['report_type'] !== 'inventory') {
+            $this->redirect('/tenant/documents');
+        }
+
+        $userRepo = new \FleetLog\App\Repositories\UserRepository();
+        $driver = $userRepo->find($report['driver_id']);
+
+        $this->render('tenant/documents/inventory_print', [
+            'title' => 'Inventar: ' . $report['document_number'],
+            'report' => $report,
+            'driver' => $driver
+        ]);
+    }
+
     public function viewProtocol(int $id): void
     {
         $tenantId = Auth::tenantId();
@@ -830,13 +946,7 @@ class TenantController extends BaseController
                 $summary['extinguishers']++;
             }
 
-            if (!empty($missing)) {
-                $shoppingList[] = [
-                    'vehicle' => $vehicle['make'] . ' ' . $vehicle['model'] . ' (' . $vehicle['license_plate'] . ')',
-                    'missing' => $missing
-                ];
-            }
-        }
+            if (!empty($missing)) {\n                $shoppingList[] = [\n                    'vehicle' => $vehicle['make'] . ' ' . $vehicle['model'] . ' (' . $vehicle['license_plate'] . ')',\n                    'missing' => $missing\n                ];\n            }\n        }\n\n        // Check Driver Custody\n        $tenantRaw = DB::fetch(\"SELECT equipment_config FROM tenants WHERE id = ?\", [$tenantId]);\n        $eqConfig = json_decode($tenantRaw['equipment_config'] ?? '[]', true);\n        \n        $userRepo = new \\FleetLog\\App\\Repositories\\UserRepository();\n        $drivers = $userRepo->getByTenantAndRole($tenantId, 'driver');\n\n        foreach ($drivers as $driver) {\n            $missing = [];\n            \n            if (($eqConfig['triangles'] ?? 'vehicle') === 'driver' && (int)$driver['has_triangles'] < 2) {\n                $count = 2 - (int)$driver['has_triangles'];\n                $missing[] = \"Triunghiuri: Lipsește $count buc.\";\n                $summary['triangles'] += $count;\n            }\n\n            if (($eqConfig['vest'] ?? 'vehicle') === 'driver' && (int)$driver['has_vest'] < 1) {\n                $missing[] = \"Vestă Reflectorizantă\";\n                $summary['vests']++;\n            }\n\n            if (($eqConfig['jack'] ?? 'vehicle') === 'driver' && empty($driver['has_jack'])) {\n                $missing[] = \"Cric\";\n                $summary['jacks']++;\n            }\n\n            if (($eqConfig['tow_rope'] ?? 'vehicle') === 'driver' && empty($driver['has_tow_rope'])) {\n                $missing[] = \"Șufă Tractare\";\n                $summary['tow_ropes']++;\n            }\n\n            if (($eqConfig['jumper_cables'] ?? 'vehicle') === 'driver' && empty($driver['has_jumper_cables'])) {\n                $missing[] = \"Cabluri Curent\";\n                $summary['jumper_cables']++;\n            }\n\n            if (($eqConfig['spare_wheel'] ?? 'vehicle') === 'driver' && isset($driver['has_spare_wheel']) && !$driver['has_spare_wheel']) {\n                $missing[] = \"Roată Rezervă\";\n                $summary['spare_wheels']++;\n            }\n\n            if (($eqConfig['medical_kit'] ?? 'vehicle') === 'driver') {\n                if (empty($driver['medical_kit_expiry']) || $driver['medical_kit_expiry'] < date('Y-m-d')) {\n                    $status = empty($driver['medical_kit_expiry']) ? \"Lipsă\" : \"Expirată (\" . date('d.m.y', strtotime($driver['medical_kit_expiry'])) . \")\";\n                    $missing[] = \"Trusă Medicală ($status)\";\n                    $summary['med_kits']++;\n                }\n            }\n\n            if (($eqConfig['extinguisher'] ?? 'vehicle') === 'driver') {\n                if (empty($driver['extinguisher_expiry']) || $driver['extinguisher_expiry'] < date('Y-m-d')) {\n                    $status = empty($driver['extinguisher_expiry']) ? \"Lipsă\" : \"Expirat (\" . date('d.m.y', strtotime($driver['extinguisher_expiry'])) . \")\";\n                    $missing[] = \"Stingător ($status)\";\n                    $summary['extinguishers']++;\n                }\n            }\n\n            if (!empty($missing)) {\n                $shoppingList[] = [\n                    'vehicle' => 'ȘOFER: ' . $driver['name'],\n                    'missing' => $missing\n                ];\n            }\n        }
 
         $this->render('tenant/reports/inventory_shopping_list', [
             'title' => 'Inventory Shopping List',

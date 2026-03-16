@@ -55,6 +55,51 @@
             <p class="mt-1 text-xs text-slate-500 italic">Separate multiple emails with commas. These recipients will also receive expiry alerts.</p>
         </div>
 
+        <div class="pt-6 border-t border-slate-100">
+            <h3 class="text-sm font-bold text-slate-800 mb-4 uppercase tracking-wider">Inventory Assignment Mapping</h3>
+            <p class="text-xs text-slate-500 mb-4">Choose where each mandatory item is managed. Items assigned to <b>Driver</b> will generate alerts on the driver's profile and follow them across vehicles.</p>
+            
+            <?php 
+                $eqConfig = json_decode($tenant['equipment_config'] ?? '[]', true);
+                $items = [
+                    'triangles' => 'Triunghiuri',
+                    'vest' => 'Vestă',
+                    'jack' => 'Cric',
+                    'medical_kit' => 'Trusă Medicală',
+                    'tow_rope' => 'Șufă Tractare',
+                    'jumper_cables' => 'Cabluri Curent',
+                    'extinguisher' => 'Stingător',
+                    'spare_wheel' => 'Roată Rezervă'
+                ];
+            ?>
+            <div class="bg-slate-50 rounded-lg border border-slate-200 overflow-hidden">
+                <table class="w-full text-xs text-left">
+                    <thead class="bg-slate-100 font-bold text-slate-600">
+                        <tr>
+                            <th class="px-3 py-2">Item Name</th>
+                            <th class="px-3 py-2 text-center">Vehicle</th>
+                            <th class="px-3 py-2 text-center">Driver</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200">
+                        <?php foreach ($items as $key => $label): 
+                            $val = $eqConfig[$key] ?? 'vehicle';
+                        ?>
+                            <tr>
+                                <td class="px-3 py-2 font-medium text-slate-700"><?php echo $label; ?></td>
+                                <td class="px-3 py-2 text-center">
+                                    <input type="radio" name="equipment_config[<?php echo $key; ?>]" value="vehicle" <?php echo $val === 'vehicle' ? 'checked' : ''; ?> class="text-blue-600 focus:ring-blue-500">
+                                </td>
+                                <td class="px-3 py-2 text-center">
+                                    <input type="radio" name="equipment_config[<?php echo $key; ?>]" value="driver" <?php echo $val === 'driver' ? 'checked' : ''; ?> class="text-blue-600 focus:ring-blue-500">
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <div class="pt-4 border-t border-slate-100 flex justify-end">
             <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors">
                 Save Settings

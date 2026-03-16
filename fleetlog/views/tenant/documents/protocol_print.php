@@ -138,6 +138,75 @@
         </div>
 
         <!-- Inventory / Documents -->
+        <?php 
+            $eqConfig = json_decode($report['equipment_config'] ?? '[]', true);
+            $inventoryItems = [
+                'has_triangles' => 'Triunghiuri Reflectorizante',
+                'has_vest' => 'Vestă Reflectorizantă',
+                'has_jack' => 'Cric',
+                'has_tow_rope' => 'Șufă Tractare',
+                'has_jumper_cables' => 'Cabluri Curent',
+                'has_spare_wheel' => 'Roată Rezervă',
+                'medical_kit_expiry' => 'Trusă Medicală',
+                'extinguisher_expiry' => 'Stingător'
+            ];
+            
+            $vehicleItems = [];
+            $driverItems = [];
+            
+            foreach ($inventoryItems as $key => $label) {
+                $configKey = str_replace('_expiry', '', str_replace('has_', '', $key));
+                if (($eqConfig[$configKey] ?? 'vehicle') === 'driver') {
+                    $driverItems[$key] = $label;
+                } else {
+                    $vehicleItems[$key] = $label;
+                }
+            }
+        ?>
+
+        <div class="mb-4">
+            <h3 class="text-[10px] font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-1 mb-2">GESTIUNE VEHICUL (ECHIPAMENTE PREZENTE)</h3>
+            <div class="grid grid-cols-4 gap-2">
+                <?php foreach ($vehicleItems as $key => $label): 
+                    $val = $report[$key] ?? 0;
+                    $isPresent = is_numeric($val) ? $val > 0 : !empty($val);
+                ?>
+                <div class="flex items-center space-x-2 p-2 rounded-lg <?php echo $isPresent ? 'bg-indigo-50 border border-indigo-100' : 'bg-slate-50 border border-slate-100 opacity-50'; ?>">
+                    <div class="w-5 h-5 rounded border border-slate-300 flex items-center justify-center <?php echo $isPresent ? 'bg-indigo-600 border-indigo-600' : ''; ?>">
+                        <?php if ($isPresent): ?>
+                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                        <?php endif; ?>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-bold text-slate-700 leading-tight"><?php echo $label; ?></span>
+                        <?php if (strpos($key, 'expiry') !== false && !empty($report[$key])): ?>
+                            <span class="text-[8px] text-slate-500"><?php echo date('d.m.Y', strtotime($report[$key])); ?></span>
+                        <?php elseif (is_numeric($val) && $val > 1): ?>
+                            <span class="text-[8px] text-slate-500"><?php echo $val; ?> buc.</span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+        <?php if (!empty($driverItems)): ?>
+        <div class="mb-4">
+            <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-1 mb-2">GESTIUNE PERSONALĂ ȘOFER (NU APARȚIN VEHICULULUI)</h3>
+            <div class="grid grid-cols-4 gap-2">
+                <?php foreach ($driverItems as $key => $label): ?>
+                <div class="flex items-center space-x-2 p-2 rounded-lg bg-slate-50 border border-slate-100">
+                    <div class="w-5 h-5 rounded border border-slate-200 flex items-center justify-center bg-slate-200">
+                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    </div>
+                    <span class="text-[10px] font-medium text-slate-400 leading-tight"><?php echo $label; ?></span>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <p class="text-[9px] text-slate-400 mt-1 italic leading-tight">Obiectele de mai sus sunt în gestiunea directă a șoferului și nu fac obiectul predării/primirii vehiculului conform configurării reglementate de companie.</p>
+        </div>
+        <?php endif; ?>
+
         <div class="mb-4">
             <h3 class="text-[10px] font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-100 pb-1 mb-1">DOCUMENTE PREZENTE ÎN VEHICUL</h3>
             <div class="grid grid-cols-4 gap-2">

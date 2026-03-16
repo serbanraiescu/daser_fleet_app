@@ -110,23 +110,40 @@
                 <?php if (empty($expiringDocs)): ?>
                     <p class="text-sm text-slate-500 text-center py-4 italic">All documents are up to date.</p>
                 <?php else: ?>
+                    <?php 
+                        $eqConfig = json_decode($tenant['equipment_config'] ?? '[]', true);
+                    ?>
                     <?php foreach ($expiringDocs as $veh): ?>
                         <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                            <div class="font-bold text-slate-900 text-sm mb-3"><?php echo htmlspecialchars($veh['license_plate']); ?></div>
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="font-bold text-slate-900 text-sm"><?php echo htmlspecialchars($veh['entity_label']); ?></div>
+                                <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded border <?php echo $veh['source_type'] === 'driver' ? 'bg-indigo-50 border-indigo-100 text-indigo-600' : 'bg-slate-100 border-slate-200 text-slate-500'; ?>">
+                                    <?php echo $veh['source_type'] === 'driver' ? 'ȘOFER' : 'MAȘINĂ'; ?>
+                                </span>
+                            </div>
                             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
                                 <?php 
                                 $today = date('Y-m-d'); 
                                 $limit = date('Y-m-d', strtotime('+30 days')); 
-                                $checks = [
-                                    'RCA' => $veh['expiry_rca'], 
-                                    'ITP' => $veh['expiry_itp'], 
-                                    'RO' => $veh['expiry_rovigneta'],
-                                    'TRUSĂ' => $veh['medical_kit_expiry'],
-                                    'STING.' => $veh['extinguisher_expiry']
-                                ];
+                                
+                                // Map display labels to DB keys and their ownership rules
+                                $checks = [];
+                                if ($veh['source_type'] === 'vehicle') {
+                                    $checks['RCA'] = ['val' => $veh['expiry_rca'], 'owned' => true];
+                                    $checks['ITP'] = ['val' => $veh['expiry_itp'], 'owned' => true];
+                                    $checks['RO'] = ['val' => $veh['expiry_rovigneta'], 'owned' => true];
+                                    $checks['TRUSĂ'] = ['val' => $veh['medical_kit_expiry'], 'owned' => ($eqConfig['medical_kit'] ?? 'vehicle') === 'vehicle'];
+                                    $checks['STING.'] = ['val' => $veh['extinguisher_expiry'], 'owned' => ($eqConfig['extinguisher'] ?? 'vehicle') === 'vehicle'];
+                                } else {
+                                    $checks['TRUSĂ'] = ['val' => $veh['medical_kit_expiry'], 'owned' => ($eqConfig['medical_kit'] ?? 'vehicle') === 'driver'];
+                                    $checks['STING.'] = ['val' => $veh['extinguisher_expiry'], 'owned' => ($eqConfig['extinguisher'] ?? 'vehicle') === 'driver'];
+                                }
                                 ?>
-                                <?php foreach ($checks as $label => $val): ?>
+                                <?php foreach ($checks as $label => $info): ?>
                                     <?php 
+                                        if (!$info['owned']) continue;
+                                        
+                                        $val = $info['val'];
                                         $isEquipment = in_array($label, ['TRUSĂ', 'STING.']);
                                         $isMissing = empty($val);
                                         $isExpiring = $val && $val <= $limit;

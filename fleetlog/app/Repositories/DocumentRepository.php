@@ -11,7 +11,7 @@ class DocumentRepository
         return DB::fetchAll("
             SELECT d.*, v.license_plate, v.make, v.model, u.name as driver_name
             FROM vehicle_handover_reports d
-            JOIN vehicles v ON d.vehicle_id = v.id
+            LEFT JOIN vehicles v ON d.vehicle_id = v.id
             JOIN users u ON d.driver_id = u.id
             WHERE d.tenant_id = ?
             ORDER BY d.created_at DESC
@@ -22,19 +22,20 @@ class DocumentRepository
     {
         return DB::fetch("
             SELECT d.*, v.license_plate, v.make, v.model, u.name as driver_name, u.cnp, u.license_series, u.license_expiry,
-                   t.name as tenant_name, t.cui as tenant_cui, t.address as tenant_address, t.reg_com as tenant_reg_com, t.county as tenant_county, t.city as tenant_city
+                   t.name as tenant_name, t.cui as tenant_cui, t.address as tenant_address, t.reg_com as tenant_reg_com, 
+                   t.county as tenant_county, t.city as tenant_city, t.equipment_config
             FROM vehicle_handover_reports d
-            JOIN vehicles v ON d.vehicle_id = v.id
+            LEFT JOIN vehicles v ON d.vehicle_id = v.id
             JOIN users u ON d.driver_id = u.id
             JOIN tenants t ON d.tenant_id = t.id
             WHERE d.id = ? AND d.tenant_id = ?
         ", [$id, $tenantId]);
     }
 
-    public function generateDocumentNumber(): string
+    public function generateDocumentNumber(string $typePrefix = 'PV'): string
     {
         $year = date('Y');
-        $prefix = "PV-$year-";
+        $prefix = "$typePrefix-$year-";
         
         $last = DB::fetch("
             SELECT document_number 
