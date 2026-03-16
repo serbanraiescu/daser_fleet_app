@@ -946,7 +946,78 @@ class TenantController extends BaseController
                 $summary['extinguishers']++;
             }
 
-            if (!empty($missing)) {\n                $shoppingList[] = [\n                    'vehicle' => $vehicle['make'] . ' ' . $vehicle['model'] . ' (' . $vehicle['license_plate'] . ')',\n                    'missing' => $missing\n                ];\n            }\n        }\n\n        // Check Driver Custody\n        $tenantRaw = DB::fetch(\"SELECT equipment_config FROM tenants WHERE id = ?\", [$tenantId]);\n        $eqConfig = json_decode($tenantRaw['equipment_config'] ?? '[]', true);\n        \n        $userRepo = new \\FleetLog\\App\\Repositories\\UserRepository();\n        $drivers = $userRepo->getByTenantAndRole($tenantId, 'driver');\n\n        foreach ($drivers as $driver) {\n            $missing = [];\n            \n            if (($eqConfig['triangles'] ?? 'vehicle') === 'driver' && (int)$driver['has_triangles'] < 2) {\n                $count = 2 - (int)$driver['has_triangles'];\n                $missing[] = \"Triunghiuri: Lipsește $count buc.\";\n                $summary['triangles'] += $count;\n            }\n\n            if (($eqConfig['vest'] ?? 'vehicle') === 'driver' && (int)$driver['has_vest'] < 1) {\n                $missing[] = \"Vestă Reflectorizantă\";\n                $summary['vests']++;\n            }\n\n            if (($eqConfig['jack'] ?? 'vehicle') === 'driver' && empty($driver['has_jack'])) {\n                $missing[] = \"Cric\";\n                $summary['jacks']++;\n            }\n\n            if (($eqConfig['tow_rope'] ?? 'vehicle') === 'driver' && empty($driver['has_tow_rope'])) {\n                $missing[] = \"Șufă Tractare\";\n                $summary['tow_ropes']++;\n            }\n\n            if (($eqConfig['jumper_cables'] ?? 'vehicle') === 'driver' && empty($driver['has_jumper_cables'])) {\n                $missing[] = \"Cabluri Curent\";\n                $summary['jumper_cables']++;\n            }\n\n            if (($eqConfig['spare_wheel'] ?? 'vehicle') === 'driver' && isset($driver['has_spare_wheel']) && !$driver['has_spare_wheel']) {\n                $missing[] = \"Roată Rezervă\";\n                $summary['spare_wheels']++;\n            }\n\n            if (($eqConfig['medical_kit'] ?? 'vehicle') === 'driver') {\n                if (empty($driver['medical_kit_expiry']) || $driver['medical_kit_expiry'] < date('Y-m-d')) {\n                    $status = empty($driver['medical_kit_expiry']) ? \"Lipsă\" : \"Expirată (\" . date('d.m.y', strtotime($driver['medical_kit_expiry'])) . \")\";\n                    $missing[] = \"Trusă Medicală ($status)\";\n                    $summary['med_kits']++;\n                }\n            }\n\n            if (($eqConfig['extinguisher'] ?? 'vehicle') === 'driver') {\n                if (empty($driver['extinguisher_expiry']) || $driver['extinguisher_expiry'] < date('Y-m-d')) {\n                    $status = empty($driver['extinguisher_expiry']) ? \"Lipsă\" : \"Expirat (\" . date('d.m.y', strtotime($driver['extinguisher_expiry'])) . \")\";\n                    $missing[] = \"Stingător ($status)\";\n                    $summary['extinguishers']++;\n                }\n            }\n\n            if (!empty($missing)) {\n                $shoppingList[] = [\n                    'vehicle' => 'ȘOFER: ' . $driver['name'],\n                    'missing' => $missing\n                ];\n            }\n        }
+            if (!empty($missing)) {
+                $shoppingList[] = [
+                    'vehicle' => $vehicle['make'] . ' ' . $vehicle['model'] . ' (' . $vehicle['license_plate'] . ')',
+                    'missing' => $missing
+                ];
+            }
+        }
+
+        // Check Driver Custody
+        $tenantRaw = DB::fetch("SELECT equipment_config FROM tenants WHERE id = ?", [$tenantId]);
+        $eqConfig = json_decode($tenantRaw['equipment_config'] ?? '[]', true);
+        
+        $userRepo = new \FleetLog\App\Repositories\UserRepository();
+        $drivers = $userRepo->getByTenantAndRole($tenantId, 'driver');
+
+        foreach ($drivers as $driver) {
+            $missing = [];
+            
+            if (($eqConfig['triangles'] ?? 'vehicle') === 'driver' && (int)$driver['has_triangles'] < 2) {
+                $count = 2 - (int)$driver['has_triangles'];
+                $missing[] = "Triunghiuri: Lipsește $count buc.";
+                $summary['triangles'] += $count;
+            }
+
+            if (($eqConfig['vest'] ?? 'vehicle') === 'driver' && (int)$driver['has_vest'] < 1) {
+                $missing[] = "Vestă Reflectorizantă";
+                $summary['vests']++;
+            }
+
+            if (($eqConfig['jack'] ?? 'vehicle') === 'driver' && empty($driver['has_jack'])) {
+                $missing[] = "Cric";
+                $summary['jacks']++;
+            }
+
+            if (($eqConfig['tow_rope'] ?? 'vehicle') === 'driver' && empty($driver['has_tow_rope'])) {
+                $missing[] = "Șufă Tractare";
+                $summary['tow_ropes']++;
+            }
+
+            if (($eqConfig['jumper_cables'] ?? 'vehicle') === 'driver' && empty($driver['has_jumper_cables'])) {
+                $missing[] = "Cabluri Curent";
+                $summary['jumper_cables']++;
+            }
+
+            if (($eqConfig['spare_wheel'] ?? 'vehicle') === 'driver' && isset($driver['has_spare_wheel']) && !$driver['has_spare_wheel']) {
+                $missing[] = "Roată Rezervă";
+                $summary['spare_wheels']++;
+            }
+
+            if (($eqConfig['medical_kit'] ?? 'vehicle') === 'driver') {
+                if (empty($driver['medical_kit_expiry']) || $driver['medical_kit_expiry'] < date('Y-m-d')) {
+                    $status = empty($driver['medical_kit_expiry']) ? "Lipsă" : "Expirată (" . date('d.m.y', strtotime($driver['medical_kit_expiry'])) . ")";
+                    $missing[] = "Trusă Medicală ($status)";
+                    $summary['med_kits']++;
+                }
+            }
+
+            if (($eqConfig['extinguisher'] ?? 'vehicle') === 'driver') {
+                if (empty($driver['extinguisher_expiry']) || $driver['extinguisher_expiry'] < date('Y-m-d')) {
+                    $status = empty($driver['extinguisher_expiry']) ? "Lipsă" : "Expirat (" . date('d.m.y', strtotime($driver['extinguisher_expiry'])) . ")";
+                    $missing[] = "Stingător ($status)";
+                    $summary['extinguishers']++;
+                }
+            }
+
+            if (!empty($missing)) {
+                $shoppingList[] = [
+                    'vehicle' => 'ȘOFER: ' . $driver['name'],
+                    'missing' => $missing
+                ];
+            }
+        }
 
         $this->render('tenant/reports/inventory_shopping_list', [
             'title' => 'Inventory Shopping List',
