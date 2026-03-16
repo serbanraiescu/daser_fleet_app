@@ -83,6 +83,10 @@ $router->add('GET', '/tenant/documents', 'TenantController@documents', [\FleetLo
 $router->add('GET', '/tenant/documents/handover/add', 'TenantController@showHandoverForm', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('POST', '/tenant/documents/handover/add', 'TenantController@generateProtocol', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('GET', '/tenant/documents/handover/view/{id}', 'TenantController@viewProtocol', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('GET', '/tenant/documents/inventory/add', 'TenantController@showInventoryProtocol', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('POST', '/tenant/documents/inventory/add', 'TenantController@generateInventoryProtocol', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('GET', '/tenant/documents/inventory/view/{id}', 'TenantController@viewInventoryProtocol', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+
 
 // Vehicle Events (BETA)
 $router->add('GET', '/tenant/vehicle-events', 'VehicleEventController@index', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
