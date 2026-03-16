@@ -4,106 +4,203 @@
 </div>
 
 <?php if (isset($_GET['success'])): ?>
-    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-        Settings updated successfully!
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 flex items-center shadow-sm">
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <span>Settings updated successfully!</span>
     </div>
 <?php endif; ?>
 
-<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden max-w-lg">
-    <form action="/tenant/settings" method="POST" class="p-6 space-y-4">
-        <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">Firm Timezone</label>
-            <select name="timezone" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                <?php foreach ($timezones as $tz): ?>
-                    <option value="<?php echo $tz; ?>" <?php echo $tz === ($tenant['timezone'] ?? 'Europe/Bucharest') ? 'selected' : ''; ?>>
-                        <?php echo $tz; ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-            <p class="mt-1 text-xs text-slate-500 italic">All reports and logs will use this timezone.</p>
-        </div>
-
-        <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">Interface Language</label>
-            <select name="language" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                <option value="ro" <?php echo ($tenant['language'] ?? 'ro') === 'ro' ? 'selected' : ''; ?>>Română</option>
-                <option value="en" <?php echo ($tenant['language'] ?? 'ro') === 'en' ? 'selected' : ''; ?>>English</option>
-            </select>
-            <p class="mt-1 text-xs text-slate-500 italic">The administrative interface will use this language.</p>
-        </div>
-
-        <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">Custom Trip Types</label>
-            <textarea name="trip_types" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="CURSE, NAVETA, SERVICE, ALTE"><?php echo \htmlspecialchars($tenant['trip_types'] ?? ''); ?></textarea>
-            <p class="mt-1 text-xs text-slate-500 italic">Separate types with commas.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Contact Phone</label>
-                <input type="text" name="contact_phone" value="<?php echo \htmlspecialchars($tenant['contact_phone'] ?? ''); ?>" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Notification Phone</label>
-                <input type="text" name="notification_phone" value="<?php echo \htmlspecialchars($tenant['notification_phone'] ?? ''); ?>" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-            </div>
-        </div>
-
-        <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">Additional Notification Emails</label>
-            <textarea name="notification_emails" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="manager@company.com, office@company.com"><?php echo \htmlspecialchars($tenant['notification_emails'] ?? ''); ?></textarea>
-            <p class="mt-1 text-xs text-slate-500 italic">Separate multiple emails with commas. These recipients will also receive expiry alerts.</p>
-        </div>
-
-        <div class="pt-6 border-t border-slate-100">
-            <h3 class="text-sm font-bold text-slate-800 mb-4 uppercase tracking-wider">Inventory Assignment Mapping</h3>
-            <p class="text-xs text-slate-500 mb-4">Choose where each mandatory item is managed. Items assigned to <b>Driver</b> will generate alerts on the driver's profile and follow them across vehicles.</p>
-            
-            <?php 
-                $eqConfig = json_decode($tenant['equipment_config'] ?? '[]', true);
-                $items = [
-                    'triangles' => 'Triunghiuri',
-                    'vest' => 'Vestă',
-                    'jack' => 'Cric',
-                    'medical_kit' => 'Trusă Medicală',
-                    'tow_rope' => 'Șufă Tractare',
-                    'jumper_cables' => 'Cabluri Curent',
-                    'extinguisher' => 'Stingător',
-                    'spare_wheel' => 'Roată Rezervă'
-                ];
-            ?>
-            <div class="bg-slate-50 rounded-lg border border-slate-200 overflow-hidden">
-                <table class="w-full text-xs text-left">
-                    <thead class="bg-slate-100 font-bold text-slate-600">
-                        <tr>
-                            <th class="px-3 py-2">Item Name</th>
-                            <th class="px-3 py-2 text-center">Vehicle</th>
-                            <th class="px-3 py-2 text-center">Driver</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-200">
-                        <?php foreach ($items as $key => $label): 
-                            $val = $eqConfig[$key] ?? 'vehicle';
-                        ?>
-                            <tr>
-                                <td class="px-3 py-2 font-medium text-slate-700"><?php echo $label; ?></td>
-                                <td class="px-3 py-2 text-center">
-                                    <input type="radio" name="equipment_config[<?php echo $key; ?>]" value="vehicle" <?php echo $val === 'vehicle' ? 'checked' : ''; ?> class="text-blue-600 focus:ring-blue-500">
-                                </td>
-                                <td class="px-3 py-2 text-center">
-                                    <input type="radio" name="equipment_config[<?php echo $key; ?>]" value="driver" <?php echo $val === 'driver' ? 'checked' : ''; ?> class="text-blue-600 focus:ring-blue-500">
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="pt-4 border-t border-slate-100 flex justify-end">
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors">
-                Save Settings
-            </button>
-        </div>
-    </form>
+<!-- Tabs Navigation -->
+<div class="mb-8 border-b border-slate-200">
+    <nav class="flex space-x-8" id="settings-tabs">
+        <button onclick="switchTab('general')" class="tab-btn border-b-2 border-indigo-500 py-4 px-1 text-sm font-black text-indigo-600 transition-all uppercase tracking-wider" id="tab-general">
+            Configurare Generală
+        </button>
+        <button onclick="switchTab('notifications')" class="tab-btn border-b-2 border-transparent py-4 px-1 text-sm font-medium text-slate-500 hover:text-slate-700 hover:border-slate-300 transition-all uppercase tracking-wider" id="tab-notifications">
+            Notificări & Contact
+        </button>
+        <button onclick="switchTab('inventory')" class="tab-btn border-b-2 border-transparent py-4 px-1 text-sm font-medium text-slate-500 hover:text-slate-700 hover:border-slate-300 transition-all uppercase tracking-wider" id="tab-inventory">
+            Gestiune Inventar
+        </button>
+    </nav>
 </div>
+
+<form action="/tenant/settings" method="POST" class="space-y-8">
+    
+    <!-- General Settings Section -->
+    <div id="section-general" class="tab-content">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-8 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Firm Timezone</label>
+                        <select name="timezone" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none font-medium">
+                            <?php foreach ($timezones as $tz): ?>
+                                <option value="<?php echo $tz; ?>" <?php echo $tz === ($tenant['timezone'] ?? 'Europe/Bucharest') ? 'selected' : ''; ?>>
+                                    <?php echo $tz; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <p class="mt-2 text-xs text-slate-400 italic">All reports and logs will use this timezone.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Interface Language</label>
+                        <select name="language" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none font-medium">
+                            <option value="ro" <?php echo ($tenant['language'] ?? 'ro') === 'ro' ? 'selected' : ''; ?>>Română</option>
+                            <option value="en" <?php echo ($tenant['language'] ?? 'ro') === 'en' ? 'selected' : ''; ?>>English</option>
+                        </select>
+                        <p class="mt-2 text-xs text-slate-400 italic">The administrative interface will use this language.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Custom Trip Types</label>
+                    <textarea name="trip_types" rows="3" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none font-medium" placeholder="LIVRARI, NAVETA, SERVICE, UZ PERSONAL"><?php echo \htmlspecialchars($tenant['trip_types'] ?? ''); ?></textarea>
+                    <p class="mt-2 text-xs text-slate-400 italic">Separate types with commas. These appear in the travel logs (foi de parcurs).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Section -->
+    <div id="section-notifications" class="tab-content hidden">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-8 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Contact Phone</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                            </span>
+                            <input type="text" name="contact_phone" value="<?php echo \htmlspecialchars($tenant['contact_phone'] ?? ''); ?>" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none font-medium">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Notification Phone (SMS Alerts)</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                            </span>
+                            <input type="text" name="notification_phone" value="<?php echo \htmlspecialchars($tenant['notification_phone'] ?? ''); ?>" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none font-medium">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Additional Notification Emails</label>
+                    <textarea name="notification_emails" rows="3" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none font-medium" placeholder="manager@company.com, office@company.com"><?php echo \htmlspecialchars($tenant['notification_emails'] ?? ''); ?></textarea>
+                    <p class="mt-2 text-xs text-slate-400 italic">Separate multiple emails with commas. These recipients will also receive expiry and damage alerts.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Section -->
+    <div id="section-inventory" class="tab-content hidden">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-8">
+                <div class="flex items-center space-x-4 mb-8">
+                    <div class="p-3 bg-indigo-50 rounded-xl text-indigo-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-black text-slate-800 uppercase tracking-tight">Assignment Mapping</h3>
+                        <p class="text-sm text-slate-500">Choose who is responsible for each mandatory item. Items assigned to <b>Driver</b> generate personal alerts.</p>
+                    </div>
+                </div>
+                
+                <?php 
+                    $eqConfig = json_decode($tenant['equipment_config'] ?? '[]', true);
+                    $items = [
+                        'triangles' => 'Triunghiuri Reflectorizante',
+                        'vest' => 'Vestă Reflectorizantă',
+                        'jack' => 'Cric',
+                        'medical_kit' => 'Trusă Medicală',
+                        'tow_rope' => 'Șufă Tractare',
+                        'jumper_cables' => 'Cabluri Curent',
+                        'extinguisher' => 'Stingător',
+                        'spare_wheel' => 'Roată Rezervă'
+                    ];
+                ?>
+                <div class="border border-slate-100 rounded-2xl overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-100">
+                                <th class="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Item Name / Echipament</th>
+                                <th class="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Gestiune Vehicul</th>
+                                <th class="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Gestiune Șofer</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50">
+                            <?php foreach ($items as $key => $label): 
+                                $val = $eqConfig[$key] ?? 'vehicle';
+                            ?>
+                                <tr class="hover:bg-slate-50/50 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-700"><?php echo $label; ?></td>
+                                    <td class="px-6 py-4 text-center">
+                                        <label class="inline-flex items-center cursor-pointer group">
+                                            <input type="radio" name="equipment_config[<?php echo $key; ?>]" value="vehicle" <?php echo $val === 'vehicle' ? 'checked' : ''; ?> class="w-5 h-5 text-indigo-600 border-slate-300 focus:ring-indigo-500">
+                                            <span class="ml-2 text-xs font-bold text-slate-400 group-hover:text-indigo-600 transition-colors uppercase">Masină</span>
+                                        </label>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <label class="inline-flex items-center cursor-pointer group">
+                                            <input type="radio" name="equipment_config[<?php echo $key; ?>]" value="driver" <?php echo $val === 'driver' ? 'checked' : ''; ?> class="w-5 h-5 text-indigo-600 border-slate-300 focus:ring-indigo-500">
+                                            <span class="ml-2 text-xs font-bold text-slate-400 group-hover:text-indigo-600 transition-colors uppercase">Șofer</span>
+                                        </label>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Footer with Save Button -->
+    <div class="flex justify-end pt-8">
+        <button type="submit" class="group relative inline-flex items-center justify-center px-8 py-4 font-black text-white bg-indigo-600 rounded-2xl overflow-hidden shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all hover:-translate-y-1">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+            <?php echo __('save_changes') ?? 'Salvează Configurarea'; ?>
+        </button>
+    </div>
+</form>
+
+<script>
+function switchTab(tabId) {
+    // Hide all contents
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+    
+    // Show active content
+    document.getElementById('section-' + tabId).classList.remove('hidden');
+    
+    // Update button styles
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('border-indigo-500', 'text-indigo-600', 'font-black');
+        btn.classList.add('border-transparent', 'text-slate-500', 'font-medium');
+    });
+    
+    // Set active button style
+    const activeBtn = document.getElementById('tab-' + tabId);
+    activeBtn.classList.remove('border-transparent', 'text-slate-500', 'font-medium');
+    activeBtn.classList.add('border-indigo-500', 'text-indigo-600', 'font-black');
+}
+
+// Check for deep link or persistent tab
+window.onload = function() {
+    // Optional: could use localStorage to persist tab over refresh
+    const lastTab = localStorage.getItem('last_settings_tab');
+    if (lastTab) switchTab(lastTab);
+};
+
+// Update localStorage on switch
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const id = this.id.replace('tab-', '');
+        localStorage.setItem('last_settings_tab', id);
+    });
+});
+</script>
