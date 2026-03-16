@@ -147,14 +147,17 @@ class TenantController extends BaseController
 
     public function vehicles(): void
     {
+        $tenantId = Auth::tenantId();
         $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
-        $activeVehicles = $vehicleRepo->getAllNonArchivedByTenant(Auth::tenantId());
-        $archivedVehicles = $vehicleRepo->getArchivedByTenant(Auth::tenantId());
+        $activeVehicles = $vehicleRepo->getAllNonArchivedByTenant($tenantId);
+        $archivedVehicles = $vehicleRepo->getArchivedByTenant($tenantId);
+        $tenant = DB::fetch("SELECT * FROM tenants WHERE id = ?", [$tenantId]);
 
         $this->render('tenant/vehicles/index', [
             'title' => 'Manage Vehicles',
             'vehicles' => $activeVehicles,
-            'archivedVehicles' => $archivedVehicles
+            'archivedVehicles' => $archivedVehicles,
+            'tenant' => $tenant
         ]);
     }
 

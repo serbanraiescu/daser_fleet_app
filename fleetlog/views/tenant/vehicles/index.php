@@ -1,7 +1,6 @@
-<?php
-// Ensure variables exist even if empty
 $vehicles = $vehicles ?? [];
 $archivedVehicles = $archivedVehicles ?? [];
+$eqConfig = json_decode($tenant['equipment_config'] ?? '{}', true);
 ?>
 
 <div class="mb-6 flex justify-between items-center">
@@ -115,46 +114,67 @@ $archivedVehicles = $archivedVehicles ?? [];
                                     <span class="font-bold">ACTE:</span>
                                     <span class="<?php echo ($vehicle['expiry_rca'] && $vehicle['expiry_rca'] < date('Y-m-d')) ? 'text-red-600 font-black' : ''; ?>"><?php echo $vehicle['expiry_rca'] ? date('d.m.y', strtotime($vehicle['expiry_rca'])) : 'N/A'; ?></span>
                                 </div>
+                                <?php if (($eqConfig['medical_kit'] ?? 'vehicle') === 'vehicle'): ?>
                                 <div class="flex items-center justify-between border-t border-slate-50 pt-1">
                                     <span class="font-bold">TRUSĂ:</span>
                                     <span class="<?php echo (!$vehicle['medical_kit_expiry'] || $vehicle['medical_kit_expiry'] < date('Y-m-d')) ? 'text-red-600 font-black' : 'text-blue-600'; ?>">
                                         <?php echo $vehicle['medical_kit_expiry'] ? date('d.m.y', strtotime($vehicle['medical_kit_expiry'])) : 'GOL'; ?>
                                     </span>
                                 </div>
-                                <div class="flex items-center justify-between">
+                                <?php endif; ?>
+                                <?php if (($eqConfig['extinguisher'] ?? 'vehicle') === 'vehicle'): ?>
+                                <div class="flex items-center justify-between border-t border-slate-50 pt-1">
                                     <span class="font-bold">STING:</span>
                                     <span class="<?php echo (!$vehicle['extinguisher_expiry'] || $vehicle['extinguisher_expiry'] < date('Y-m-d')) ? 'text-red-600 font-black' : 'text-blue-600'; ?>">
                                         <?php echo $vehicle['extinguisher_expiry'] ? date('d.m.y', strtotime($vehicle['extinguisher_expiry'])) : 'GOL'; ?>
                                     </span>
                                 </div>
+                                <?php endif; ?>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center space-x-2">
                                 <!-- Triangles -->
+                                <?php if (($eqConfig['triangles'] ?? 'vehicle') === 'vehicle'): ?>
                                 <div title="Triunghiuri: <?php echo $vehicle['has_triangles'] ?? 0; ?>" class="w-10 h-10 rounded-lg flex items-center justify-center <?php echo ($vehicle['has_triangles'] ?? 0) > 0 ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-slate-50 text-slate-300 border border-slate-100'; ?>">
                                     <span class="text-xs font-black"><?php echo ($vehicle['has_triangles'] ?? 0); ?>Δ</span>
                                 </div>
+                                <?php endif; ?>
+                                
                                 <!-- Vests -->
+                                <?php if (($eqConfig['vest'] ?? 'vehicle') === 'vehicle'): ?>
                                 <div title="Veste: <?php echo $vehicle['has_vest'] ?? 0; ?>" class="w-10 h-10 rounded-lg flex items-center justify-center <?php echo ($vehicle['has_vest'] ?? 0) > 0 ? 'bg-amber-50 text-amber-600 border border-amber-100' : 'bg-slate-50 text-slate-300 border border-slate-100'; ?>">
                                     <span class="text-xs font-black"><?php echo ($vehicle['has_vest'] ?? 0); ?>V</span>
                                 </div>
+                                <?php endif; ?>
+
                                 <!-- Jack -->
+                                <?php if (($eqConfig['jack'] ?? 'vehicle') === 'vehicle'): ?>
                                 <div title="Cric: <?php echo !empty($vehicle['has_jack']) ? 'Da' : 'Nu'; ?>" class="w-10 h-10 rounded-lg flex items-center justify-center <?php echo !empty($vehicle['has_jack']) ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-slate-50 text-slate-300 border border-slate-100'; ?>">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M12 21l-8-8 8-8 8 8-8 8zM12 5v16" /></svg>
                                 </div>
+                                <?php endif; ?>
+
                                 <!-- Spare Wheel -->
+                                <?php if (($eqConfig['spare_wheel'] ?? 'vehicle') === 'vehicle'): ?>
                                 <div title="Roată Rezervă: <?php echo (isset($vehicle['has_spare_wheel']) ? (bool)$vehicle['has_spare_wheel'] : true) ? 'Da' : 'Nu'; ?>" class="w-10 h-10 rounded-lg flex items-center justify-center <?php echo (isset($vehicle['has_spare_wheel']) ? (bool)$vehicle['has_spare_wheel'] : true) ? 'bg-indigo-50 text-indigo-600 border border-indigo-100' : 'bg-slate-50 text-slate-300 border border-slate-100'; ?>">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="2" /><path stroke-linecap="round" d="M12 3v6M12 15v6M3 12h6M15 12h6" /></svg>
                                 </div>
+                                <?php endif; ?>
+
                                 <!-- Tow Rope -->
+                                <?php if (($eqConfig['tow_rope'] ?? 'vehicle') === 'vehicle'): ?>
                                 <div title="Șufă Tractare: <?php echo !empty($vehicle['has_tow_rope']) ? 'Da' : 'Nu'; ?>" class="w-10 h-10 rounded-lg flex items-center justify-center <?php echo !empty($vehicle['has_tow_rope']) ? 'bg-cyan-50 text-cyan-600 border border-cyan-100' : 'bg-slate-50 text-slate-300 border border-slate-100'; ?>">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /><path d="M9 3h6M9 21h6" stroke-width="1"/></svg>
                                 </div>
+                                <?php endif; ?>
+
                                 <!-- Jumper Cables -->
+                                <?php if (($eqConfig['jumper_cables'] ?? 'vehicle') === 'vehicle'): ?>
                                 <div title="Cabluri Curent: <?php echo !empty($vehicle['has_jumper_cables']) ? 'Da' : 'Nu'; ?>" class="w-10 h-10 rounded-lg flex items-center justify-center <?php echo !empty($vehicle['has_jumper_cables']) ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'bg-slate-50 text-slate-300 border border-slate-100'; ?>">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9h14M5 15h14" /></svg>
                                 </div>
+                                <?php endif; ?>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
