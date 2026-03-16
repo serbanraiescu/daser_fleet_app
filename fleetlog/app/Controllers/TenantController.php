@@ -757,11 +757,19 @@ class TenantController extends BaseController
     {
         $tenantId = Auth::tenantId();
         $docRepo = new \FleetLog\App\Repositories\DocumentRepository();
+        $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
+        
+        $vehicleId = (int)$_POST['vehicle_id'];
+        $vehicle = $vehicleRepo->find($vehicleId);
+
+        if (!$vehicle || (int)$vehicle['tenant_id'] !== $tenantId) {
+            $this->redirect('/tenant/documents/handover/add?error=invalid_vehicle');
+        }
 
         $data = [
             'tenant_id' => $tenantId,
             'document_number' => $docRepo->generateDocumentNumber(),
-            'vehicle_id' => (int)$_POST['vehicle_id'],
+            'vehicle_id' => $vehicleId,
             'driver_id' => (int)$_POST['driver_id'],
             'vehicle_plate' => $_POST['vehicle_plate'],
             'vehicle_model' => $_POST['vehicle_model'],
@@ -773,6 +781,14 @@ class TenantController extends BaseController
             'doc_rovinieta' => isset($_POST['doc_rovinieta']) ? 1 : 0,
             'aesthetic_condition' => $_POST['aesthetic_condition'],
             'mechanical_condition' => $_POST['mechanical_condition'],
+            'has_triangles' => $vehicle['has_triangles'] ?? 0,
+            'has_vest' => $vehicle['has_vest'] ?? 0,
+            'has_jack' => $vehicle['has_jack'] ?? 0,
+            'has_tow_rope' => $vehicle['has_tow_rope'] ?? 0,
+            'has_jumper_cables' => $vehicle['has_jumper_cables'] ?? 0,
+            'has_spare_wheel' => $vehicle['has_spare_wheel'] ?? 0,
+            'medical_kit_expiry' => $vehicle['medical_kit_expiry'] ?? null,
+            'extinguisher_expiry' => $vehicle['extinguisher_expiry'] ?? null,
             'notes' => $_POST['notes'] ?? ''
         ];
 
