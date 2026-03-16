@@ -15,4 +15,4 @@ if (!in_array('user_id', $columnNames)) {
 // Ensure vehicle_id is nullable
 DB::query("ALTER TABLE expiry_alerts_track MODIFY vehicle_id INT NULL");
 
-return "Migration 040 complete: expiry_alerts_track now supports driver alerts (idempotent).";
+return "SELECT 'Migration 040 complete' as result;";
