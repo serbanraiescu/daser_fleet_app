@@ -238,7 +238,8 @@ class SMSService
                         'driver_name' => $assetType === 'Șofer' ? $assetName : 'N/A',
                         'company_name' => $tenant['name'],
                         'asset_type' => $assetType,
-                        'phone_number' => $tenant['phone']
+                        'phone_number' => $tenant['phone'],
+                        'vehicle_plate' => $assetType === 'Vehicul' ? $assetName : 'N/A'
                     ];
 
                     if (self::enqueueFromTemplate($tenant['phone'], 'universal_expiry', $data)) {
