@@ -141,6 +141,7 @@ class SMSService
         $tenants = [];
         foreach ($tenantsRaw as $t) {
             $tenants[$t['id']] = [
+                'id' => (int)$t['id'],
                 'name' => $t['name'],
                 'phone' => !empty($t['notification_phone']) ? $t['notification_phone'] : $t['contact_phone'],
                 'config' => json_decode($t['equipment_config'] ?? '[]', true)
