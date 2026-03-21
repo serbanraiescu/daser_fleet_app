@@ -44,7 +44,11 @@ if (!flock($lockHandle, LOCK_EX | LOCK_NB)) {
 }
 
 // 4. Logging & Prep
-$logFile = __DIR__ . '/../logs/cron.log';
+$logDir = __DIR__ . '/../logs';
+if (!is_dir($logDir)) {
+    @mkdir($logDir, 0755, true);
+}
+$logFile = $logDir . '/cron.log';
 function logCron($task, $message, $status = 'INFO') {
     global $logFile;
     $entry = "[" . date('Y-m-d H:i:s') . "] [$status] [$task] $message\n";

@@ -157,7 +157,10 @@ class SMSService
 
         foreach ($expiringVehicles as $v) {
             $t = $tenants[$v['tenant_id']] ?? null;
-            if (!$t || empty($t['phone'])) continue;
+            if (!$t || empty($t['phone'])) {
+                if ($t) $skippedTenants[$t['name']] = true;
+                continue;
+            }
 
             $docTypes = [
                 'RCA' => $v['expiry_rca'],
@@ -175,7 +178,7 @@ class SMSService
 
             foreach ($docTypes as $type => $date) {
                 if (!$date) continue;
-                $this->processAlertMilestones($v['vehicle_id'], null, $type, $date, $v['license_plate'], 'Vehicul', $t, $alertDays, $enqueuedCount);
+                self::processAlertMilestones($v['vehicle_id'], null, $type, $date, $v['license_plate'], 'Vehicul', $t, $alertDays, $enqueuedCount);
             }
         }
 
@@ -188,7 +191,10 @@ class SMSService
 
         foreach ($expiringDrivers as $u) {
             $t = $tenants[$u['tenant_id']] ?? null;
-            if (!$t || empty($t['phone'])) continue;
+            if (!$t || empty($t['phone'])) {
+                if ($t) $skippedTenants[$t['name']] = true;
+                continue;
+            }
 
             $docTypes = [];
             if (($t['config']['medical_kit'] ?? 'vehicle') === 'driver') {
@@ -200,11 +206,11 @@ class SMSService
 
             foreach ($docTypes as $type => $date) {
                 if (!$date) continue;
-                $this->processAlertMilestones(null, $u['user_id'], $type, $date, $u['driver_name'], 'Șofer', $t, $alertDays, $enqueuedCount);
+                self::processAlertMilestones(null, $u['user_id'], $type, $date, $u['driver_name'], 'Șofer', $t, $alertDays, $enqueuedCount);
             }
         }
 
-        return [$enqueuedCount, array_unique($skippedTenants)];
+        return [$enqueuedCount, array_keys($skippedTenants)];
     }
 
     private static function processAlertMilestones($vehicleId, $userId, $type, $date, $assetName, $assetType, $tenant, $alertDays, &$enqueuedCount): void
