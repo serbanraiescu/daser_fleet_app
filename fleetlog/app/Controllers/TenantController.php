@@ -356,14 +356,25 @@ class TenantController extends BaseController
         $contactPhone = $_POST['contact_phone'] ?? null;
         $notificationPhone = $_POST['notification_phone'] ?? null;
         $notificationEmails = $_POST['notification_emails'] ?? null;
+        $signupEnabled = isset($_POST['signup_enabled']) ? 1 : 0;
         $equipmentConfig = $_POST['equipment_config'] ?? [];
         $equipmentJson = json_encode($equipmentConfig);
 
-        DB::query("UPDATE tenants SET timezone = ?, language = ?, trip_types = ?, contact_phone = ?, notification_phone = ?, notification_emails = ?, equipment_config = ? WHERE id = ?", [
-            $timezone, $language, $tripTypes, $contactPhone, $notificationPhone, $notificationEmails, $equipmentJson, $tenantId
+        DB::query("UPDATE tenants SET timezone = ?, language = ?, trip_types = ?, contact_phone = ?, notification_phone = ?, notification_emails = ?, signup_enabled = ?, equipment_config = ? WHERE id = ?", [
+            $timezone, $language, $tripTypes, $contactPhone, $notificationPhone, $notificationEmails, $signupEnabled, $equipmentJson, $tenantId
         ]);
 
         $this->redirect('/tenant/settings?success=1');
+    }
+
+    public function regenerateSignupToken(): void
+    {
+        $tenantId = \FleetLog\Core\Auth::tenantId();
+        $token = bin2hex(random_bytes(16));
+        
+        DB::query("UPDATE tenants SET signup_token = ? WHERE id = ?", [$token, $tenantId]);
+        
+        $this->redirect('/tenant/settings?success=token_regenerated');
     }
 
     public function showEditVehicle(int $id): void

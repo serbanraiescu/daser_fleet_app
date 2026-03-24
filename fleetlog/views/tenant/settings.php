@@ -22,6 +22,9 @@
         <button onclick="switchTab('inventory')" class="tab-btn border-b-2 border-transparent py-4 px-1 text-sm font-medium text-slate-500 hover:text-slate-700 hover:border-slate-300 transition-all uppercase tracking-wider" id="tab-inventory">
             Gestiune Inventar
         </button>
+        <button onclick="switchTab('onboarding')" class="tab-btn border-b-2 border-transparent py-4 px-1 text-sm font-medium text-slate-500 hover:text-slate-700 hover:border-slate-300 transition-all uppercase tracking-wider" id="tab-onboarding">
+            Self-Onboarding (BETA)
+        </button>
     </nav>
 </div>
 
@@ -98,64 +101,68 @@
     </div>
 
     <!-- Inventory Section -->
-    <div id="section-inventory" class="tab-content hidden">
+    <!-- Inventory Section -->
+    ... (omitted for brevity) ...
+    </div>
+
+    <!-- Onboarding Section -->
+    <div id="section-onboarding" class="tab-content hidden">
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="p-8">
-                <div class="flex items-center space-x-4 mb-8">
-                    <div class="p-3 bg-indigo-50 rounded-xl text-indigo-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+            <div class="p-8 space-y-8">
+                <div class="flex items-center space-x-4">
+                    <div class="p-3 bg-blue-50 rounded-xl text-blue-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
                     </div>
                     <div>
-                        <h3 class="text-lg font-black text-slate-800 uppercase tracking-tight">Assignment Mapping</h3>
-                        <p class="text-sm text-slate-500">Choose who is responsible for each mandatory item. Items assigned to <b>Driver</b> generate personal alerts.</p>
+                        <h3 class="text-lg font-black text-slate-800 uppercase tracking-tight">Driver Self-Onboarding</h3>
+                        <p class="text-sm text-slate-500">Permite șoferilor să își creeze singuri contul folosind un link unic.</p>
                     </div>
                 </div>
-                
-                <?php 
-                    $eqConfig = json_decode($tenant['equipment_config'] ?? '[]', true);
-                    $items = [
-                        'triangles' => 'Triunghiuri Reflectorizante',
-                        'vest' => 'Vestă Reflectorizantă',
-                        'jack' => 'Cric',
-                        'medical_kit' => 'Trusă Medicală',
-                        'tow_rope' => 'Șufă Tractare',
-                        'jumper_cables' => 'Cabluri Curent',
-                        'extinguisher' => 'Stingător',
-                        'spare_wheel' => 'Roată Rezervă'
-                    ];
-                ?>
-                <div class="border border-slate-100 rounded-2xl overflow-hidden">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-slate-50 border-b border-slate-100">
-                                <th class="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Item Name / Echipament</th>
-                                <th class="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Gestiune Vehicul</th>
-                                <th class="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Gestiune Șofer</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-50">
-                            <?php foreach ($items as $key => $label): 
-                                $val = $eqConfig[$key] ?? 'vehicle';
-                            ?>
-                                <tr class="hover:bg-slate-50/50 transition-colors">
-                                    <td class="px-6 py-4 font-bold text-slate-700"><?php echo $label; ?></td>
-                                    <td class="px-6 py-4 text-center">
-                                        <label class="inline-flex items-center cursor-pointer group">
-                                            <input type="radio" name="equipment_config[<?php echo $key; ?>]" value="vehicle" <?php echo $val === 'vehicle' ? 'checked' : ''; ?> class="w-5 h-5 text-indigo-600 border-slate-300 focus:ring-indigo-500">
-                                            <span class="ml-2 text-xs font-bold text-slate-400 group-hover:text-indigo-600 transition-colors uppercase">Masină</span>
-                                        </label>
-                                    </td>
-                                    <td class="px-6 py-4 text-center">
-                                        <label class="inline-flex items-center cursor-pointer group">
-                                            <input type="radio" name="equipment_config[<?php echo $key; ?>]" value="driver" <?php echo $val === 'driver' ? 'checked' : ''; ?> class="w-5 h-5 text-indigo-600 border-slate-300 focus:ring-indigo-500">
-                                            <span class="ml-2 text-xs font-bold text-slate-400 group-hover:text-indigo-600 transition-colors uppercase">Șofer</span>
-                                        </label>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+
+                <div class="flex items-center justify-between p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div class="space-y-1">
+                        <span class="block text-sm font-bold text-slate-700">Activează Înregistrarea</span>
+                        <span class="block text-xs text-slate-400">Dacă e dezactivat, link-ul de mai jos nu va funcționa.</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" name="signup_enabled" value="1" <?php echo ($tenant['signup_enabled'] ?? 0) ? 'checked' : ''; ?> class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
                 </div>
+
+                <?php if (!empty($tenant['signup_token'])): ?>
+                    <div class="space-y-4">
+                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest">Link de Înscriere</label>
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <div class="flex-grow flex items-center px-4 py-3 bg-white border border-slate-200 rounded-xl font-mono text-sm text-slate-600 overflow-x-auto">
+                                <?php 
+                                    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+                                    $host = $_SERVER['HTTP_HOST'];
+                                    $joinLink = "$protocol://$host/join/" . $tenant['signup_token'];
+                                    echo $joinLink;
+                                ?>
+                            </div>
+                            <button type="button" onclick="copyToClipboard('<?php echo $joinLink; ?>')" class="px-6 py-3 bg-slate-800 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-700 transition-all flex-shrink-0">
+                                Copiază Link
+                            </button>
+                        </div>
+                        <p class="text-xs text-slate-400 italic">Trimite acest link șoferilor tăi. După înscriere, va trebui să îi aprobi manual din lista de șoferi.</p>
+                    </div>
+
+                    <div class="pt-6 border-t border-slate-100">
+                        <form action="/tenant/settings/regenerate-token" method="POST" onsubmit="return confirm('Ești sigur că vrei să generezi un nou link? Cel vechi nu va mai funcționa!')">
+                            <button type="submit" class="text-red-600 font-bold text-xs uppercase tracking-widest hover:text-red-700 transition-all flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                Regenerează Link (Resetare Securitate)
+                            </button>
+                        </form>
+                    </div>
+                <?php else: ?>
+                    <div class="p-6 bg-amber-50 border border-amber-100 rounded-2xl text-amber-700 text-sm flex items-center">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        E nevoie de un token pentru a genera link-ul. Apasă pe butonul de regenerare de mai jos.
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -203,4 +210,12 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
         localStorage.setItem('last_settings_tab', id);
     });
 });
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Link copiat în clipboard!');
+    }).catch(err => {
+        console.error('Eroare la copiere:', err);
+    });
+}
 </script>
