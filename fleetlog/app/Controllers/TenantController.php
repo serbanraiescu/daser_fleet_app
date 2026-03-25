@@ -374,7 +374,7 @@ class TenantController extends BaseController
         
         DB::query("UPDATE tenants SET signup_token = ? WHERE id = ?", [$token, $tenantId]);
         
-        $this->redirect('/tenant/settings?success=token_regenerated');
+        $this->redirect('/tenant/settings?success=token_regenerated#onboarding');
     }
 
     public function showEditVehicle(int $id): void

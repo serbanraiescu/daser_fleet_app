@@ -6,7 +6,12 @@
 <?php if (isset($_GET['success'])): ?>
     <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 flex items-center shadow-sm">
         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-        <span>Settings updated successfully!</span>
+        <span>
+            <?php 
+                if ($_GET['success'] === 'token_regenerated') echo "Link de înscriere generat/actualizat cu succes!";
+                else echo "Settings updated successfully!";
+            ?>
+        </span>
     </div>
 <?php endif; ?>
 
@@ -214,12 +219,10 @@
                 <?php endif; ?>
 
                 <div class="pt-6 border-t border-slate-100">
-                    <form action="/tenant/settings/regenerate-token" method="POST" onsubmit="return confirm('Ești sigur că vrei să generezi un nou link? Cel vechi nu va mai funcționa!')">
-                        <button type="submit" class="<?php echo !empty($tenant['signup_token']) ? 'text-red-600 text-xs' : 'bg-indigo-600 text-white px-8 py-3 rounded-xl text-sm'; ?> font-bold uppercase tracking-widest hover:opacity-80 transition-all flex items-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                            <?php echo !empty($tenant['signup_token']) ? 'Regenerează Link (Resetare Securitate)' : 'Generează Link de Înscriere'; ?>
-                        </button>
-                    </form>
+                    <button type="submit" form="form-regenerate" class="<?php echo !empty($tenant['signup_token']) ? 'text-red-600 text-xs' : 'bg-indigo-600 text-white px-8 py-3 rounded-xl text-sm'; ?> font-bold uppercase tracking-widest hover:opacity-80 transition-all flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        <?php echo !empty($tenant['signup_token']) ? 'Regenerează Link (Resetare Securitate)' : 'Generează Link de Înscriere'; ?>
+                    </button>
                 </div>
             </div>
         </div>
@@ -232,7 +235,11 @@
             <?php echo __('save_settings') ?? 'Salvează Configurarea'; ?>
         </button>
     </div>
+<!-- Main settings form ends here -->
 </form>
+
+<!-- Regeneration form moved outside main form to avoid nesting -->
+<form id="form-regenerate" action="/tenant/settings/regenerate-token" method="POST" onsubmit="return confirm('Ești sigur că vrei să generezi un nou link? Cel vechi nu va mai funcționa!')" class="hidden"></form>
 
 <script>
 function switchTab(tabId) {
@@ -240,7 +247,8 @@ function switchTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
     
     // Show active content
-    document.getElementById('section-' + tabId).classList.remove('hidden');
+    const target = document.getElementById('section-' + tabId);
+    if (target) target.classList.remove('hidden');
     
     // Update button styles
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -250,8 +258,10 @@ function switchTab(tabId) {
     
     // Set active button style
     const activeBtn = document.getElementById('tab-' + tabId);
-    activeBtn.classList.remove('border-transparent', 'text-slate-500', 'font-medium');
-    activeBtn.classList.add('border-indigo-500', 'text-indigo-600', 'font-black');
+    if (activeBtn) {
+        activeBtn.classList.remove('border-transparent', 'text-slate-500', 'font-medium');
+        activeBtn.classList.add('border-indigo-500', 'text-indigo-600', 'font-black');
+    }
 }
 
 // Check for deep link or persistent tab
