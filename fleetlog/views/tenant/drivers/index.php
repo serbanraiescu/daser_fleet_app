@@ -43,6 +43,12 @@
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                        <?php if (!$driver['active']): ?>
+                            <a href="/tenant/drivers/approve/<?php echo $driver['id']; ?>" class="inline-flex items-center px-3 py-1 bg-green-50 text-green-700 rounded-lg border border-green-200 hover:bg-green-100 transition-colors text-xs font-black uppercase tracking-widest">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                Aprobă
+                            </a>
+                        <?php endif; ?>
                         <a href="/tenant/documents/inventory/add?driver_id=<?php echo $driver['id']; ?>" class="text-blue-600 hover:text-blue-900 font-bold">Protocol Inventar</a>
                         <a href="/tenant/drivers/edit/<?php echo $driver['id']; ?>" class="text-slate-400 hover:text-slate-600">Edit</a>
                     </td>

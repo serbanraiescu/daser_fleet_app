@@ -377,6 +377,19 @@ class TenantController extends BaseController
         $this->redirect('/tenant/settings?success=token_regenerated#onboarding');
     }
 
+    public function approveDriver(int $id): void
+    {
+        $tenantId = \FleetLog\Core\Auth::tenantId();
+        $driver = DB::fetch("SELECT * FROM users WHERE id = ? AND tenant_id = ? AND role = 'driver'", [$id, $tenantId]);
+        
+        if ($driver) {
+            DB::query("UPDATE users SET active = 1 WHERE id = ?", [$id]);
+            $this->redirect('/tenant/drivers?success=approved');
+        } else {
+            $this->redirect('/tenant/drivers?error=not_found');
+        }
+    }
+
     public function showEditVehicle(int $id): void
     {
         $repo = new \FleetLog\App\Repositories\VehicleRepository();
