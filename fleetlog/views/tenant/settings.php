@@ -101,8 +101,66 @@
     </div>
 
     <!-- Inventory Section -->
-    <!-- Inventory Section -->
-    ... (omitted for brevity) ...
+    <div id="section-inventory" class="tab-content hidden">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-8">
+                <div class="flex items-center space-x-4 mb-8">
+                    <div class="p-3 bg-indigo-50 rounded-xl text-indigo-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-black text-slate-800 uppercase tracking-tight">Assignment Mapping</h3>
+                        <p class="text-sm text-slate-500">Choose who is responsible for each mandatory item. Items assigned to <b>Driver</b> generate personal alerts.</p>
+                    </div>
+                </div>
+                
+                <?php 
+                    $eqConfig = json_decode($tenant['equipment_config'] ?? '[]', true);
+                    $items = [
+                        'triangles' => 'Triunghiuri Reflectorizante',
+                        'vest' => 'Vestă Reflectorizantă',
+                        'jack' => 'Cric',
+                        'medical_kit' => 'Trusă Medicală',
+                        'tow_rope' => 'Șufă Tractare',
+                        'jumper_cables' => 'Cabluri Curent',
+                        'extinguisher' => 'Stingător',
+                        'spare_wheel' => 'Roată Rezervă'
+                    ];
+                ?>
+                <div class="border border-slate-100 rounded-2xl overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-100">
+                                <th class="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Item Name / Echipament</th>
+                                <th class="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Gestiune Vehicul</th>
+                                <th class="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Gestiune Șofer</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50">
+                            <?php foreach ($items as $key => $label): 
+                                $val = $eqConfig[$key] ?? 'vehicle';
+                            ?>
+                                <tr class="hover:bg-slate-50/50 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-700"><?php echo $label; ?></td>
+                                    <td class="px-6 py-4 text-center">
+                                        <label class="inline-flex items-center cursor-pointer group">
+                                            <input type="radio" name="equipment_config[<?php echo $key; ?>]" value="vehicle" <?php echo $val === 'vehicle' ? 'checked' : ''; ?> class="w-5 h-5 text-indigo-600 border-slate-300 focus:ring-indigo-500">
+                                            <span class="ml-2 text-xs font-bold text-slate-400 group-hover:text-indigo-600 transition-colors uppercase">Masină</span>
+                                        </label>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <label class="inline-flex items-center cursor-pointer group">
+                                            <input type="radio" name="equipment_config[<?php echo $key; ?>]" value="driver" <?php echo $val === 'driver' ? 'checked' : ''; ?> class="w-5 h-5 text-indigo-600 border-slate-300 focus:ring-indigo-500">
+                                            <span class="ml-2 text-xs font-bold text-slate-400 group-hover:text-indigo-600 transition-colors uppercase">Șofer</span>
+                                        </label>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Onboarding Section -->
@@ -168,10 +226,10 @@
     </div>
 
     <!-- Floating Footer with Save Button -->
-    <div class="flex justify-end pt-8">
-        <button type="submit" class="group relative inline-flex items-center justify-center px-8 py-4 font-black text-white bg-indigo-600 rounded-2xl overflow-hidden shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all hover:-translate-y-1">
+    <div class="sticky bottom-0 bg-slate-50/80 backdrop-blur-md pt-6 pb-6 mt-8 border-t border-slate-200 flex justify-end z-10">
+        <button type="submit" class="group relative inline-flex items-center justify-center px-10 py-4 font-black text-white bg-indigo-600 rounded-2xl shadow-xl shadow-indigo-200 hover:bg-indigo-700 transition-all hover:-translate-y-0.5 active:scale-[0.98] uppercase tracking-widest text-sm">
             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-            <?php echo __('save_changes') ?? 'Salvează Configurarea'; ?>
+            <?php echo __('save_settings') ?? 'Salvează Configurarea'; ?>
         </button>
     </div>
 </form>

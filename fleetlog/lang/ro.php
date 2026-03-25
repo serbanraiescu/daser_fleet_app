@@ -41,6 +41,7 @@ return [
     'edit' => 'Editează',
     'delete' => 'Șterge',
     'save' => 'Salvează Modificările',
+    'save_settings' => 'Salvează Configurarea',
     'cancel' => 'Anulează',
 
     // Driver Dashboard
