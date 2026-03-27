@@ -23,8 +23,8 @@
                 <p class="text-slate-500 font-medium">
                     Perioada: 
                     <?php 
-                        if ($period === 'monthly') echo date('F Y', strtotime("$year-$selected_month-01"));
-                        elseif ($period === 'yearly') echo $year;
+                        if ($period === 'monthly') echo date('F Y', strtotime("$selected_year-$selected_month-01"));
+                        elseif ($period === 'yearly') echo $selected_year;
                         elseif ($period === 'weekly') echo "Ultima săptămână";
                         else echo "Astăzi";
                     ?>
