@@ -78,23 +78,25 @@ class TenantController extends BaseController
             ORDER BY t.start_time DESC
         ", [$tenantId]);
 
-        // 8. Current Month Expenses
+        // 8. Current Month Expenses (Legacy + Timeline)
         $currentMonthExpenses = DB::fetch("
-            SELECT SUM(cost) as total 
-            FROM vehicle_expenses 
-            WHERE tenant_id = ? 
-            AND MONTH(expense_date) = MONTH(CURRENT_DATE())
-            AND YEAR(expense_date) = YEAR(CURRENT_DATE())
-        ", [$tenantId])['total'] ?? 0;
+            SELECT (
+                (SELECT IFNULL(SUM(cost), 0) FROM vehicle_expenses WHERE tenant_id = ? AND MONTH(expense_date) = MONTH(CURRENT_DATE()) AND YEAR(expense_date) = YEAR(CURRENT_DATE())) +
+                (SELECT IFNULL(SUM(cost), 0) FROM vehicle_events WHERE tenant_id = ? AND MONTH(event_date) = MONTH(CURRENT_DATE()) AND YEAR(event_date) = YEAR(CURRENT_DATE()))
+            ) as total
+        ", [$tenantId, $tenantId])['total'] ?? 0;
 
-        // 9. Top 3 Costly Vehicles (Last 90 days)
+        // 9. Top 3 Costly Vehicles (Last 90 days) - Legacy + Timeline + Fuel (+ Damages if they have cost)
         $topCostly = DB::fetchAll("
-            SELECT v.id, v.license_plate, v.make, v.model, SUM(e.cost) as total_cost 
+            SELECT v.id, v.license_plate, v.make, v.model, 
+                (
+                    (SELECT IFNULL(SUM(cost), 0) FROM vehicle_expenses WHERE vehicle_id = v.id AND expense_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 90 DAY)) +
+                    (SELECT IFNULL(SUM(cost), 0) FROM vehicle_events WHERE vehicle_id = v.id AND event_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 90 DAY)) +
+                    (SELECT IFNULL(SUM(total_price), 0) FROM fuelings WHERE vehicle_id = v.id AND created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 90 DAY)) +
+                    (SELECT IFNULL(SUM(repair_cost), 0) FROM damage_reports WHERE vehicle_id = v.id AND datetime >= DATE_SUB(CURRENT_DATE(), INTERVAL 90 DAY))
+                ) as total_cost 
             FROM vehicles v 
-            JOIN vehicle_expenses e ON v.id = e.vehicle_id 
             WHERE v.tenant_id = ? 
-            AND e.expense_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 90 DAY)
-            GROUP BY v.id 
             ORDER BY total_cost DESC 
             LIMIT 3
         ", [$tenantId]);
