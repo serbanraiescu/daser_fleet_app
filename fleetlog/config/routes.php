@@ -103,6 +103,7 @@ $router->add('POST', '/tenant/vehicle-events/delete', 'VehicleEventController@de
 $router->add('GET', '/tenant/reports', 'ReportController@index', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('GET', '/tenant/reports/vehicle', 'ReportController@vehicleReport', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('GET', '/tenant/reports/driver', 'ReportController@driverReport', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('GET', '/tenant/reports/performance/print', 'ReportController@printVehiclePerformance', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 
 // Driver Routes
 $driverMiddleware = [

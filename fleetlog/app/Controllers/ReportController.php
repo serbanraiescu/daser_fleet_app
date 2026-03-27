@@ -69,6 +69,64 @@ class ReportController extends BaseController
         ]);
     }
 
+    public function printVehiclePerformance(): void
+    {
+        $tenantId = Auth::tenantId();
+        $period = $_GET['period'] ?? 'monthly';
+        $month = $_GET['month'] ?? date('m');
+        $year = $_GET['year'] ?? date('Y');
+        
+        $dateFilter = $this->getDateFilter($period, $month, $year);
+        $endDate = $this->getEndDate($period, $month, $year);
+
+        // Fetch vehicle stats
+        $vehicles = DB::fetchAll("
+            SELECT 
+                v.id, v.license_plate, v.make, v.model,
+                (SELECT MIN(start_km) FROM trips WHERE vehicle_id = v.id AND tenant_id = ? AND start_time >= ? AND start_time < ?) as start_km,
+                (SELECT MAX(end_km) FROM trips WHERE vehicle_id = v.id AND tenant_id = ? AND end_time >= ? AND end_time < ?) as end_km,
+                (SELECT SUM(liters) FROM fuelings WHERE vehicle_id = v.id AND tenant_id = ? AND created_at >= ? AND created_at < ?) as total_liters,
+                (SELECT SUM(total_price) FROM fuelings WHERE vehicle_id = v.id AND tenant_id = ? AND created_at >= ? AND created_at < ?) as total_fuel_cost,
+                (SELECT COUNT(*) FROM trips WHERE vehicle_id = v.id AND tenant_id = ? AND start_time >= ? AND start_time < ?) as trip_count,
+                
+                -- Damage Count (from reports + timeline)
+                ((SELECT COUNT(*) FROM damage_reports WHERE vehicle_id = v.id AND tenant_id = ? AND datetime >= ? AND datetime < ?) + 
+                 (SELECT COUNT(*) FROM vehicle_events WHERE vehicle_id = v.id AND tenant_id = ? AND event_type = 'damage' AND event_date >= ? AND event_date < ?)) as damage_count,
+
+                -- Total Repair Cost (from reports + timeline)
+                ((SELECT IFNULL(SUM(repair_cost), 0) FROM damage_reports WHERE vehicle_id = v.id AND tenant_id = ? AND datetime >= ? AND datetime < ?) + 
+                 (SELECT IFNULL(SUM(cost), 0) FROM vehicle_events WHERE vehicle_id = v.id AND tenant_id = ? AND event_type = 'damage' AND event_date >= ? AND event_date < ?)) as total_repair_cost,
+
+                -- Total Other Expenses (from legacy expenses + timeline)
+                ((SELECT IFNULL(SUM(cost), 0) FROM vehicle_expenses WHERE vehicle_id = v.id AND tenant_id = ? AND expense_date >= ? AND expense_date < ?) + 
+                 (SELECT IFNULL(SUM(cost), 0) FROM vehicle_events WHERE vehicle_id = v.id AND tenant_id = ? AND event_type NOT IN ('fueling', 'damage') AND event_date >= ? AND event_date < ?)) as total_other_expenses
+            FROM vehicles v
+            WHERE v.tenant_id = ?
+        ", [
+            $tenantId, $dateFilter, $endDate, 
+            $tenantId, $dateFilter, $endDate, 
+            $tenantId, $dateFilter, $endDate, 
+            $tenantId, $dateFilter, $endDate, 
+            $tenantId, $dateFilter, $endDate, 
+            $tenantId, $dateFilter, $endDate, 
+            $tenantId, $dateFilter, $endDate, 
+            $tenantId, $dateFilter, $endDate, 
+            $tenantId, $dateFilter, $endDate, 
+            $tenantId, $dateFilter, $endDate, 
+            $tenantId, $dateFilter, $endDate, 
+            $tenantId
+        ]);
+
+        $this->render('tenant/reports/print_performance', [
+            'title' => 'Raport Performanță Flotă',
+            'vehicles' => $vehicles,
+            'period' => $period,
+            'selected_month' => $month,
+            'selected_year' => $year,
+            'tenant' => DB::fetch("SELECT * FROM tenants WHERE id = ?", [$tenantId])
+        ]);
+    }
+
     public function driverReport(): void
     {
         $tenantId = Auth::tenantId();

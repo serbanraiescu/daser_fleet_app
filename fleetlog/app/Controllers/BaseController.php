@@ -57,7 +57,8 @@ abstract class BaseController
             'tenant/documents/inventory_print',
             'tenant/documents/protocol_print',
             'tenant/fuelings/receipts',
-            'tenant/fuelings/report'
+            'tenant/fuelings/report',
+            'tenant/reports/print_performance'
         ];
 
         // Check if layout should be used (e.g., skip for login/standalone/print pages)
