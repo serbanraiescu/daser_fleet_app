@@ -57,7 +57,6 @@ class ReportController extends BaseController
             $tenantId, $dateFilter, $endDate, 
             $tenantId, $dateFilter, $endDate, 
             $tenantId, $dateFilter, $endDate, 
-            $tenantId, $dateFilter, $endDate,
             $tenantId
         ]);
 
