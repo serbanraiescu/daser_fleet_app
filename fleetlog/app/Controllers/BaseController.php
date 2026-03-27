@@ -49,8 +49,19 @@ abstract class BaseController
         require $viewPath;
         $content = ob_get_clean();
 
-        // Check if layout should be used (e.g., skip for login/home/reports/qr-print)
-        if (strpos($view, 'auth/') === 0 || $view === 'home' || strpos($view, 'report') !== false || strpos($view, 'receipts') !== false || strpos($view, 'qr_print') !== false || strpos($view, 'protocol_print') !== false) {
+        // Whitelist of views that provide their own standalone HTML layout (e.g. for printing)
+        $standaloneViews = [
+            'home',
+            'tenant/reports/inventory_shopping_list',
+            'tenant/vehicles/qr_print',
+            'tenant/documents/inventory_print',
+            'tenant/documents/protocol_print',
+            'tenant/fuelings/receipts',
+            'tenant/fuelings/report'
+        ];
+
+        // Check if layout should be used (e.g., skip for login/standalone/print pages)
+        if (strpos($view, 'auth/') === 0 || in_array($view, $standaloneViews)) {
             echo $content;
             return;
         }
