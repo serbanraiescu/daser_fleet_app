@@ -8,8 +8,13 @@
             <input type="text" id="driverSearch" placeholder="Cauta sofer..." 
                 class="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
         </div>
-        <a href="/tenant/drivers/add" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors w-full md:w-auto text-center">
-            + Add Driver
+        <button onclick="toggleArchived()" class="inline-flex items-center px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 bg-white hover:bg-slate-50 transition-colors w-full md:w-auto justify-center">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            Vezi Arhivați
+        </button>
+        <a href="/tenant/drivers/add" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors w-full md:w-auto text-center flex items-center justify-center">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            Adaugă Șofer
         </a>
     </div>
 </div>
@@ -38,9 +43,15 @@
                         <div class="text-sm text-slate-600"><?php echo $driver['phone'] ?: '-'; ?></div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo $driver['active'] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
-                            <?php echo $driver['active'] ? 'Active' : 'Inactive'; ?>
-                        </span>
+                        <?php if ($driver['active']): ?>
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 border border-green-200">
+                                Active
+                            </span>
+                        <?php else: ?>
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                                Așteaptă Aprobare
+                            </span>
+                        <?php endif; ?>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
                         <?php if (!$driver['active']): ?>
@@ -69,46 +80,58 @@
 </div>
 
 <!-- Archived Drivers Section -->
-<?php if (!empty($archivedDrivers)): ?>
-<div class="mt-10 mb-10">
+<div id="archivedSection" class="mt-10 mb-10 hidden border-t-2 border-slate-100 pt-8">
     <h2 class="text-lg font-bold text-red-700 mb-3 flex items-center">
         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-        Archived Drivers
+        Archived Drivers (Istoric)
     </h2>
     <div class="bg-red-50/30 rounded-xl shadow-sm border border-red-100 overflow-hidden opacity-90 hover:opacity-100 transition-opacity">
-        <table class="min-w-full divide-y divide-red-200">
-            <thead class="bg-red-50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-red-800 uppercase tracking-wider">Name</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-red-800 uppercase tracking-wider">Email</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-red-800 uppercase tracking-wider">Archive Reason / Notes</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-red-800 uppercase tracking-wider">Archived Date</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-red-100 bg-white">
-                <?php foreach ($archivedDrivers as $driver): ?>
-                    <tr class="hover:bg-red-50/50">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-slate-900 line-through decoration-slate-400"><?php echo htmlspecialchars($driver['name']); ?></div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                            <?php echo htmlspecialchars($driver['email']); ?>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-red-800 italic max-w-sm overflow-hidden text-ellipsis">
-                            "<?php echo htmlspecialchars($driver['archive_notes'] ?? 'No reason provided'); ?>"
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-400">
-                            <?php echo date('d.m.Y H:i', strtotime($driver['updated_at'])); ?>
-                        </td>
+        <?php if (!empty($archivedDrivers)): ?>
+            <table class="min-w-full divide-y divide-red-200">
+                <thead class="bg-red-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-red-800 uppercase tracking-wider">Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-red-800 uppercase tracking-wider">Email</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-red-800 uppercase tracking-wider">Archive Reason / Notes</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-red-800 uppercase tracking-wider">Archived Date</th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody class="divide-y divide-red-100 bg-white">
+                    <?php foreach ($archivedDrivers as $driver): ?>
+                        <tr class="hover:bg-red-50/50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-slate-900 line-through decoration-slate-400"><?php echo htmlspecialchars($driver['name']); ?></div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                                <?php echo htmlspecialchars($driver['email']); ?>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-red-800 italic max-w-sm overflow-hidden text-ellipsis">
+                                "<?php echo htmlspecialchars($driver['archive_notes'] ?? 'No reason provided'); ?>"
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-400">
+                                <?php echo date('d.m.Y H:i', strtotime($driver['updated_at'])); ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php else: ?>
+            <div class="px-6 py-10 text-center text-slate-400 italic">
+                Niciun șofer arhivat momentan.
+            </div>
+        <?php endif; ?>
     </div>
 </div>
-<?php endif; ?>
 
 <script>
+function toggleArchived() {
+    const section = document.getElementById('archivedSection');
+    section.classList.toggle('hidden');
+    if (!section.classList.contains('hidden')) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
 document.getElementById('driverSearch')?.addEventListener('input', function(e) {
     const term = e.target.value.toLowerCase();
     const rows = document.querySelectorAll('#driversTable tbody tr');

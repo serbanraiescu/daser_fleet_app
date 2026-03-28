@@ -22,7 +22,7 @@ class UserRepository extends BaseRepository
     public function getDrivers(): array
     {
         $tenantId = Auth::tenantId();
-        return DB::fetchAll("SELECT * FROM users WHERE tenant_id = ? AND role = 'driver' AND active = 1 AND is_archived = 0", [$tenantId]);
+        return DB::fetchAll("SELECT * FROM users WHERE tenant_id = ? AND role = 'driver' AND is_archived = 0 ORDER BY active ASC, name ASC", [$tenantId]);
     }
 
     public function getByTenantAndRole(int $tenantId, string $role): array
