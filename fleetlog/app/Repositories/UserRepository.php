@@ -22,12 +22,22 @@ class UserRepository extends BaseRepository
     public function getDrivers(): array
     {
         $tenantId = Auth::tenantId();
-        return DB::fetchAll("SELECT * FROM users WHERE tenant_id = ? AND role = 'driver' AND active = 1", [$tenantId]);
+        return DB::fetchAll("SELECT * FROM users WHERE tenant_id = ? AND role = 'driver' AND active = 1 AND is_archived = 0", [$tenantId]);
     }
 
     public function getByTenantAndRole(int $tenantId, string $role): array
     {
-        return DB::fetchAll("SELECT * FROM users WHERE tenant_id = ? AND role = ? AND active = 1", [$tenantId, $role]);
+        return DB::fetchAll("SELECT * FROM users WHERE tenant_id = ? AND role = ? AND active = 1 AND is_archived = 0", [$tenantId, $role]);
+    }
+
+    public function getArchivedByTenant(int $tenantId): array
+    {
+        return DB::fetchAll("SELECT * FROM users WHERE tenant_id = ? AND role = 'driver' AND is_archived = 1 ORDER BY updated_at DESC", [$tenantId]);
+    }
+
+    public function archive(int $id, string $notes, int $tenantId): bool
+    {
+        return DB::query("UPDATE users SET is_archived = 1, archive_notes = ? WHERE id = ? AND tenant_id = ?", [$notes, $id, $tenantId])->rowCount() > 0;
     }
 
     public function create(array $input): bool

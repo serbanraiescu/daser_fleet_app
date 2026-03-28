@@ -50,20 +50,63 @@
                             </a>
                         <?php endif; ?>
                         <a href="/tenant/documents/inventory/add?driver_id=<?php echo $driver['id']; ?>" class="text-blue-600 hover:text-blue-900 font-bold">Protocol Inventar</a>
-                        <a href="/tenant/drivers/edit/<?php echo $driver['id']; ?>" class="text-slate-400 hover:text-slate-600">Edit</a>
+                        <a href="/tenant/drivers/edit/<?php echo $driver['id']; ?>" class="text-slate-400 hover:text-slate-600 transition-colors">Edit</a>
+                        <a href="/tenant/drivers/archive/<?php echo $driver['id']; ?>" class="text-red-400 hover:text-red-600 transition-colors" title="Archive Driver">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </a>
                     </td>
                 </tr>
             <?php endforeach; ?>
             <?php if (empty($drivers)): ?>
                 <tr>
-                    <td colspan="4" class="px-6 py-10 text-center text-slate-500 italic">
-                        No drivers registered yet.
+                    <td colspan="5" class="px-6 py-10 text-center text-slate-500 italic">
+                        No active drivers registered yet.
                     </td>
                 </tr>
             <?php endif; ?>
         </tbody>
-</table>
+    </table>
 </div>
+
+<!-- Archived Drivers Section -->
+<?php if (!empty($archivedDrivers)): ?>
+<div class="mt-10 mb-10">
+    <h2 class="text-lg font-bold text-red-700 mb-3 flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+        Archived Drivers
+    </h2>
+    <div class="bg-red-50/30 rounded-xl shadow-sm border border-red-100 overflow-hidden opacity-90 hover:opacity-100 transition-opacity">
+        <table class="min-w-full divide-y divide-red-200">
+            <thead class="bg-red-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-red-800 uppercase tracking-wider">Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-red-800 uppercase tracking-wider">Email</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-red-800 uppercase tracking-wider">Archive Reason / Notes</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-red-800 uppercase tracking-wider">Archived Date</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-red-100 bg-white">
+                <?php foreach ($archivedDrivers as $driver): ?>
+                    <tr class="hover:bg-red-50/50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-slate-900 line-through decoration-slate-400"><?php echo htmlspecialchars($driver['name']); ?></div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                            <?php echo htmlspecialchars($driver['email']); ?>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-red-800 italic max-w-sm overflow-hidden text-ellipsis">
+                            "<?php echo htmlspecialchars($driver['archive_notes'] ?? 'No reason provided'); ?>"
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-400">
+                            <?php echo date('d.m.Y H:i', strtotime($driver['updated_at'])); ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+<?php endif; ?>
 
 <script>
 document.getElementById('driverSearch')?.addEventListener('input', function(e) {

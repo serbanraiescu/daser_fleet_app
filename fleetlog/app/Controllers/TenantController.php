@@ -133,11 +133,14 @@ class TenantController extends BaseController
     public function drivers(): void
     {
         $tenantId = Auth::tenantId();
-        $drivers = DB::fetchAll("SELECT * FROM users WHERE tenant_id = ? AND role = 'driver' ORDER BY name ASC", [$tenantId]);
+        $userRepo = new \FleetLog\App\Repositories\UserRepository();
+        $drivers = $userRepo->getDrivers();
+        $archivedDrivers = $userRepo->getArchivedByTenant($tenantId);
         
         $this->render('tenant/drivers/index', [
             'title' => 'Fleet Drivers',
-            'drivers' => $drivers
+            'drivers' => $drivers,
+            'archivedDrivers' => $archivedDrivers
         ]);
     }
 
@@ -389,6 +392,41 @@ class TenantController extends BaseController
             $this->redirect('/tenant/drivers?success=approved');
         } else {
             $this->redirect('/tenant/drivers?error=not_found');
+        }
+    }
+
+    public function showArchiveDriver(int $id): void
+    {
+        $tenantId = Auth::tenantId();
+        $userRepo = new \FleetLog\App\Repositories\UserRepository();
+        $driver = $userRepo->find($id);
+
+        if (!$driver || (int)$driver['tenant_id'] !== $tenantId || $driver['role'] !== 'driver') {
+            $this->redirect('/tenant/drivers');
+        }
+
+        $this->render('tenant/drivers/archive', [
+            'title' => 'Archive Driver',
+            'driver' => $driver
+        ]);
+    }
+
+    public function archiveDriver(int $id): void
+    {
+        $tenantId = Auth::tenantId();
+        $userRepo = new \FleetLog\App\Repositories\UserRepository();
+        $driver = $userRepo->find($id);
+
+        if (!$driver || (int)$driver['tenant_id'] !== $tenantId || $driver['role'] !== 'driver') {
+            $this->redirect('/tenant/drivers');
+        }
+
+        $notes = trim($_POST['archive_notes'] ?? '');
+        
+        if ($userRepo->archive($id, $notes, $tenantId)) {
+            $this->redirect('/tenant/drivers?success=driver_archived');
+        } else {
+            $this->redirect('/tenant/drivers?error=archive_failed');
         }
     }
 
