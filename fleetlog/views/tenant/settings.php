@@ -140,8 +140,8 @@
                     <div class="mt-4 pt-6 border-t border-slate-100 italic">
                         <div class="flex items-center justify-between p-6 bg-indigo-50/30 rounded-2xl border border-indigo-100/50">
                             <div class="space-y-1">
-                                <span class="block text-sm font-bold text-indigo-900">Reminder Automat Curse Deschise (ora 20:30)</span>
-                                <span class="block text-xs text-indigo-700/70">Trimite un SMS șoferilor care au uitat cursa deschisă înainte de raportul final.</span>
+                                <span class="block text-sm font-bold text-indigo-900">Reminder Automat Curse Deschise (19:00 și 20:00)</span>
+                                <span class="block text-xs text-indigo-700/70">Trimite două SMS-uri automate șoferilor care au uitat cursa deschisă, pentru a asigura raportul zilnic corect la ora 21:00.</span>
                             </div>
                             <div class="flex items-center space-x-6">
                                 <label class="relative inline-flex items-center cursor-pointer">

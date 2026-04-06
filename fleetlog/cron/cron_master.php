@@ -159,12 +159,13 @@ if (shouldRunTask('weekly_report', 'weekly')) {
     }
 }
 
-// TASK 5.8: Open Trip Auto-Reminders (Daily - After 20:30)
-if (shouldRunTask('open_trip_reminders', 'daily') && (int)date('H') >= 20 && (int)date('i') >= 30) {
+// TASK 5.8: Open Trip Auto-Reminders (Daily - at 19:00 and 20:00)
+$currentHour = (int)date('H');
+if (in_array($currentHour, [19, 20]) && shouldRunTask("open_trip_reminders_h{$currentHour}", 'daily')) {
     try {
-        SMSService::sendAutomatedOpenTripReminders();
-        updateLastRun('open_trip_reminders');
-        logCron('OpenTripReminders', "Auto-reminders processed and enqueued", 'SUCCESS');
+        SMSService::sendAutomatedOpenTripReminders($currentHour);
+        updateLastRun("open_trip_reminders_h{$currentHour}");
+        logCron('OpenTripReminders', "Auto-reminders processed for hour $currentHour", 'SUCCESS');
         $tasksExecuted++;
     } catch (Exception $e) {
         logCron('OpenTripReminders', $e->getMessage(), 'ERROR');

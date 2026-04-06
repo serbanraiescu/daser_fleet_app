@@ -430,9 +430,9 @@ class SMSService
     }
 
     /**
-     * Send automated reminders to drivers with open trips (at 20:30)
+     * Send automated reminders to drivers with open trips (at 19:00 and 20:00)
      */
-    public static function sendAutomatedOpenTripReminders(): void
+    public static function sendAutomatedOpenTripReminders(int $currentHour): void
     {
         $today = date('Y-m-d');
         
@@ -440,8 +440,12 @@ class SMSService
             SELECT id, name FROM tenants 
             WHERE status = 'active' 
               AND open_trip_reminder_enabled = 1 
-              AND (open_trip_reminder_last_sent IS NULL OR open_trip_reminder_last_sent != ?)
-        ", [$today]);
+              AND (
+                open_trip_reminder_last_sent IS NULL 
+                OR open_trip_reminder_last_sent != ? 
+                OR open_trip_reminder_last_hour != ?
+              )
+        ", [$today, $currentHour]);
 
         foreach ($tenants as $t) {
             try {
@@ -465,7 +469,7 @@ class SMSService
                     self::enqueue($trip['phone'], self::cleanForSms($message));
                 }
 
-                DB::query("UPDATE tenants SET open_trip_reminder_last_sent = ? WHERE id = ?", [$today, $tenantId]);
+                DB::query("UPDATE tenants SET open_trip_reminder_last_sent = ?, open_trip_reminder_last_hour = ? WHERE id = ?", [$today, $currentHour, $tenantId]);
             } catch (\Exception $e) {
                 continue;
             }
