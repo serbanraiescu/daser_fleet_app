@@ -172,8 +172,10 @@ class SuperAdminController extends BaseController
         $county = $_POST['county'] ?? null;
         $city = $_POST['city'] ?? null;
 
-        DB::query("UPDATE tenants SET name = ?, email = ?, cui = ?, status = ?, contact_phone = ?, notification_phone = ?, reg_com = ?, address = ?, county = ?, city = ? WHERE id = ?", [
-            $name, $email, $cui, $status, $contact_phone, $notification_phone, $reg_com, $address, $county, $city, $id
+        $send_to_admin_enabled = isset($_POST['send_to_admin_enabled']) ? 1 : 0;
+
+        DB::query("UPDATE tenants SET name = ?, email = ?, cui = ?, status = ?, contact_phone = ?, notification_phone = ?, reg_com = ?, address = ?, county = ?, city = ?, send_to_admin_enabled = ? WHERE id = ?", [
+            $name, $email, $cui, $status, $contact_phone, $notification_phone, $reg_com, $address, $county, $city, $send_to_admin_enabled, $id
         ]);
 
         $this->redirect('/admin/tenants?success=tenant_updated');
@@ -369,6 +371,23 @@ class SuperAdminController extends BaseController
             $_SESSION['flash_error'] = "Eroare la trimiterea email-ului. Verifică setările SMTP.";
         }
         $this->redirect('/admin/settings');
+    }
+
+    public function testAdminReport(int $tenantId): void
+    {
+        $adminEmail = $this->settingsData()['admin_report_email'] ?? null;
+        if (empty($adminEmail)) {
+            $_SESSION['flash_error'] = "Te rugăm să setezi adresa de e-mail pentru rapoarte în setările generale.";
+            $this->redirect('/admin/tenants');
+        }
+
+        $today = date('Y-m-d');
+        if (EmailService::sendDetailedDailyReport($tenantId, $today, $adminEmail)) {
+            $_SESSION['flash_success'] = "Raport de test generat și adăugat în coadă pentru administrator.";
+        } else {
+            $_SESSION['flash_error'] = "Eroare la generarea raportului de test.";
+        }
+        $this->redirect('/admin/tenants');
     }
 
     public function presentation(): void

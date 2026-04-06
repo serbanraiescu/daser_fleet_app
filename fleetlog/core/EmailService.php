@@ -208,4 +208,141 @@ class EmailService
 </body>
 </html>";
     }
+
+    /**
+     * Send a detailed daily report to the admin for a specific tenant
+     */
+    public static function sendDetailedDailyReport(int $tenantId, string $date, string $adminEmail): bool
+    {
+        $tenant = DB::fetch("SELECT name FROM tenants WHERE id = ?", [$tenantId]);
+        if (!$tenant) return false;
+
+        $trips = DB::fetchAll("
+            SELECT t.*, v.license_plate, u.name as driver_name 
+            FROM trips t
+            JOIN vehicles v ON t.vehicle_id = v.id
+            JOIN users u ON t.driver_id = u.id
+            WHERE t.tenant_id = ? AND DATE(t.start_time) = ?
+            ORDER BY t.start_time ASC
+        ", [$tenantId, $date]);
+
+        $fuelings = DB::fetchAll("
+            SELECT f.*, v.license_plate 
+            FROM fuelings f
+            JOIN vehicles v ON f.vehicle_id = v.id
+            WHERE f.tenant_id = ? AND DATE(f.date) = ?
+            ORDER BY f.date ASC
+        ", [$tenantId, $date]);
+
+        $driversCount = DB::fetch("SELECT COUNT(*) as count FROM users WHERE tenant_id = ? AND role = 'driver' AND active = 1 AND is_archived = 0", [$tenantId])['count'];
+        $activeDrivers = DB::fetch("
+            SELECT COUNT(DISTINCT driver_id) as count 
+            FROM trips 
+            WHERE tenant_id = ? AND DATE(start_time) = ?
+        ", [$tenantId, $date])['count'];
+
+        $html = "<h3 style='color: #1e3a8a; margin-top: 0;'>Rezumat Zilnic: {$tenant['name']}</h3>";
+        $html .= "<p style='font-size: 14px; color: #64748b;'>Data: <strong>" . date('d.m.Y', strtotime($date)) . "</strong></p>";
+        
+        $html .= "<div style='margin: 20px 0; padding: 15px; background: #f0f9ff; border-radius: 8px; border: 1px solid #bae6fd;'>";
+        $html .= "<span style='font-size: 14px; color: #0369a1;'><strong>Activitate Șoferi:</strong> {$activeDrivers} activi din {$driversCount} total.</span>";
+        $html .= "</div>";
+
+        // Trips Table
+        $html .= "<h4 style='margin-bottom: 10px; color: #334155;'>Curse ({$activeDrivers} Curse)</h4>";
+        if (empty($trips)) {
+            $html .= "<p style='color: #6b7280; font-style: italic; font-size: 13px;'>Nicio cursă înregistrată astăzi.</p>";
+        } else {
+            $html .= "<table style='width: 100%; border-collapse: collapse; font-size: 13px;'>
+                <thead><tr style='background: #f8fafc; text-align: left; color: #475569;'>
+                <th style='padding: 10px; border: 1px solid #e5e7eb;'>Șofer</th>
+                <th style='padding: 10px; border: 1px solid #e5e7eb;'>Vehicul</th>
+                <th style='padding: 10px; border: 1px solid #e5e7eb;'>Ruta / Scop</th>
+                <th style='padding: 10px; border: 1px solid #e5e7eb;'>KM</th>
+                <th style='padding: 10px; border: 1px solid #e5e7eb;'>Status</th>
+                </tr></thead><tbody>";
+            foreach ($trips as $t) {
+                $km = $t['distance'] ? number_format($t['distance'], 2) . " KM" : "-";
+                $statusColor = $t['status'] === 'open' ? "#ef4444" : "#10b981";
+                $html .= "<tr>
+                    <td style='padding: 10px; border: 1px solid #e5e7eb; font-weight: 500;'>{$t['driver_name']}</td>
+                    <td style='padding: 10px; border: 1px solid #e5e7eb;'>{$t['license_plate']}</td>
+                    <td style='padding: 10px; border: 1px solid #e5e7eb;'>{$t['route_details']}</td>
+                    <td style='padding: 10px; border: 1px solid #e5e7eb;'>{$km}</td>
+                    <td style='padding: 10px; border: 1px solid #e5e7eb; color: {$statusColor}; font-weight: bold;'>" . strtoupper($t['status']) . "</td>
+                </tr>";
+            }
+            $html .= "</tbody></table>";
+        }
+
+        // Fuelings Table
+        $html .= "<h4 style='margin-top: 25px; margin-bottom: 10px; color: #334155;'>Alimentări</h4>";
+        if (empty($fuelings)) {
+            $html .= "<p style='color: #6b7280; font-style: italic; font-size: 13px;'>Nicio alimentare înregistrată astăzi.</p>";
+        } else {
+            $html .= "<table style='width: 100%; border-collapse: collapse; font-size: 13px;'>
+                <thead><tr style='background: #f8fafc; text-align: left; color: #475569;'>
+                <th style='padding: 10px; border: 1px solid #e5e7eb;'>Vehicul</th>
+                <th style='padding: 10px; border: 1px solid #e5e7eb;'>Litri</th>
+                <th style='padding: 10px; border: 1px solid #e5e7eb;'>Sumă</th>
+                <th style='padding: 10px; border: 1px solid #e5e7eb;'>Stație</th>
+                </tr></thead><tbody>";
+            foreach ($fuelings as $f) {
+                $html .= "<tr>
+                    <td style='padding: 10px; border: 1px solid #e5e7eb; font-weight: 500;'>{$f['license_plate']}</td>
+                    <td style='padding: 10px; border: 1px solid #e5e7eb;'>" . number_format($f['liters'], 2) . " L</td>
+                    <td style='padding: 10px; border: 1px solid #e5e7eb;'>" . number_format($f['total_price'], 2) . " Lei</td>
+                    <td style='padding: 10px; border: 1px solid #e5e7eb;'>{$f['gas_station']}</td>
+                </tr>";
+            }
+            $html .= "</tbody></table>";
+        }
+
+        return self::queue($adminEmail, "Raport Zilnic Detaliat: {$tenant['name']}", self::wrapHtml("Raport Detaliat - {$tenant['name']}", $html));
+    }
+
+    /**
+     * Send a monthly summary report to the admin
+     */
+    public static function sendDetailedMonthlyReport(int $tenantId, string $month, string $adminEmail): bool
+    {
+        $tenant = DB::fetch("SELECT name FROM tenants WHERE id = ?", [$tenantId]);
+        if (!$tenant) return false;
+
+        $stats = DB::fetch("
+            SELECT 
+                COUNT(*) as total_trips,
+                SUM(distance) as total_km,
+                (SELECT SUM(liters) FROM fuelings WHERE tenant_id = ? AND DATE_FORMAT(date, '%Y-%m') = ?) as total_liters,
+                (SELECT SUM(total_price) FROM fuelings WHERE tenant_id = ? AND DATE_FORMAT(date, '%Y-%m') = ?) as total_fuel_cost
+            FROM trips 
+            WHERE tenant_id = ? AND DATE_FORMAT(start_time, '%Y-%m') = ?
+        ", [$tenantId, $month, $tenantId, $month, $tenantId, $month]);
+
+        $html = "<h3 style='color: #1e3a8a; margin-top: 0;'>Raport Lunar: {$tenant['name']}</h3>";
+        $html .= "<p style='font-size: 14px; color: #64748b;'>Luna: <strong>" . date('F Y', strtotime($month . "-01")) . "</strong></p>";
+
+        $html .= "<table style='width: 100%; border-collapse: separate; border-spacing: 10px; margin: 20px -10px;'>";
+        $html .= "<tr>";
+        $html .= "<td style='width: 50%; padding: 20px; background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 12px;'>
+                    <div style='font-size: 11px; color: #64748b; font-weight: bold; text-transform: uppercase; margin-bottom: 5px;'>Total Distanță</div>
+                    <div style='font-size: 24px; font-weight: bold; color: #1e293b;'>" . number_format($stats['total_km'] ?? 0, 2) . " <span style='font-size: 14px; font-weight: normal;'>KM</span></div>
+                  </td>";
+        $html .= "<td style='width: 50%; padding: 20px; background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 12px;'>
+                    <div style='font-size: 11px; color: #64748b; font-weight: bold; text-transform: uppercase; margin-bottom: 5px;'>Total Curse</div>
+                    <div style='font-size: 24px; font-weight: bold; color: #1e293b;'>{$stats['total_trips']}</div>
+                  </td>";
+        $html .= "</tr><tr>";
+        $html .= "<td style='width: 50%; padding: 20px; background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 12px;'>
+                    <div style='font-size: 11px; color: #64748b; font-weight: bold; text-transform: uppercase; margin-bottom: 5px;'>Consum Total</div>
+                    <div style='font-size: 24px; font-weight: bold; color: #1e293b;'>" . number_format($stats['total_liters'] ?? 0, 2) . " <span style='font-size: 14px; font-weight: normal;'>L</span></div>
+                  </td>";
+        $html .= "<td style='width: 50%; padding: 20px; background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 12px;'>
+                    <div style='font-size: 11px; color: #64748b; font-weight: bold; text-transform: uppercase; margin-bottom: 5px;'>Cost Combustibil</div>
+                    <div style='font-size: 24px; font-weight: bold; color: #1e293b;'>" . number_format($stats['total_fuel_cost'] ?? 0, 2) . " <span style='font-size: 14px; font-weight: normal;'>Lei</span></div>
+                  </td>";
+        $html .= "</tr></table>";
+
+        return self::queue($adminEmail, "Raport Lunar: {$tenant['name']} (" . date('M Y', strtotime($month . "-01")) . ")", self::wrapHtml("Rezumat Lunar - {$tenant['name']}", $html));
+    }
 }

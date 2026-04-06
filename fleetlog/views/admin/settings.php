@@ -126,6 +126,24 @@
                             </div>
                         </div>
 
+                        <div class="pt-8 border-t border-slate-100">
+                            <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center">
+                                <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center mr-3">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m32 4v-2a4 4 0 00-4-4h-5a4 4 0 00-4 4v2m-8-22a4 4 0 11-8 0 4 4 0 018 0zM12 20a7 7 0 100-14 7 7 0 000 14z"></path></svg>
+                                </div>
+                                Admin Daily Reports
+                            </h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2">Recipient Email</label>
+                                    <input type="email" name="settings[admin_report_email]" value="<?php echo htmlspecialchars($settings['admin_report_email'] ?? 'office@daserdesign.ro'); ?>"
+                                           class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none transition-all"
+                                           placeholder="office@daserdesign.ro">
+                                    <p class="text-[11px] text-slate-400 mt-2 italic">Adresa unde vei primi rapoartele detaliate zilnice și lunare pentru firmele active.</p>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="pt-6 flex justify-end">
                             <button type="submit" class="px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all shadow-md active:scale-95">
                                 Save Email Settings

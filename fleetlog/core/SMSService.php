@@ -368,10 +368,12 @@ class SMSService
 
         // Fetch tenants
         $tenants = DB::fetchAll("
-            SELECT id, name, notification_phone, contact_phone, daily_report_phone_type 
+            SELECT id, name, notification_phone, contact_phone, daily_report_phone_type, send_to_admin_enabled 
             FROM tenants 
             $whereClause
         ", $params);
+
+        $adminEmail = DB::fetch("SELECT value FROM system_settings WHERE `key` = 'admin_report_email'")['value'] ?? null;
 
         foreach ($tenants as $t) {
             try {
@@ -421,6 +423,11 @@ class SMSService
                 if (self::enqueue($phone, self::cleanForSms($msg))) {
                     DB::query("UPDATE tenants SET daily_report_last_sent = ? WHERE id = ?", [$today, $tenantId]);
                     error_log("SMSService::sendDailyTenantReports - Sent to tenant: {$t['name']} ($tenantId)");
+                }
+
+                // Detailed Admin Email Report
+                if ($adminEmail && ($t['send_to_admin_enabled'] ?? 0)) {
+                    EmailService::sendDetailedDailyReport($tenantId, $today, $adminEmail);
                 }
 
             } catch (\Exception $e) {

@@ -185,6 +185,27 @@ if (shouldRunTask('daily_tenant_report', 'daily') && (int)date('H') >= 21) {
         $errorsCount++;
     }
 }
+// TASK 7: Monthly Admin Summary Report (Run on 1st of each month)
+if (date('j') == '1' && shouldRunTask('monthly_admin_report', 'monthly')) {
+    try {
+        $adminEmail = DB::fetch("SELECT value FROM system_settings WHERE `key` = 'admin_report_email'")['value'] ?? null;
+        if ($adminEmail) {
+            $lastMonth = date('Y-m', strtotime('first day of last month'));
+            $tenants = DB::fetchAll("SELECT id FROM tenants WHERE status = 'active' AND send_to_admin_enabled = 1");
+            
+            foreach ($tenants as $t) {
+                EmailService::sendDetailedMonthlyReport((int)$t['id'], $lastMonth, $adminEmail);
+            }
+            
+            updateLastRun('monthly_admin_report');
+            logCron('MonthlyAdminReport', "Monthly summaries queued for " . count($tenants) . " tenants", 'SUCCESS');
+            $tasksExecuted++;
+        }
+    } catch (Exception $e) {
+        logCron('MonthlyAdminReport', $e->getMessage(), 'ERROR');
+        $errorsCount++;
+    }
+}
 
 logCron('MASTER', "Finished. Tasks: $tasksExecuted, Errors: $errorsCount");
 

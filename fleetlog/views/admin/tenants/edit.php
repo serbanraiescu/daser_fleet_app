@@ -79,6 +79,27 @@
                     <option value="suspended" <?php echo $tenant['status'] === 'suspended' ? 'selected' : ''; ?>>Suspended</option>
                 </select>
             </div>
+
+            <div class="p-6 bg-amber-50 rounded-2xl border border-amber-200/50 space-y-4 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="block text-sm font-bold text-amber-900">Raport Detaliat Administrator</span>
+                        <span class="block text-xs text-amber-700/70">Trimite zilnic și lunar detalii complete către dashboard-ul central.</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" name="send_to_admin_enabled" value="1" <?php echo ($tenant['send_to_admin_enabled'] ?? 0) ? 'checked' : ''; ?> class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+                    </label>
+                </div>
+                
+                <div class="pt-4 border-t border-amber-200/30 flex justify-end">
+                    <a href="/admin/tenants/test-report/<?php echo $tenant['id']; ?>" 
+                       class="text-xs font-bold text-amber-700 hover:text-amber-900 flex items-center bg-white px-3 py-2 rounded-lg border border-amber-200/50 hover:bg-amber-100 transition-all shadow-sm">
+                        <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                        Trimite Raport Test ACUM pe mail
+                    </a>
+                </div>
+            </div>
         </div>
 
         <div class="pt-4 flex items-center justify-end space-x-4">
