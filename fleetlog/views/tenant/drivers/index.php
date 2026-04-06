@@ -20,7 +20,51 @@
 </div>
 
 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-    <table class="min-w-full divide-y divide-slate-200" id="driversTable">
+    <!-- Mobile Driver Cards (Visible on mobile only) -->
+    <div class="md:hidden divide-y divide-slate-100">
+        <?php foreach ($drivers as $driver): ?>
+            <div class="p-4 hover:bg-slate-50 transition-colors">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-black text-sm mr-3">
+                            <?php echo strtoupper(substr($driver['name'], 0, 1)); ?>
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-800 text-sm"><?php echo htmlspecialchars($driver['name']); ?></div>
+                            <div class="text-[10px] text-slate-500 font-medium"><?php echo htmlspecialchars($driver['email']); ?></div>
+                        </div>
+                    </div>
+                    <?php if ($driver['active']): ?>
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-green-50 text-green-700 border border-green-100 uppercase">Activ</span>
+                    <?php else: ?>
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-amber-50 text-amber-700 border border-amber-100 uppercase">In așteptare</span>
+                    <?php endif; ?>
+                </div>
+
+                <?php if ($driver['phone']): ?>
+                <div class="mb-4">
+                    <a href="tel:<?php echo $driver['phone']; ?>" class="flex items-center text-xs font-bold text-blue-600 bg-blue-50/50 px-3 py-2 rounded-lg border border-blue-100 w-fit">
+                        <svg class="w-3.5 h-3.5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                        Suna: <?php echo htmlspecialchars($driver['phone']); ?>
+                    </a>
+                </div>
+                <?php endif; ?>
+
+                <div class="flex items-center space-x-2">
+                    <?php if (!$driver['active']): ?>
+                        <a href="/tenant/drivers/approve/<?php echo $driver['id']; ?>" class="flex-1 bg-green-600 text-white px-3 py-2 rounded-lg text-center font-bold text-[10px] uppercase">Aprobă</a>
+                    <?php endif; ?>
+                    <a href="/tenant/drivers/edit/<?php echo $driver['id']; ?>" class="flex-1 bg-slate-50 text-slate-600 px-3 py-2 rounded-lg border border-slate-200 text-center font-bold text-[10px] uppercase">Editează</a>
+                    <a href="/tenant/documents/inventory/add?driver_id=<?php echo $driver['id']; ?>" class="w-10 h-8 bg-blue-50 text-blue-600 rounded-lg border border-blue-100 flex items-center justify-center" title="Inventar">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    </a>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
+    <!-- Desktop Table (Visible on desktop only) -->
+    <table class="hidden md:table min-w-full divide-y divide-slate-200" id="driversTable">
         <thead class="bg-slate-50">
             <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Name</th>
@@ -68,7 +112,7 @@
                     </td>
                 </tr>
             <?php endforeach; ?>
-            <?php if (empty($drivers)): ?>
+<?php if (empty($drivers)): ?>
                 <tr>
                     <td colspan="5" class="px-6 py-10 text-center text-slate-500 italic">
                         No active drivers registered yet.

@@ -1,5 +1,5 @@
 <!-- Top Row: Core Stats -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
         <div class="flex items-center justify-between mb-2">
             <span class="text-slate-500 text-sm font-bold uppercase tracking-wider"><?php echo __('monthly_expenses'); ?></span>
@@ -181,7 +181,28 @@
                 </h2>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm">
+                <!-- Mobile List (Hidden on Desktop) -->
+                <div class="md:hidden divide-y divide-slate-100">
+                    <?php if (empty($activeTrips)): ?>
+                        <div class="px-5 py-8 text-center text-slate-400 italic">Nu sunt șoferi pe traseu acum.</div>
+                    <?php else: ?>
+                        <?php foreach ($activeTrips as $trip): ?>
+                            <div class="p-4 flex justify-between items-center bg-white hover:bg-slate-50">
+                                <div class="flex flex-col">
+                                    <span class="font-bold text-slate-800"><?php echo htmlspecialchars($trip['driver_name']); ?></span>
+                                    <span class="text-xs text-slate-500 font-mono font-bold uppercase mt-1"><?php echo htmlspecialchars($trip['license_plate']); ?></span>
+                                </div>
+                                <div class="text-right flex flex-col">
+                                    <span class="text-[10px] uppercase font-black text-slate-400">Pornit la</span>
+                                    <span class="text-sm font-bold text-slate-700"><?php echo date('H:i', strtotime($trip['start_time'])); ?></span>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Desktop Table (Hidden on Mobile) -->
+                <table class="hidden md:table w-full text-left text-sm">
                     <thead class="bg-slate-50 text-[10px] uppercase font-black text-slate-400 border-b border-slate-100">
                         <tr>
                             <th class="px-5 py-3">Driver</th>

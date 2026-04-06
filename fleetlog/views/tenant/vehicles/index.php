@@ -51,8 +51,58 @@ $eqConfig = json_decode($tenant['equipment_config'] ?? '{}', true);
                 class="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
         </div>
     </div>
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200">
-        <table class="min-w-full divide-y divide-slate-200" id="vehiclesTable">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <!-- Mobile List (Hidden on Desktop) -->
+        <div class="md:hidden divide-y divide-slate-100">
+            <?php foreach ($vehicles as $vehicle): ?>
+                <?php 
+                    $status = $vehicle['status'] ?? 'active';
+                    $statusColors = [
+                        'active' => 'bg-green-100 text-green-800 border-green-200',
+                        'inactive' => 'bg-slate-100 text-slate-600 border-slate-200',
+                        'service' => 'bg-orange-100 text-orange-800 border-orange-200'
+                    ];
+                    $stColor = $statusColors[$status] ?? 'bg-slate-100 text-slate-800';
+                ?>
+                <div class="p-4 hover:bg-slate-50 transition-colors">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1"><?php echo $vehicle['make'] . ' ' . $vehicle['model']; ?></div>
+                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded font-mono text-xs font-bold ring-1 ring-slate-200">
+                                <?php echo $vehicle['license_plate']; ?>
+                            </span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-black border uppercase <?php echo $stColor; ?>">
+                            <?php echo $status; ?>
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <div class="bg-slate-50/50 p-2 rounded-lg border border-slate-100">
+                            <div class="text-[8px] font-bold text-slate-400 uppercase">Km actuali</div>
+                            <div class="text-xs font-black text-slate-700"><?php echo number_format($vehicle['current_odometer']); ?></div>
+                        </div>
+                        <div class="bg-slate-50/50 p-2 rounded-lg border border-slate-100">
+                            <div class="text-[8px] font-bold text-slate-400 uppercase">RCA</div>
+                            <div class="text-xs font-black <?php echo ($vehicle['expiry_rca'] && $vehicle['expiry_rca'] < date('Y-m-d')) ? 'text-red-600' : 'text-slate-700'; ?>">
+                                <?php echo $vehicle['expiry_rca'] ? date('d.m.y', strtotime($vehicle['expiry_rca'])) : 'N/A'; ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <a href="/tenant/vehicle-events?vehicle_id=<?php echo $vehicle['id']; ?>" class="flex-1 bg-indigo-50 text-indigo-600 px-3 py-2 rounded-lg border border-indigo-100 text-center font-bold text-[10px] uppercase">Timeline</a>
+                        <a href="/tenant/vehicles/edit/<?php echo $vehicle['id']; ?>" class="flex-1 bg-blue-50 text-blue-600 px-3 py-2 rounded-lg border border-blue-100 text-center font-bold text-[10px] uppercase">Edit</a>
+                        <a href="/tenant/vehicles/mechanic-report/<?php echo $vehicle['id']; ?>" class="w-10 h-8 bg-slate-50 text-slate-500 rounded-lg border border-slate-200 flex items-center justify-center">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        </a>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
+        <!-- Desktop Table (Hidden on Mobile) -->
+        <table class="hidden md:table min-w-full divide-y divide-slate-200" id="vehiclesTable">
             <thead class="bg-slate-50">
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Vehicle</th>

@@ -25,8 +25,20 @@
     <?php endif; ?>
 
     <div class="flex h-screen overflow-hidden">
+        <!-- Mobile Sidebar Backdrop -->
+        <div x-show="sidebarOpen" 
+             @click="sidebarOpen = false" 
+             x-transition:enter="transition-opacity ease-linear duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition-opacity ease-linear duration-300"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm lg:hidden" 
+             x-cloak></div>
+
         <!-- Sidebar -->
-        <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transition-transform duration-300 transform lg:translate-x-0 lg:static lg:inset-0 flex flex-col">
+        <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-50 w-72 bg-slate-900 text-white transition-transform duration-300 transform lg:translate-x-0 lg:static lg:inset-0 flex flex-col shadow-2xl lg:shadow-none">
             <div class="flex items-center justify-between px-6 py-4">
                 <span class="text-2xl font-black uppercase tracking-tighter text-white">DASER <span class="text-blue-500">FLEET</span></span>
                 <button @click="sidebarOpen = false" class="lg:hidden">

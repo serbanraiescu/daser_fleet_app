@@ -35,7 +35,45 @@
 </div>
 
 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-    <table class="min-w-full divide-y divide-slate-200">
+    <!-- Mobile Fueling Cards -->
+    <div class="md:hidden divide-y divide-slate-100">
+        <?php foreach ($fuelings as $log): ?>
+            <div class="p-4 hover:bg-slate-50 transition-colors">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <div class="text-[10px] font-black text-slate-400 uppercase tracking-tighter mb-1"><?php echo date('d M Y H:i', strtotime($log['created_at'])); ?></div>
+                        <div class="flex items-center">
+                            <span class="font-mono font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded text-xs border border-slate-200 mr-2"><?php echo $log['license_plate']; ?></span>
+                            <?php if ($log['is_full']): ?>
+                                <span class="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[8px] font-black uppercase rounded border border-blue-200">Full</span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm font-black text-blue-600"><?php echo number_format($log['total_price'], 2); ?> <span class="text-[9px] font-normal text-slate-400 uppercase">RON</span></div>
+                        <div class="text-[10px] font-bold text-slate-500"><?php echo $log['liters']; ?> L</div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mt-4 pt-3 border-t border-slate-50">
+                    <div class="text-[10px] text-slate-500 italic">
+                        By <span class="font-bold text-slate-700"><?php echo htmlspecialchars($log['driver_name']); ?></span>
+                    </div>
+                    <?php if ($log['receipt_photo']): ?>
+                        <a href="/<?php echo $log['receipt_photo']; ?>" target="_blank" class="text-[10px] font-black uppercase text-blue-600 bg-blue-50 px-2 py-1 rounded-lg border border-blue-100">
+                            Vezi Poza
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
+        <?php if (empty($fuelings)): ?>
+            <div class="px-6 py-10 text-center text-slate-400 italic">Nicio alimentare înregistrată.</div>
+        <?php endif; ?>
+    </div>
+
+    <!-- Desktop Table -->
+    <table class="hidden md:table min-w-full divide-y divide-slate-200">
         <thead class="bg-slate-50">
             <tr>
                 <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Date</th>
