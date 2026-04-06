@@ -430,9 +430,13 @@ class SuperAdminController extends BaseController
         }
 
         try {
+            // Fetch tenant name for placeholder
+            $tenant = DB::fetch("SELECT name FROM tenants WHERE id = ?", [$tenantId]);
+            $companyName = $tenant ? $tenant['name'] : 'Companie';
+
             // Fetch all active, non-archived drivers for this tenant with a valid phone
             $drivers = DB::fetchAll("
-                SELECT DISTINCT phone 
+                SELECT phone, name 
                 FROM users 
                 WHERE tenant_id = ? 
                   AND role = 'driver' 
@@ -440,6 +444,7 @@ class SuperAdminController extends BaseController
                   AND is_archived = 0 
                   AND phone IS NOT NULL 
                   AND phone != ''
+                GROUP BY phone
             ", [$tenantId]);
 
             if (empty($drivers)) {
@@ -449,12 +454,18 @@ class SuperAdminController extends BaseController
 
             $count = 0;
             foreach ($drivers as $driver) {
-                if (\FleetLog\Core\SMSService::enqueue($driver['phone'], $message)) {
+                // Personalize message with placeholders
+                $personalizedMessage = \FleetLog\Core\TemplateService::replace($message, [
+                    'driver_name' => $driver['name'],
+                    'company_name' => $companyName
+                ]);
+
+                if (\FleetLog\Core\SMSService::enqueue($driver['phone'], $personalizedMessage)) {
                     $count++;
                 }
             }
 
-            $_SESSION['flash_success'] = "S-au adăugat $count SMS-uri în coadă pentru trimitere.";
+            $_SESSION['flash_success'] = "S-au adăugat $count SMS-uri PERSONALIZATE în coadă pentru trimitere.";
         } catch (\Throwable $e) {
             $_SESSION['flash_error'] = "Eroare la procesarea Mass SMS: " . $e->getMessage();
         }

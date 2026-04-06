@@ -355,6 +355,15 @@
                                 <span id="char_count" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">0 / 160 caractere (1 SMS)</span>
                                 <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Max 500</span>
                             </div>
+
+                            <div class="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Placeholder-e Personalizare:</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <code class="px-2 py-1 bg-white border border-slate-200 rounded text-[10px] text-blue-600 font-bold cursor-pointer hover:bg-blue-50" onclick="document.getElementById('mass_message').value += '{driver_name}'">{driver_name}</code>
+                                    <code class="px-2 py-1 bg-white border border-slate-200 rounded text-[10px] text-blue-600 font-bold cursor-pointer hover:bg-blue-50" onclick="document.getElementById('mass_message').value += '{company_name}'">{company_name}</code>
+                                </div>
+                                <p class="mt-2 text-[10px] text-slate-400 italic">Dă click pe un cod pentru a-l introduce în mesaj.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
