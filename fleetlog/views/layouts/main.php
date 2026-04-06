@@ -151,10 +151,33 @@
                 <button @click="sidebarOpen = true" class="lg:hidden p-1 text-slate-500 hover:bg-slate-100 rounded">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
-                <div class="flex items-center space-x-4">
-                    <span class="text-sm font-medium text-slate-600"><?php echo $currentUser['name'] ?? 'Guest'; ?></span>
-                    <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center border border-slate-300">
-                        <span class="text-xs font-bold text-slate-500"><?php echo strtoupper(substr($currentUser['name'] ?? 'G', 0, 1)); ?></span>
+
+                <div class="flex items-center space-x-6">
+                    <!-- Real-time Clock Widget -->
+                    <div x-data="{ 
+                        date: '', 
+                        time: '',
+                        update() {
+                            const now = new Date();
+                            this.date = now.toLocaleDateString('ro-RO', { weekday: 'short', day: '2-digit', month: 'short' });
+                            this.time = now.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                        }
+                    }" x-init="update(); setInterval(() => update(), 1000)" class="hidden md:flex items-center space-x-3 text-right border-r border-slate-100 pr-6">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1" x-text="date"></span>
+                            <span class="text-sm font-black text-slate-700 tracking-tight leading-none" x-text="time"></span>
+                        </div>
+                        <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                    </div>
+
+                    <!-- User Profile -->
+                    <div class="flex items-center space-x-3">
+                        <span class="text-sm font-bold text-slate-600"><?php echo $currentUser['name'] ?? 'Guest'; ?></span>
+                        <div class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 shadow-sm">
+                            <span class="text-xs font-black text-blue-600"><?php echo strtoupper(substr($currentUser['name'] ?? 'G', 0, 1)); ?></span>
+                        </div>
                     </div>
                 </div>
             </header>

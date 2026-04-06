@@ -12,13 +12,22 @@ abstract class BaseController
     {
         $tenantId = Auth::tenantId();
         $lang = 'ro'; // Default
+        $timezone = 'Europe/Bucharest'; // Default
 
         if ($tenantId !== null) {
-            // Cache language in session for performance if needed, 
-            // but for now fetch it or use a session-stored value if we update Auth
-            $tenant = DB::fetch("SELECT language FROM tenants WHERE id = ?", [$tenantId]);
+            // Fetch both language and timezone
+            $tenant = DB::fetch("SELECT language, timezone FROM tenants WHERE id = ?", [$tenantId]);
             $lang = $tenant['language'] ?? 'ro';
+            $timezone = $tenant['timezone'] ?? 'Europe/Bucharest';
         }
+
+        // Apply PHP Timezone
+        date_default_timezone_set($timezone);
+        
+        // Sync MySQL Session Timezone (using offset for 100% compatibility)
+        $now = new \DateTime();
+        $offset = $now->format('P'); 
+        DB::query("SET time_zone = ?", [$offset]);
 
         \FleetLog\Core\LanguageService::load($lang);
     }
