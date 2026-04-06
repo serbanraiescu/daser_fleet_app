@@ -36,6 +36,10 @@
            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm <?php echo $activeTab === 'mass' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'; ?>">
             Mass SMS (Broadcast)
         </a>
+        <a href="/admin/sms-logs?tab=reminders" 
+           class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm <?php echo $activeTab === 'reminders' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'; ?>">
+            Remindere Zilnice
+        </a>
     </nav>
     <div class="pb-3 px-1">
         <a href="/admin/sms/trigger-alerts" 
@@ -398,4 +402,117 @@
             });
         </script>
     </div>
+<?php elseif ($activeTab === 'reminders'): ?>
+    <!-- Daily Reminders Tab -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- List of Reminders -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <h3 class="font-black text-slate-800 uppercase tracking-widest text-sm">Remindere Active</h3>
+                </div>
+                <div class="divide-y divide-slate-100">
+                    <?php if (empty($reminders)): ?>
+                        <div class="p-12 text-center text-slate-400 italic">Nu există remindere configurate.</div>
+                    <?php endif; ?>
+                    <?php foreach ($reminders as $rem): ?>
+                        <div class="p-6 hover:bg-slate-50 transition-colors">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <div class="flex items-center space-x-2 mb-1">
+                                        <span class="px-2 py-1 bg-blue-100 text-blue-700 text-[10px] font-black rounded uppercase"><?php echo sprintf('%02d:00', $rem['scheduled_hour']); ?></span>
+                                        <span class="font-bold text-slate-800"><?php echo htmlspecialchars($rem['tenant_name']); ?></span>
+                                    </div>
+                                    <p class="text-sm text-slate-600"><?php echo htmlspecialchars($rem['message']); ?></p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <form action="/admin/sms/toggle-reminder" method="POST">
+                                        <input type="hidden" name="id" value="<?php echo $rem['id']; ?>">
+                                        <button type="submit" class="text-xs font-bold <?php echo $rem['is_active'] ? 'text-green-600 bg-green-50' : 'text-slate-400 bg-slate-100'; ?> px-3 py-1 rounded-full hover:opacity-80 transition-all">
+                                            <?php echo $rem['is_active'] ? 'Activ' : 'Inactiv'; ?>
+                                        </button>
+                                    </form>
+                                    <form action="/admin/sms/delete-reminder" method="POST" onsubmit="return confirm('Sigur vrei să ștergi acest reminder?');">
+                                        <input type="hidden" name="id" value="<?php echo $rem['id']; ?>">
+                                        <button type="submit" class="p-1 text-slate-300 hover:text-red-500 transition-colors">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <?php if ($rem['last_run_date']): ?>
+                                <div class="text-[10px] text-slate-400 font-medium">Ultima rulare: <?php echo date('d.m.Y', strtotime($rem['last_run_date'])); ?></div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Reminder Form -->
+        <div class="space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+                    <h3 class="font-black text-slate-800 uppercase tracking-widest text-sm">Adaugă Reminder Nou</h3>
+                </div>
+                <form action="/admin/sms/save-reminder" method="POST" class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Tenant</label>
+                        <select name="tenant_id" required class="w-full px-4 py-2 rounded-lg border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 font-bold text-slate-700 text-sm">
+                            <option value="">-- Selectează Tenant --</option>
+                            <?php foreach ($tenants as $t): ?>
+                                <option value="<?php echo $t['id']; ?>"><?php echo htmlspecialchars($t['name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Ora Trimitere</label>
+                        <select name="scheduled_hour" required class="w-full px-4 py-2 rounded-lg border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 font-bold text-slate-700 text-sm">
+                            <?php for ($i = 0; $i < 24; $i++): ?>
+                                <option value="<?php echo $i; ?>" <?php echo $i === 8 ? 'selected' : ''; ?>><?php echo sprintf('%02d:00', $i); ?></option>
+                            <?php endfor; ?>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Mesaj</label>
+                        <textarea name="message" id="reminder_message" rows="4" required maxlength="500"
+                                  class="w-full px-4 py-2 rounded-lg border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-sm"
+                                  placeholder="Ex: Bună dimineața! Nu uitați să porniți aplicația..."></textarea>
+                        <div class="flex justify-between items-center mt-1">
+                            <span id="rem_char_count" class="text-[10px] text-slate-400">0 / 160</span>
+                            <div class="flex space-x-1">
+                                <span class="px-1 text-[9px] bg-slate-100 rounded cursor-pointer hover:bg-blue-100" onclick="document.getElementById('reminder_message').value += '{driver_name}'">{driver_name}</span>
+                                <span class="px-1 text-[9px] bg-slate-100 rounded cursor-pointer hover:bg-blue-100" onclick="document.getElementById('reminder_message').value += '{company_name}'">{company_name}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 bg-blue-600 text-white font-black rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20 uppercase tracking-widest text-xs">
+                        Salvează Reminder
+                    </button>
+                </form>
+            </div>
+            
+            <div class="bg-blue-50 rounded-2xl p-6 border border-blue-100">
+                <h4 class="font-black text-blue-800 text-xs uppercase mb-2">Informații</h4>
+                <p class="text-xs text-blue-700 leading-relaxed">
+                    Reminderele vor fi trimise automat de sistemul de cron. Acestea se procesează o singură dată pe zi la ora stabilită.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.getElementById('reminder_message');
+            if (textarea) {
+                const charCount = document.getElementById('rem_char_count');
+                textarea.addEventListener('input', function() {
+                    charCount.textContent = this.value.length + ' / 160';
+                });
+            }
+        });
+    </script>
 <?php endif; ?>

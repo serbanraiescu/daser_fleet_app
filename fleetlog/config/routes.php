@@ -48,6 +48,9 @@ $router->add('GET', '/admin/sms/trigger-alerts', 'SuperAdminController@triggerAl
 $router->add('POST', '/admin/sms/settings', 'SuperAdminController@updateSmsSettings', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('POST', '/admin/sms/template-update', 'SuperAdminController@updateSmsTemplate', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('POST', '/admin/sms/mass-send', 'SuperAdminController@sendMassSms', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
+$router->add('POST', '/admin/sms/save-reminder', 'SuperAdminController@saveSmsReminder', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
+$router->add('POST', '/admin/sms/toggle-reminder', 'SuperAdminController@toggleSmsReminder', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
+$router->add('POST', '/admin/sms/delete-reminder', 'SuperAdminController@deleteSmsReminder', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 
 // Tenant Admin Routes
 $router->add('GET', '/tenant/dashboard', 'TenantController@dashboard', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);

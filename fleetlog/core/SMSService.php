@@ -254,4 +254,55 @@ class SMSService
             }
         }
     }
+
+    /**
+     * Process daily reminders based on scheduled hour
+     */
+    public static function processDailyReminders(): void
+    {
+        $currentHour = (int)date('H');
+        $currentDate = date('Y-m-d');
+
+        // Find active reminders for this hour that haven't run today
+        $reminders = DB::fetchAll("
+            SELECT r.*, t.name as tenant_name 
+            FROM sms_reminders r
+            JOIN tenants t ON r.tenant_id = t.id
+            WHERE r.is_active = 1 
+              AND r.scheduled_hour = ? 
+              AND (r.last_run_date IS NULL OR r.last_run_date != ?)
+        ", [$currentHour, $currentDate]);
+
+        foreach ($reminders as $rem) {
+            try {
+                // Fetch drivers for this tenant
+                $drivers = DB::fetchAll("
+                    SELECT phone, name 
+                    FROM users 
+                    WHERE tenant_id = ? 
+                      AND role = 'driver' 
+                      AND active = 1 
+                      AND is_archived = 0 
+                      AND phone IS NOT NULL 
+                      AND phone != ''
+                    GROUP BY phone
+                ", [$rem['tenant_id']]);
+
+                foreach ($drivers as $driver) {
+                    $personalized = TemplateService::replace($rem['message'], [
+                        'driver_name' => $driver['name'],
+                        'company_name' => $rem['tenant_name']
+                    ]);
+                    self::enqueue($driver['phone'], $personalized);
+                }
+
+                // Mark as run
+                DB::query("UPDATE sms_reminders SET last_run_date = ? WHERE id = ?", [$currentDate, $rem['id']]);
+                
+                error_log("SMSService::processDailyReminders - Executed reminder ID: {$rem['id']} for tenant: {$rem['tenant_id']}");
+            } catch (Exception $e) {
+                error_log("SMSService::processDailyReminders Error (ID: {$rem['id']}): " . $e->getMessage());
+            }
+        }
+    }
 }

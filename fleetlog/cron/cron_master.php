@@ -96,6 +96,16 @@ try {
     $errorsCount++;
 }
 
+// TASK 1.5: Process Daily SMS Reminders (Every Run - handles hour checking internally)
+try {
+    SMSService::processDailyReminders();
+    logCron('SMSReminders', "Checked and processed reminders", 'SUCCESS');
+    $tasksExecuted++;
+} catch (Exception $e) {
+    logCron('SMSReminders', $e->getMessage(), 'ERROR');
+    $errorsCount++;
+}
+
 // TASK 2: Scan Email Expirations (Daily)
 if (shouldRunTask('email_expirations', 'daily')) {
     try {

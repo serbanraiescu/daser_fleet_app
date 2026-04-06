@@ -1,0 +1,13 @@
+<?php
+
+return "CREATE TABLE IF NOT EXISTS sms_reminders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tenant_id INT NOT NULL,
+    message TEXT NOT NULL,
+    scheduled_hour INT NOT NULL,
+    is_active TINYINT(1) DEFAULT 1,
+    last_run_date DATE DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE
+) ENGINE=InnoDB;";

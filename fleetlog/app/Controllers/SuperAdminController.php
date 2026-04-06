@@ -385,6 +385,7 @@ class SuperAdminController extends BaseController
         $settings = [];
         $templates = [];
         $tenants = [];
+        $reminders = [];
 
         try {
             if ($activeTab === 'logs') {
@@ -402,6 +403,16 @@ class SuperAdminController extends BaseController
             } elseif ($activeTab === 'mass') {
                 // Load Tenants for selection
                 $tenants = DB::fetchAll("SELECT id, name FROM tenants WHERE status = 'active' ORDER BY name ASC");
+            } elseif ($activeTab === 'reminders') {
+                // Load Reminders with tenant names
+                $reminders = DB::fetchAll("
+                    SELECT r.*, t.name as tenant_name 
+                    FROM sms_reminders r
+                    JOIN tenants t ON r.tenant_id = t.id
+                    ORDER BY r.scheduled_hour ASC, t.name ASC
+                ");
+                // Also need tenants for the "add" form
+                $tenants = DB::fetchAll("SELECT id, name FROM tenants WHERE status = 'active' ORDER BY name ASC");
             }
         } catch (\Throwable $e) {
             // Detailed error reporting
@@ -415,8 +426,68 @@ class SuperAdminController extends BaseController
             'activeTab' => $activeTab,
             'settings' => $settings,
             'templates' => $templates,
-            'tenants' => $tenants
+            'tenants' => $tenants,
+            'reminders' => $reminders
         ]);
+    }
+
+    public function saveSmsReminder(): void
+    {
+        $id = (int)($_POST['id'] ?? 0);
+        $tenantId = (int)($_POST['tenant_id'] ?? 0);
+        $message = $_POST['message'] ?? '';
+        $hour = (int)($_POST['scheduled_hour'] ?? 8);
+
+        if ($tenantId <= 0 || empty($message)) {
+            $_SESSION['flash_error'] = "Te rugăm să selectezi un tenant și să introduci un mesaj.";
+            $this->redirect('/admin/sms-logs?tab=reminders');
+        }
+
+        try {
+            if ($id > 0) {
+                DB::query("UPDATE sms_reminders SET tenant_id = ?, message = ?, scheduled_hour = ? WHERE id = ?", [
+                    $tenantId, $message, $hour, $id
+                ]);
+                $_SESSION['flash_success'] = "Reminder actualizat cu succes.";
+            } else {
+                DB::query("INSERT INTO sms_reminders (tenant_id, message, scheduled_hour) VALUES (?, ?, ?)", [
+                    $tenantId, $message, $hour
+                ]);
+                $_SESSION['flash_success'] = "Reminder adăugat cu succes.";
+            }
+        } catch (\Throwable $e) {
+            $_SESSION['flash_error'] = "Eroare la salvarea reminder-ului: " . $e->getMessage();
+        }
+
+        $this->redirect('/admin/sms-logs?tab=reminders');
+    }
+
+    public function toggleSmsReminder(): void
+    {
+        $id = (int)($_POST['id'] ?? 0);
+        if ($id <= 0) $this->redirect('/admin/sms-logs?tab=reminders');
+
+        try {
+            DB::query("UPDATE sms_reminders SET is_active = 1 - is_active WHERE id = ?", [$id]);
+            $_SESSION['flash_success'] = "Statusul reminder-ului a fost actualizat.";
+        } catch (\Throwable $e) {
+            $_SESSION['flash_error'] = "Eroare: " . $e->getMessage();
+        }
+        $this->redirect('/admin/sms-logs?tab=reminders');
+    }
+
+    public function deleteSmsReminder(): void
+    {
+        $id = (int)($_POST['id'] ?? 0);
+        if ($id <= 0) $this->redirect('/admin/sms-logs?tab=reminders');
+
+        try {
+            DB::query("DELETE FROM sms_reminders WHERE id = ?", [$id]);
+            $_SESSION['flash_success'] = "Reminder șters cu succes.";
+        } catch (\Throwable $e) {
+            $_SESSION['flash_error'] = "Eroare la ștergere: " . $e->getMessage();
+        }
+        $this->redirect('/admin/sms-logs?tab=reminders');
     }
 
     public function sendMassSms(): void
