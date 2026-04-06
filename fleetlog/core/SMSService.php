@@ -34,12 +34,17 @@ class SMSService
 
         $text = str_replace(array_keys($replacements), array_values($replacements), $text);
 
-        // Remove any other remaining emoji-like characters (Unicode ranges for emojis)
-        // This regex covers most common emojis and pictographs
-        $text = preg_replace('/[\x{1F600}-\x{1F64F}\x{1F300}-\x{1F5FF}\x{1F680}-\x{1F6FF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}]/u', '', $text);
+        // Transliterate Romanian diacritics to ASCII
+        $diacritics = [
+            'ă' => 'a', 'â' => 'a', 'î' => 'i', 'ș' => 's', 'ț' => 't',
+            'Ă' => 'A', 'Â' => 'A', 'Î' => 'I', 'Ș' => 'S', 'Ț' => 'T'
+        ];
+        $text = strtr($text, $diacritics);
 
-        // Optional: transliterate non-ASCII to ASCII if needed (e.g. ăîâșț -> aia-st)
-        // For now, only stripping emojis to fix the specific delivery issue reported
+        // Remove any other remaining emoji-like or non-ASCII characters
+        // We keep basic punctuation and letters. 
+        // This is the safest approach for GSM-7.
+        $text = preg_replace('/[^\x20-\x7E\n\r]/u', '', $text);
         
         return trim($text);
     }
