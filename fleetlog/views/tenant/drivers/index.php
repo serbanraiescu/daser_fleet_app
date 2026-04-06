@@ -138,6 +138,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-red-800 uppercase tracking-wider">Email</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-red-800 uppercase tracking-wider">Archive Reason / Notes</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-red-800 uppercase tracking-wider">Archived Date</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-red-800 uppercase tracking-wider">Action</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-red-100 bg-white">
@@ -153,7 +154,15 @@
                                 "<?php echo htmlspecialchars($driver['archive_notes'] ?? 'No reason provided'); ?>"
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-400">
-                                <?php echo date('d.m.Y H:i', strtotime($driver['updated_at'])); ?>
+                                <?php echo date('d.m.Y H:i', strtotime($driver['updated_at'] ?? $driver['created_at'])); ?>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="/tenant/drivers/restore/<?php echo $driver['id']; ?>" 
+                                   class="inline-flex items-center px-3 py-1 bg-green-50 text-green-700 rounded-lg border border-green-200 hover:bg-green-100 transition-colors text-xs font-bold uppercase"
+                                   onclick="return confirm('Sigur doresti sa restaurezi acest sofer?')">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                    Restaurază
+                                </a>
                             </td>
                         </tr>
                     <?php endforeach; ?>

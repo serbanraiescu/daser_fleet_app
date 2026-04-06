@@ -40,6 +40,11 @@ class UserRepository extends BaseRepository
         return DB::query("UPDATE users SET is_archived = 1, archive_notes = ? WHERE id = ? AND tenant_id = ?", [$notes, $id, $tenantId])->rowCount() > 0;
     }
 
+    public function restore(int $id, int $tenantId): bool
+    {
+        return DB::query("UPDATE users SET is_archived = 0, archive_notes = NULL WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->rowCount() > 0;
+    }
+
     public function create(array $input): bool
     {
         $input = $this->prepareData($input);

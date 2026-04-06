@@ -438,6 +438,23 @@ class TenantController extends BaseController
         }
     }
 
+    public function restoreDriver(int $id): void
+    {
+        $tenantId = Auth::tenantId();
+        $userRepo = new \FleetLog\App\Repositories\UserRepository();
+        $driver = $userRepo->find($id);
+
+        if (!$driver || (int)$driver['tenant_id'] !== $tenantId || $driver['role'] !== 'driver') {
+            $this->redirect('/tenant/drivers');
+        }
+
+        if ($userRepo->restore($id, $tenantId)) {
+            $this->redirect('/tenant/drivers?success=driver_restored');
+        } else {
+            $this->redirect('/tenant/drivers?error=restore_failed');
+        }
+    }
+
     public function showEditVehicle(int $id): void
     {
         $repo = new \FleetLog\App\Repositories\VehicleRepository();
