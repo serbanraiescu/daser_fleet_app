@@ -136,6 +136,21 @@
                             </label>
                         </div>
                     </div>
+
+                    <div class="mt-4 pt-6 border-t border-slate-100 italic">
+                        <div class="flex items-center justify-between p-6 bg-indigo-50/30 rounded-2xl border border-indigo-100/50">
+                            <div class="space-y-1">
+                                <span class="block text-sm font-bold text-indigo-900">Reminder Automat Curse Deschise (ora 20:30)</span>
+                                <span class="block text-xs text-indigo-700/70">Trimite un SMS șoferilor care au uitat cursa deschisă înainte de raportul final.</span>
+                            </div>
+                            <div class="flex items-center space-x-6">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="open_trip_reminder_enabled" value="1" <?php echo ($tenant['open_trip_reminder_enabled'] ?? 0) ? 'checked' : ''; ?> class="sr-only peer">
+                                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div>

@@ -159,6 +159,19 @@ if (shouldRunTask('weekly_report', 'weekly')) {
     }
 }
 
+// TASK 5.8: Open Trip Auto-Reminders (Daily - After 20:30)
+if (shouldRunTask('open_trip_reminders', 'daily') && (int)date('H') >= 20 && (int)date('i') >= 30) {
+    try {
+        SMSService::sendAutomatedOpenTripReminders();
+        updateLastRun('open_trip_reminders');
+        logCron('OpenTripReminders', "Auto-reminders processed and enqueued", 'SUCCESS');
+        $tasksExecuted++;
+    } catch (Exception $e) {
+        logCron('OpenTripReminders', $e->getMessage(), 'ERROR');
+        $errorsCount++;
+    }
+}
+
 // TASK 6: Daily Tenant Summary Report (Daily - After 21:00)
 if (shouldRunTask('daily_tenant_report', 'daily') && (int)date('H') >= 21) {
     try {

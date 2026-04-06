@@ -423,8 +423,51 @@ class SMSService
                     error_log("SMSService::sendDailyTenantReports - Sent to tenant: {$t['name']} ($tenantId)");
                 }
 
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 error_log("SMSService::sendDailyTenantReports Error (Tenant: {$t['id']}): " . $e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * Send automated reminders to drivers with open trips (at 20:30)
+     */
+    public static function sendAutomatedOpenTripReminders(): void
+    {
+        $today = date('Y-m-d');
+        
+        $tenants = DB::fetchAll("
+            SELECT id, name FROM tenants 
+            WHERE status = 'active' 
+              AND open_trip_reminder_enabled = 1 
+              AND (open_trip_reminder_last_sent IS NULL OR open_trip_reminder_last_sent != ?)
+        ", [$today]);
+
+        foreach ($tenants as $t) {
+            try {
+                $tenantId = (int)$t['id'];
+                
+                $openTrips = DB::fetchAll("
+                    SELECT tr.id, u.name as driver_name, u.phone, v.license_plate
+                    FROM trips tr
+                    JOIN users u ON tr.driver_id = u.id
+                    JOIN vehicles v ON tr.vehicle_id = v.id
+                    WHERE tr.tenant_id = ? 
+                      AND tr.status = 'open'
+                      AND u.phone IS NOT NULL AND u.phone != ''
+                ", [$tenantId]);
+
+                foreach ($openTrips as $trip) {
+                    $fullName = trim($trip['driver_name']);
+                    $firstName = explode(' ', $fullName)[0];
+                    $message = "Salut {$firstName}, cursa ta (Masina: {$trip['license_plate']}) este inca DESCHISA! Te rugam sa o inchizi in aplicatia Daser Fleet. Seara buna!";
+                    
+                    self::enqueue($trip['phone'], self::cleanForSms($message));
+                }
+
+                DB::query("UPDATE tenants SET open_trip_reminder_last_sent = ? WHERE id = ?", [$today, $tenantId]);
+            } catch (\Exception $e) {
+                continue;
             }
         }
     }
