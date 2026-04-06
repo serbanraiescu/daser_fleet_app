@@ -399,14 +399,12 @@ class SMSService
                 $totalDrivers = DB::fetch("SELECT COUNT(*) as count FROM users WHERE tenant_id = ? AND role = 'driver' AND active = 1 AND is_archived = 0", [$tenantId])['count'];
                 $inactiveCount = $totalDrivers - $activeDrivers;
 
-                // 5. Message Formatting
-                $msg = "Salut {$t['name']}, DASER FLEET Raport Zilnic:\n"
-                     . "[RUTE] {$opened} Curse Noi / {$closed} Inchise Azi.\n"
-                     . "[OPEN] {$unfinished} Curse ramase DESCHISE.\n"
-                     . "[FUEL] {$fuelCost} Lei Alimentari ({$liters}L la pret mediu {$avgPrice} lei).\n"
-                     . "[DIST] {$km} KM total parcursi ({$avgKm} km/cursa).\n"
-                     . "[DRIVERS] Prezenta: {$activeDrivers}/{$totalDrivers} soferi activi azi.\n"
-                     . "[!!!] Atentie: {$inactiveCount} soferi nu au inregistrat nicio cursa!";
+                // 5. Message Formatting (Ultra-Concise for reliability)
+                $msg = "DASER Raport ".date('d.m', strtotime($today)).": "
+                     . "Curse {$opened}/{$closed} ({$unfinished} open). "
+                     . "Comb: {$fuelCost}L ({$liters}L). "
+                     . "KM: {$km}. "
+                     . "Drivers: {$activeDrivers}/{$totalDrivers} (Attn: {$inactiveCount}!)";
 
                 if (self::enqueue($phone, self::cleanForSms($msg))) {
                     DB::query("UPDATE tenants SET daily_report_last_sent = ? WHERE id = ?", [$today, $tenantId]);
