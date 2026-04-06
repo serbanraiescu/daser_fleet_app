@@ -368,7 +368,7 @@ class SMSService
 
         // Fetch tenants
         $tenants = DB::fetchAll("
-            SELECT id, name, notification_phone, contact_phone 
+            SELECT id, name, notification_phone, contact_phone, daily_report_phone_type 
             FROM tenants 
             $whereClause
         ", $params);
@@ -376,7 +376,17 @@ class SMSService
         foreach ($tenants as $t) {
             try {
                 $tenantId = (int)$t['id'];
-                $phone = !empty($t['notification_phone']) ? $t['notification_phone'] : $t['contact_phone'];
+                
+                $phoneType = $t['daily_report_phone_type'] ?? 'notification';
+                if ($phoneType === 'contact') {
+                    $phone = $t['contact_phone'] ?? '';
+                } else {
+                    $phone = $t['notification_phone'] ?? '';
+                    // Fallback to contact if notification is empty
+                    if (empty($phone)) {
+                        $phone = $t['contact_phone'] ?? '';
+                    }
+                }
                 
                 if (empty($phone)) continue;
 

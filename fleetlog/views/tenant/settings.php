@@ -98,21 +98,41 @@
                 </div>
 
                 <div class="pt-6 border-t border-slate-100">
-                    <div class="flex items-center justify-between p-6 bg-slate-50 rounded-2xl border border-slate-100">
-                        <div class="space-y-1">
-                            <span class="block text-sm font-bold text-slate-700">Raport Zilnic prin SMS (ora 21:00)</span>
-                            <span class="block text-xs text-slate-400">Primești un rezumat automat cu curse, alimentări și prezența șoferilor.</span>
+                    <div class="flex flex-col p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="space-y-1">
+                                <span class="block text-sm font-bold text-slate-700">Raport Zilnic prin SMS (ora 21:00)</span>
+                                <span class="block text-xs text-slate-400">Primești un rezumat automat cu curse, alimentări și prezenta șoferilor.</span>
+                            </div>
+                            <div class="flex items-center space-x-6">
+                                <?php if ($tenant['daily_report_enabled']): ?>
+                                    <button type="button" onclick="testReport()" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors uppercase tracking-widest flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                                        Test Acum
+                                    </button>
+                                <?php endif; ?>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="daily_report_enabled" value="1" <?php echo ($tenant['daily_report_enabled'] ?? 0) ? 'checked' : ''; ?> class="sr-only peer">
+                                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                </label>
+                            </div>
                         </div>
-                        <div class="flex items-center space-x-6">
-                            <?php if ($tenant['daily_report_enabled']): ?>
-                                <button type="button" onclick="testReport()" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors uppercase tracking-widest flex items-center">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                                    Test Acum
-                                </button>
-                            <?php endif; ?>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" name="daily_report_enabled" value="1" <?php echo ($tenant['daily_report_enabled'] ?? 0) ? 'checked' : ''; ?> class="sr-only peer">
-                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                        
+                        <!-- Phone Destination Choice -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 pt-4 border-t border-slate-200/60">
+                            <label class="relative flex items-center p-3 rounded-xl border border-slate-200 bg-white cursor-pointer hover:border-indigo-200 transition-all group">
+                                <input type="radio" name="daily_report_phone_type" value="notification" <?php echo ($tenant['daily_report_phone_type'] ?? 'notification') === 'notification' ? 'checked' : ''; ?> class="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500">
+                                <div class="ml-3">
+                                    <span class="block text-xs font-black text-slate-400 uppercase tracking-widest group-hover:text-indigo-600 transition-colors">Trimite la SMS Alerts</span>
+                                    <span class="block text-sm font-bold text-slate-700"><?php echo htmlspecialchars($tenant['notification_phone'] ?: 'Nespecificat'); ?></span>
+                                </div>
+                            </label>
+                            <label class="relative flex items-center p-3 rounded-xl border border-slate-200 bg-white cursor-pointer hover:border-indigo-200 transition-all group">
+                                <input type="radio" name="daily_report_phone_type" value="contact" <?php echo ($tenant['daily_report_phone_type'] ?? 'notification') === 'contact' ? 'checked' : ''; ?> class="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500">
+                                <div class="ml-3">
+                                    <span class="block text-xs font-black text-slate-400 uppercase tracking-widest group-hover:text-indigo-600 transition-colors">Trimite la Nr. Contact</span>
+                                    <span class="block text-sm font-bold text-slate-700"><?php echo htmlspecialchars($tenant['contact_phone'] ?: 'Nespecificat'); ?></span>
+                                </div>
                             </label>
                         </div>
                     </div>

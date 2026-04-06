@@ -363,11 +363,12 @@ class TenantController extends BaseController
         $notificationEmails = $_POST['notification_emails'] ?? null;
         $signupEnabled = isset($_POST['signup_enabled']) ? 1 : 0;
         $dailyReportEnabled = isset($_POST['daily_report_enabled']) ? 1 : 0;
+        $dailyReportPhoneType = $_POST['daily_report_phone_type'] ?? 'notification';
         $equipmentConfig = $_POST['equipment_config'] ?? [];
         $equipmentJson = json_encode($equipmentConfig);
 
-        DB::query("UPDATE tenants SET timezone = ?, language = ?, trip_types = ?, contact_phone = ?, notification_phone = ?, notification_emails = ?, signup_enabled = ?, daily_report_enabled = ?, equipment_config = ? WHERE id = ?", [
-            $timezone, $language, $tripTypes, $contactPhone, $notificationPhone, $notificationEmails, $signupEnabled, $dailyReportEnabled, $equipmentJson, $tenantId
+        DB::query("UPDATE tenants SET timezone = ?, language = ?, trip_types = ?, contact_phone = ?, notification_phone = ?, notification_emails = ?, signup_enabled = ?, daily_report_enabled = ?, daily_report_phone_type = ?, equipment_config = ? WHERE id = ?", [
+            $timezone, $language, $tripTypes, $contactPhone, $notificationPhone, $notificationEmails, $signupEnabled, $dailyReportEnabled, $dailyReportPhoneType, $equipmentJson, $tenantId
         ]);
 
         $this->redirect('/tenant/settings?success=1');
