@@ -159,6 +159,19 @@ if (shouldRunTask('weekly_report', 'weekly')) {
     }
 }
 
+// TASK 6: Daily Tenant Summary Report (Daily - After 21:00)
+if (shouldRunTask('daily_tenant_report', 'daily') && (int)date('H') >= 21) {
+    try {
+        SMSService::sendDailyTenantReports();
+        updateLastRun('daily_tenant_report');
+        logCron('DailyTenantReport', "Reports processed and enqueued", 'SUCCESS');
+        $tasksExecuted++;
+    } catch (Exception $e) {
+        logCron('DailyTenantReport', $e->getMessage(), 'ERROR');
+        $errorsCount++;
+    }
+}
+
 logCron('MASTER', "Finished. Tasks: $tasksExecuted, Errors: $errorsCount");
 
 // 6. Final Clean up

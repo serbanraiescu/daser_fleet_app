@@ -305,4 +305,77 @@ class SMSService
             }
         }
     }
+
+    /**
+     * Send daily summary reports to all enabled tenants
+     * @param int|null $targetTenantId Optional ID for manual testing
+     */
+    public static function sendDailyTenantReports(?int $targetTenantId = null): void
+    {
+        $today = date('Y-m-d');
+        
+        $whereClause = "WHERE status = 'active'";
+        $params = [];
+
+        if ($targetTenantId) {
+            $whereClause .= " AND id = ?";
+            $params[] = $targetTenantId;
+        } else {
+            $whereClause .= " AND daily_report_enabled = 1 AND (daily_report_last_sent IS NULL OR daily_report_last_sent != ?)";
+            $params[] = $today;
+        }
+
+        // Fetch tenants
+        $tenants = DB::fetchAll("
+            SELECT id, name, notification_phone, contact_phone 
+            FROM tenants 
+            $whereClause
+        ", $params);
+
+        foreach ($tenants as $t) {
+            try {
+                $tenantId = (int)$t['id'];
+                $phone = !empty($t['notification_phone']) ? $t['notification_phone'] : $t['contact_phone'];
+                
+                if (empty($phone)) continue;
+
+                // 1. Trips Stats
+                $opened = DB::fetch("SELECT COUNT(*) as count FROM trips WHERE tenant_id = ? AND DATE(start_time) = ?", [$tenantId, $today])['count'];
+                $closed = DB::fetch("SELECT COUNT(*) as count FROM trips WHERE tenant_id = ? AND DATE(end_time) = ? AND status = 'closed'", [$tenantId, $today])['count'];
+                $unfinished = DB::fetch("SELECT COUNT(*) as count FROM trips WHERE tenant_id = ? AND status = 'open'", [$tenantId])['count'];
+                
+                // 2. Fuel Stats
+                $fuel = DB::fetch("SELECT SUM(total_price) as total, SUM(liters) as liters FROM fuelings WHERE tenant_id = ? AND DATE(created_at) = ?", [$tenantId, $today]);
+                $fuelCost = number_format($fuel['total'] ?? 0, 2);
+                $liters = number_format($fuel['liters'] ?? 0, 2);
+                $avgPrice = ($fuel['liters'] > 0) ? number_format($fuel['total'] / $fuel['liters'], 2) : "0.00";
+
+                // 3. KM Stats
+                $km = DB::fetch("SELECT SUM(end_km - start_km) as total FROM trips WHERE tenant_id = ? AND DATE(end_time) = ? AND status = 'closed'", [$tenantId, $today])['total'] ?? 0;
+                $avgKm = ($closed > 0) ? number_format($km / $closed, 1) : "0";
+
+                // 4. Driver Presence
+                $activeDrivers = DB::fetch("SELECT COUNT(DISTINCT driver_id) as count FROM trips WHERE tenant_id = ? AND DATE(start_time) = ?", [$tenantId, $today])['count'];
+                $totalDrivers = DB::fetch("SELECT COUNT(*) as count FROM users WHERE tenant_id = ? AND role = 'driver' AND active = 1 AND is_archived = 0", [$tenantId])['count'];
+                $inactiveCount = $totalDrivers - $activeDrivers;
+
+                // 5. Message Formatting
+                $msg = "Salut {$t['name']}, DASER FLEET Raport Zilnic:\n"
+                     . "🛣️ {$opened} Curse Noi / {$closed} Inchise Azi.\n"
+                     . "⚡ {$unfinished} Curse ramase DESCHISE.\n"
+                     . "⛽ {$fuelCost} Lei Alimentari ({$liters}L la pret mediu {$avgPrice} lei).\n"
+                     . "📏 {$km} KM total parcursi ({$avgKm} km/cursa).\n"
+                     . "👥 Prezenta: {$activeDrivers}/{$totalDrivers} soferi activi azi.\n"
+                     . "⚠️ Atentie: {$inactiveCount} soferi nu au inregistrat nicio cursa!";
+
+                if (self::enqueue($phone, $msg)) {
+                    DB::query("UPDATE tenants SET daily_report_last_sent = ? WHERE id = ?", [$today, $tenantId]);
+                    error_log("SMSService::sendDailyTenantReports - Sent to tenant: {$t['name']} ($tenantId)");
+                }
+
+            } catch (Exception $e) {
+                error_log("SMSService::sendDailyTenantReports Error (Tenant: {$t['id']}): " . $e->getMessage());
+            }
+        }
+    }
 }

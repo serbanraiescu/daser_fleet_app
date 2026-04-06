@@ -9,6 +9,7 @@
         <span>
             <?php 
                 if ($_GET['success'] === 'token_regenerated') echo "Link de înscriere generat/actualizat cu succes!";
+                elseif ($_GET['success'] === 'test_sent') echo "Raportul de test a fost adăugat în coada de trimitere!";
                 else echo "Settings updated successfully!";
             ?>
         </span>
@@ -95,6 +96,38 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="pt-6 border-t border-slate-100">
+                    <div class="flex items-center justify-between p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div class="space-y-1">
+                            <span class="block text-sm font-bold text-slate-700">Raport Zilnic prin SMS (ora 21:00)</span>
+                            <span class="block text-xs text-slate-400">Primești un rezumat automat cu curse, alimentări și prezența șoferilor.</span>
+                        </div>
+                        <div class="flex items-center space-x-6">
+                            <?php if ($tenant['daily_report_enabled']): ?>
+                                <button type="button" onclick="testReport()" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors uppercase tracking-widest flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                                    Test Acum
+                                </button>
+                            <?php endif; ?>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="daily_report_enabled" value="1" <?php echo ($tenant['daily_report_enabled'] ?? 0) ? 'checked' : ''; ?> class="sr-only peer">
+                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden form for testing the report -->
+                <form id="form-test-report" action="/tenant/settings/test-report" method="POST" class="hidden"></form>
+                
+                <script>
+                function testReport() {
+                    if (confirm('Vrei să primești un raport de test acum pe numărul de notificări?')) {
+                        document.getElementById('form-test-report').submit();
+                    }
+                }
+                </script>
 
                 <div>
                     <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Additional Notification Emails</label>

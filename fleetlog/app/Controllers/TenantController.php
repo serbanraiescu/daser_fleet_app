@@ -362,14 +362,22 @@ class TenantController extends BaseController
         $notificationPhone = $_POST['notification_phone'] ?? null;
         $notificationEmails = $_POST['notification_emails'] ?? null;
         $signupEnabled = isset($_POST['signup_enabled']) ? 1 : 0;
+        $dailyReportEnabled = isset($_POST['daily_report_enabled']) ? 1 : 0;
         $equipmentConfig = $_POST['equipment_config'] ?? [];
         $equipmentJson = json_encode($equipmentConfig);
 
-        DB::query("UPDATE tenants SET timezone = ?, language = ?, trip_types = ?, contact_phone = ?, notification_phone = ?, notification_emails = ?, signup_enabled = ?, equipment_config = ? WHERE id = ?", [
-            $timezone, $language, $tripTypes, $contactPhone, $notificationPhone, $notificationEmails, $signupEnabled, $equipmentJson, $tenantId
+        DB::query("UPDATE tenants SET timezone = ?, language = ?, trip_types = ?, contact_phone = ?, notification_phone = ?, notification_emails = ?, signup_enabled = ?, daily_report_enabled = ?, equipment_config = ? WHERE id = ?", [
+            $timezone, $language, $tripTypes, $contactPhone, $notificationPhone, $notificationEmails, $signupEnabled, $dailyReportEnabled, $equipmentJson, $tenantId
         ]);
 
         $this->redirect('/tenant/settings?success=1');
+    }
+
+    public function testDailyReport(): void
+    {
+        $tenantId = \FleetLog\Core\Auth::tenantId();
+        \FleetLog\Core\SMSService::sendDailyTenantReports($tenantId);
+        $this->redirect('/tenant/settings?success=test_sent#notifications');
     }
 
     public function regenerateSignupToken(): void
