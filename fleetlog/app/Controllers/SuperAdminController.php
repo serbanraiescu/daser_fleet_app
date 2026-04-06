@@ -373,7 +373,7 @@ class SuperAdminController extends BaseController
         $this->redirect('/admin/settings');
     }
 
-    public function testAdminReport(int $tenantId): void
+    public function testAdminReport(int $id): void
     {
         $adminEmail = $this->settingsData()['admin_report_email'] ?? null;
         if (empty($adminEmail)) {
@@ -382,7 +382,7 @@ class SuperAdminController extends BaseController
         }
 
         $today = date('Y-m-d');
-        if (EmailService::sendDetailedDailyReport($tenantId, $today, $adminEmail)) {
+        if (EmailService::sendDetailedDailyReport($id, $today, $adminEmail)) {
             $_SESSION['flash_success'] = "Raport de test generat și adăugat în coadă pentru administrator.";
         } else {
             $_SESSION['flash_error'] = "Eroare la generarea raportului de test.";
