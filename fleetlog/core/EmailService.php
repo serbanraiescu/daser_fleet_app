@@ -218,7 +218,7 @@ class EmailService
         if (!$tenant) return false;
 
         $trips = DB::fetchAll("
-            SELECT t.*, v.license_plate, u.name as driver_name 
+            SELECT t.*, v.license_plate, u.name as driver_name, (t.end_km - t.start_km) as distance 
             FROM trips t
             JOIN vehicles v ON t.vehicle_id = v.id
             JOIN users u ON t.driver_id = u.id
@@ -257,17 +257,17 @@ class EmailService
                 <thead><tr style='background: #f8fafc; text-align: left; color: #475569;'>
                 <th style='padding: 10px; border: 1px solid #e5e7eb;'>Șofer</th>
                 <th style='padding: 10px; border: 1px solid #e5e7eb;'>Vehicul</th>
-                <th style='padding: 10px; border: 1px solid #e5e7eb;'>Ruta / Scop</th>
+                <th style='padding: 10px; border: 1px solid #e5e7eb;'>Note / Scop</th>
                 <th style='padding: 10px; border: 1px solid #e5e7eb;'>KM</th>
                 <th style='padding: 10px; border: 1px solid #e5e7eb;'>Status</th>
                 </tr></thead><tbody>";
             foreach ($trips as $t) {
-                $km = $t['distance'] ? number_format($t['distance'], 2) . " KM" : "-";
+                $km = $t['distance'] ? number_format($t['distance'], 1) . " KM" : "0 KM";
                 $statusColor = $t['status'] === 'open' ? "#ef4444" : "#10b981";
                 $html .= "<tr>
                     <td style='padding: 10px; border: 1px solid #e5e7eb; font-weight: 500;'>{$t['driver_name']}</td>
                     <td style='padding: 10px; border: 1px solid #e5e7eb;'>{$t['license_plate']}</td>
-                    <td style='padding: 10px; border: 1px solid #e5e7eb;'>{$t['route_details']}</td>
+                    <td style='padding: 10px; border: 1px solid #e5e7eb;'>{$t['notes']}</td>
                     <td style='padding: 10px; border: 1px solid #e5e7eb;'>{$km}</td>
                     <td style='padding: 10px; border: 1px solid #e5e7eb; color: {$statusColor}; font-weight: bold;'>" . strtoupper($t['status']) . "</td>
                 </tr>";
@@ -285,14 +285,15 @@ class EmailService
                 <th style='padding: 10px; border: 1px solid #e5e7eb;'>Vehicul</th>
                 <th style='padding: 10px; border: 1px solid #e5e7eb;'>Litri</th>
                 <th style='padding: 10px; border: 1px solid #e5e7eb;'>Sumă</th>
-                <th style='padding: 10px; border: 1px solid #e5e7eb;'>Stație</th>
+                <th style='padding: 10px; border: 1px solid #e5e7eb;'>Full</th>
                 </tr></thead><tbody>";
             foreach ($fuelings as $f) {
+                $fullLabel = $f['is_full'] ? 'Da' : 'Nu';
                 $html .= "<tr>
                     <td style='padding: 10px; border: 1px solid #e5e7eb; font-weight: 500;'>{$f['license_plate']}</td>
                     <td style='padding: 10px; border: 1px solid #e5e7eb;'>" . number_format($f['liters'], 2) . " L</td>
                     <td style='padding: 10px; border: 1px solid #e5e7eb;'>" . number_format($f['total_price'], 2) . " Lei</td>
-                    <td style='padding: 10px; border: 1px solid #e5e7eb;'>{$f['gas_station']}</td>
+                    <td style='padding: 10px; border: 1px solid #e5e7eb;'>{$fullLabel}</td>
                 </tr>";
             }
             $html .= "</tbody></table>";
