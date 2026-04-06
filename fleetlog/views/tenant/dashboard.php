@@ -190,7 +190,10 @@
                             <div class="p-4 flex justify-between items-center bg-white hover:bg-slate-50">
                                 <div class="flex flex-col">
                                     <span class="font-bold text-slate-800"><?php echo htmlspecialchars($trip['driver_name']); ?></span>
-                                    <span class="text-xs text-slate-500 font-mono font-bold uppercase mt-1"><?php echo htmlspecialchars($trip['license_plate']); ?></span>
+                                    <div class="flex items-center space-x-2 mt-0.5">
+                                        <span class="text-[10px] text-slate-500 font-mono font-bold uppercase"><?php echo htmlspecialchars($trip['license_plate']); ?></span>
+                                        <span class="text-[9px] px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded font-black uppercase tracking-tighter"><?php echo $trip['type']; ?></span>
+                                    </div>
                                 </div>
                                 <div class="text-right flex flex-col">
                                     <span class="text-[10px] uppercase font-black text-slate-400">Pornit la</span>
@@ -207,17 +210,21 @@
                         <tr>
                             <th class="px-5 py-3">Driver</th>
                             <th class="px-5 py-3">Vehicle</th>
+                            <th class="px-5 py-3">Type</th>
                             <th class="px-5 py-3 text-right">Started</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-50">
                         <?php if (empty($activeTrips)): ?>
-                            <tr><td colspan="3" class="px-5 py-8 text-center text-slate-400 italic">Nu sunt șoferi pe traseu acum.</td></tr>
+                            <tr><td colspan="4" class="px-5 py-8 text-center text-slate-400 italic">Nu sunt șoferi pe traseu acum.</td></tr>
                         <?php else: ?>
                             <?php foreach ($activeTrips as $trip): ?>
                                 <tr>
                                     <td class="px-5 py-3 font-bold text-slate-700"><?php echo htmlspecialchars($trip['driver_name']); ?></td>
                                     <td class="px-5 py-3 text-slate-500 font-medium"><?php echo htmlspecialchars($trip['license_plate']); ?></td>
+                                    <td class="px-5 py-3">
+                                        <span class="text-[10px] px-2 py-1 bg-slate-100 text-slate-600 rounded font-bold uppercase"><?php echo $trip['type']; ?></span>
+                                    </td>
                                     <td class="px-5 py-3 text-right text-slate-400 text-xs"><?php echo date('H:i', strtotime($trip['start_time'])); ?></td>
                                 </tr>
                             <?php endforeach; ?>
