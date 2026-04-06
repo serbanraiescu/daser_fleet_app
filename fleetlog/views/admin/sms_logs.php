@@ -426,6 +426,17 @@
                                     <p class="text-sm text-slate-600"><?php echo htmlspecialchars($rem['message']); ?></p>
                                 </div>
                                 <div class="flex items-center space-x-2">
+                                    <button type="button" 
+                                            onclick='editReminder(<?php echo htmlspecialchars(json_encode($rem), ENT_QUOTES, "UTF-8"); ?>)'
+                                            class="p-1 text-slate-300 hover:text-blue-600 transition-colors" title="Editează">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    </button>
+                                    <form action="/admin/sms/test-reminder" method="POST" onsubmit="return confirm('Sigur vrei să trimiți acest reminder ACUM către toți șoferii acestui tenant?');">
+                                        <input type="hidden" name="id" value="<?php echo $rem['id']; ?>">
+                                        <button type="submit" class="p-1 text-slate-300 hover:text-amber-600 transition-colors" title="Test Now (Trimite Acum)">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                        </button>
+                                    </form>
                                     <form action="/admin/sms/toggle-reminder" method="POST">
                                         <input type="hidden" name="id" value="<?php echo $rem['id']; ?>">
                                         <button type="submit" class="text-xs font-bold <?php echo $rem['is_active'] ? 'text-green-600 bg-green-50' : 'text-slate-400 bg-slate-100'; ?> px-3 py-1 rounded-full hover:opacity-80 transition-all">
@@ -452,10 +463,14 @@
         <!-- Add Reminder Form -->
         <div class="space-y-6">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-6 border-b border-slate-100 bg-slate-50/50">
-                    <h3 class="font-black text-slate-800 uppercase tracking-widest text-sm">Adaugă Reminder Nou</h3>
+                <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                    <h3 id="reminder_form_title" class="font-black text-slate-800 uppercase tracking-widest text-sm">Adaugă Reminder Nou</h3>
+                    <button type="button" id="cancel_edit_btn" onclick="cancelReminderEdit()" class="hidden text-[10px] font-bold text-red-600 uppercase tracking-widest hover:underline">
+                        Anulează Editarea
+                    </button>
                 </div>
-                <form action="/admin/sms/save-reminder" method="POST" class="p-6 space-y-4">
+                <form action="/admin/sms/save-reminder" method="POST" id="reminder_form" class="p-6 space-y-4">
+                    <input type="hidden" name="id" id="reminder_id" value="0">
                     <div>
                         <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Tenant</label>
                         <select name="tenant_id" required class="w-full px-4 py-2 rounded-lg border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 font-bold text-slate-700 text-sm">
@@ -489,7 +504,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full py-3 bg-blue-600 text-white font-black rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20 uppercase tracking-widest text-xs">
+                    <button type="submit" id="reminder_submit_btn" class="w-full py-3 bg-blue-600 text-white font-black rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20 uppercase tracking-widest text-xs">
                         Salvează Reminder
                     </button>
                 </form>
@@ -514,5 +529,28 @@
                 });
             }
         });
+
+        function editReminder(reminder) {
+            document.getElementById('reminder_id').value = reminder.id;
+            document.getElementById('reminder_form').querySelector('[name="tenant_id"]').value = reminder.tenant_id;
+            document.getElementById('reminder_form').querySelector('[name="scheduled_hour"]').value = reminder.scheduled_hour;
+            document.getElementById('reminder_message').value = reminder.message;
+            
+            document.getElementById('reminder_form_title').textContent = 'Editează Reminder';
+            document.getElementById('reminder_submit_btn').textContent = 'Actualizează Reminder';
+            document.getElementById('cancel_edit_btn').classList.remove('hidden');
+            
+            // Scroll to form
+            document.getElementById('reminder_form').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelReminderEdit() {
+            document.getElementById('reminder_id').value = 0;
+            document.getElementById('reminder_form').reset();
+            
+            document.getElementById('reminder_form_title').textContent = 'Adaugă Reminder Nou';
+            document.getElementById('reminder_submit_btn').textContent = 'Salvează Reminder';
+            document.getElementById('cancel_edit_btn').classList.add('hidden');
+        }
     </script>
 <?php endif; ?>

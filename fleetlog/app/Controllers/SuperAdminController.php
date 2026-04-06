@@ -490,6 +490,63 @@ class SuperAdminController extends BaseController
         $this->redirect('/admin/sms-logs?tab=reminders');
     }
 
+    public function testSmsReminder(): void
+    {
+        $id = (int)($_POST['id'] ?? 0);
+        if ($id <= 0) $this->redirect('/admin/sms-logs?tab=reminders');
+
+        try {
+            $reminder = DB::fetch("SELECT * FROM sms_reminders WHERE id = ?", [$id]);
+            if (!$reminder) {
+                $_SESSION['flash_error'] = "Reminder negăsit.";
+                $this->redirect('/admin/sms-logs?tab=reminders');
+            }
+
+            $tenantId = $reminder['tenant_id'];
+            $message = $reminder['message'];
+
+            // Fetch tenant name for placeholder
+            $tenant = DB::fetch("SELECT name FROM tenants WHERE id = ?", [$tenantId]);
+            $companyName = $tenant ? $tenant['name'] : 'Companie';
+
+            // Fetch all active, non-archived drivers for this tenant with a valid phone
+            $drivers = DB::fetchAll("
+                SELECT phone, name 
+                FROM users 
+                WHERE tenant_id = ? 
+                  AND role = 'driver' 
+                  AND active = 1 
+                  AND is_archived = 0 
+                  AND phone IS NOT NULL 
+                  AND phone != ''
+                GROUP BY phone
+            ", [$tenantId]);
+
+            if (empty($drivers)) {
+                $_SESSION['flash_error'] = "Nu s-au găsit șoferi activi pentru acest tenant.";
+                $this->redirect('/admin/sms-logs?tab=reminders');
+            }
+
+            $count = 0;
+            foreach ($drivers as $driver) {
+                $personalizedMessage = \FleetLog\Core\TemplateService::replace($message, [
+                    'driver_name' => $driver['name'],
+                    'company_name' => $companyName
+                ]);
+
+                if (\FleetLog\Core\SMSService::enqueue($driver['phone'], $personalizedMessage)) {
+                    $count++;
+                }
+            }
+
+            $_SESSION['flash_success'] = "Test reușit! S-au adăugat $count SMS-uri în coadă pentru tenant-ul " . $companyName;
+        } catch (\Throwable $e) {
+            $_SESSION['flash_error'] = "Eroare la procesarea testului: " . $e->getMessage();
+        }
+
+        $this->redirect('/admin/sms-logs?tab=reminders');
+    }
+
     public function sendMassSms(): void
     {
         $tenantId = (int)($_POST['tenant_id'] ?? 0);
