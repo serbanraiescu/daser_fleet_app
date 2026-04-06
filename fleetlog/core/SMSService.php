@@ -10,6 +10,41 @@ use Exception;
 class SMSService
 {
     /**
+     * Removes or replaces characters not compatible with basic GSM-7 encoding (like emojis)
+     * to ensure reliable delivery and optimal message length.
+     */
+    public static function cleanForSms(string $text): string
+    {
+        // Replace common emojis used in the app with text/symbols
+        $replacements = [
+            '🛣️' => '[RUTE]',
+            '⚡' => '[OPEN]',
+            '⛽' => '[FUEL]',
+            '📏' => '[DIST]',
+            '👥' => '[DRIVERS]',
+            '⚠️' => '[!!!]',
+            '✅' => '[OK]',
+            '❌' => '[X]',
+            '📅' => '[DATE]',
+            '🔔' => '[!]',
+            '🚗' => '[CAR]',
+            '🚚' => '[TRUCK]',
+            '📱' => '[SMS]'
+        ];
+
+        $text = str_replace(array_keys($replacements), array_values($replacements), $text);
+
+        // Remove any other remaining emoji-like characters (Unicode ranges for emojis)
+        // This regex covers most common emojis and pictographs
+        $text = preg_replace('/[\x{1F600}-\x{1F64F}\x{1F300}-\x{1F5FF}\x{1F680}-\x{1F6FF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}]/u', '', $text);
+
+        // Optional: transliterate non-ASCII to ASCII if needed (e.g. ăîâșț -> aia-st)
+        // For now, only stripping emojis to fix the specific delivery issue reported
+        
+        return trim($text);
+    }
+
+    /**
      * Enqueue an SMS message
      * 
      * @param string $to Recipient phone number
@@ -293,7 +328,7 @@ class SMSService
                         'driver_name' => $driver['name'],
                         'company_name' => $rem['tenant_name']
                     ]);
-                    self::enqueue($driver['phone'], $personalized);
+                    self::enqueue($driver['phone'], self::cleanForSms($personalized));
                 }
 
                 // Mark as run
@@ -361,14 +396,14 @@ class SMSService
 
                 // 5. Message Formatting
                 $msg = "Salut {$t['name']}, DASER FLEET Raport Zilnic:\n"
-                     . "🛣️ {$opened} Curse Noi / {$closed} Inchise Azi.\n"
-                     . "⚡ {$unfinished} Curse ramase DESCHISE.\n"
-                     . "⛽ {$fuelCost} Lei Alimentari ({$liters}L la pret mediu {$avgPrice} lei).\n"
-                     . "📏 {$km} KM total parcursi ({$avgKm} km/cursa).\n"
-                     . "👥 Prezenta: {$activeDrivers}/{$totalDrivers} soferi activi azi.\n"
-                     . "⚠️ Atentie: {$inactiveCount} soferi nu au inregistrat nicio cursa!";
+                     . "[RUTE] {$opened} Curse Noi / {$closed} Inchise Azi.\n"
+                     . "[OPEN] {$unfinished} Curse ramase DESCHISE.\n"
+                     . "[FUEL] {$fuelCost} Lei Alimentari ({$liters}L la pret mediu {$avgPrice} lei).\n"
+                     . "[DIST] {$km} KM total parcursi ({$avgKm} km/cursa).\n"
+                     . "[DRIVERS] Prezenta: {$activeDrivers}/{$totalDrivers} soferi activi azi.\n"
+                     . "[!!!] Atentie: {$inactiveCount} soferi nu au inregistrat nicio cursa!";
 
-                if (self::enqueue($phone, $msg)) {
+                if (self::enqueue($phone, self::cleanForSms($msg))) {
                     DB::query("UPDATE tenants SET daily_report_last_sent = ? WHERE id = ?", [$today, $tenantId]);
                     error_log("SMSService::sendDailyTenantReports - Sent to tenant: {$t['name']} ($tenantId)");
                 }

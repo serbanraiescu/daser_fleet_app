@@ -534,7 +534,7 @@ class SuperAdminController extends BaseController
                     'company_name' => $companyName
                 ]);
 
-                if (\FleetLog\Core\SMSService::enqueue($driver['phone'], $personalizedMessage)) {
+                if (\FleetLog\Core\SMSService::enqueue($driver['phone'], \FleetLog\Core\SMSService::cleanForSms($personalizedMessage))) {
                     $count++;
                 }
             }
@@ -588,7 +588,7 @@ class SuperAdminController extends BaseController
                     'company_name' => $companyName
                 ]);
 
-                if (\FleetLog\Core\SMSService::enqueue($driver['phone'], $personalizedMessage)) {
+                if (\FleetLog\Core\SMSService::enqueue($driver['phone'], \FleetLog\Core\SMSService::cleanForSms($personalizedMessage))) {
                     $count++;
                 }
             }
