@@ -37,7 +37,8 @@ class SMSService
         // Transliterate Romanian diacritics to ASCII
         $diacritics = [
             'ă' => 'a', 'â' => 'a', 'î' => 'i', 'ș' => 's', 'ț' => 't',
-            'Ă' => 'A', 'Â' => 'A', 'Î' => 'I', 'Ș' => 'S', 'Ț' => 'T'
+            'Ă' => 'A', 'Â' => 'A', 'Î' => 'I', 'Ș' => 'S', 'Ț' => 'T',
+            'ş' => 's', 'ţ' => 't', 'Ş' => 'S', 'Ţ' => 'T' // Old cedilla variants
         ];
         $text = strtr($text, $diacritics);
 
