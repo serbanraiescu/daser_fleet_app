@@ -384,6 +384,7 @@ class SuperAdminController extends BaseController
         $pendingCount = 0;
         $settings = [];
         $templates = [];
+        $tenants = [];
 
         try {
             if ($activeTab === 'logs') {
@@ -395,9 +396,12 @@ class SuperAdminController extends BaseController
                 foreach ($allSettings as $row) {
                     $settings[$row['key']] = $row['value'];
                 }
-            } else {
+            } elseif ($activeTab === 'templates') {
                 // Load Templates
                 $templates = DB::fetchAll("SELECT * FROM sms_queue_templates ORDER BY template_name ASC");
+            } elseif ($activeTab === 'mass') {
+                // Load Tenants for selection
+                $tenants = DB::fetchAll("SELECT id, name FROM tenants WHERE status = 'active' ORDER BY name ASC");
             }
         } catch (\Throwable $e) {
             // Detailed error reporting
@@ -410,8 +414,52 @@ class SuperAdminController extends BaseController
             'pendingCount' => $pendingCount,
             'activeTab' => $activeTab,
             'settings' => $settings,
-            'templates' => $templates
+            'templates' => $templates,
+            'tenants' => $tenants
         ]);
+    }
+
+    public function sendMassSms(): void
+    {
+        $tenantId = (int)($_POST['tenant_id'] ?? 0);
+        $message = $_POST['message'] ?? '';
+
+        if ($tenantId <= 0 || empty($message)) {
+            $_SESSION['flash_error'] = "Te rugăm să selectezi un tenant și să introduci un mesaj.";
+            $this->redirect('/admin/sms-logs?tab=mass');
+        }
+
+        try {
+            // Fetch all active, non-archived drivers for this tenant with a valid phone
+            $drivers = DB::fetchAll("
+                SELECT DISTINCT phone 
+                FROM users 
+                WHERE tenant_id = ? 
+                  AND role = 'driver' 
+                  AND active = 1 
+                  AND is_archived = 0 
+                  AND phone IS NOT NULL 
+                  AND phone != ''
+            ", [$tenantId]);
+
+            if (empty($drivers)) {
+                $_SESSION['flash_error'] = "Nu s-au găsit șoferi activi cu numere de telefon valide pentru acest tenant.";
+                $this->redirect('/admin/sms-logs?tab=mass');
+            }
+
+            $count = 0;
+            foreach ($drivers as $driver) {
+                if (\FleetLog\Core\SMSService::enqueue($driver['phone'], $message)) {
+                    $count++;
+                }
+            }
+
+            $_SESSION['flash_success'] = "S-au adăugat $count SMS-uri în coadă pentru trimitere.";
+        } catch (\Throwable $e) {
+            $_SESSION['flash_error'] = "Eroare la procesarea Mass SMS: " . $e->getMessage();
+        }
+
+        $this->redirect('/admin/sms-logs?tab=logs');
     }
 
     public function sendTestSms(): void

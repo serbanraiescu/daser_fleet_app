@@ -32,6 +32,10 @@
            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm <?php echo $activeTab === 'templates' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'; ?>">
             Template-uri SMS
         </a>
+        <a href="/admin/sms-logs?tab=mass" 
+           class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm <?php echo $activeTab === 'mass' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'; ?>">
+            Mass SMS (Broadcast)
+        </a>
     </nav>
     <div class="pb-3 px-1">
         <a href="/admin/sms/trigger-alerts" 
@@ -309,5 +313,80 @@
                 </p>
             </div>
         </div>
+    </div>
+<?php elseif ($activeTab === 'mass'): ?>
+    <!-- Mass SMS Tab -->
+    <div class="max-w-4xl">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-8 border-b border-slate-100 bg-slate-50/50">
+                <h3 class="text-xl font-black text-slate-800 mb-2 flex items-center tracking-tight">
+                    <svg class="w-6 h-6 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
+                    Trimitere SMS în Masă (Broadcast)
+                </h3>
+                <p class="text-slate-500 text-sm">Trimite un anunț sau o informare către toți șoferii activi ai unui tenant selectat.</p>
+            </div>
+
+            <form action="/admin/sms/mass-send" method="POST" class="p-8 space-y-6" onsubmit="return confirm('Ești sigur că vrei să trimiți acest mesaj către TOȚI șoferii selectați?');">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">1. Selectează Tenant-ul</label>
+                            <select name="tenant_id" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold text-slate-700">
+                                <option value="">-- Alege un Tenant --</option>
+                                <?php foreach ($tenants as $t): ?>
+                                    <option value="<?php echo $t['id']; ?>"><?php echo htmlspecialchars($t['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="bg-blue-50 rounded-xl p-4 border border-blue-100 italic text-xs text-blue-700 leading-relaxed">
+                            <svg class="w-4 h-4 inline mr-1 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Mesajul va fi trimis doar șoferilor care sunt <strong>activi</strong>, <strong>nearhivați</strong> și au un <strong>număr de telefon</strong> setat în profil.
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">2. Redactează Mesajul</label>
+                            <textarea name="message" id="mass_message" rows="6" required maxlength="500"
+                                      class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-700"
+                                      placeholder="Ex: Bună ziua! Vă reamintim să verificați valabilitatea documentelor în aplicația Daser Fleet..."></textarea>
+                            <div class="flex justify-between items-center mt-2 px-1">
+                                <span id="char_count" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">0 / 160 caractere (1 SMS)</span>
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Max 500</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-6 border-t border-slate-100 flex justify-end">
+                    <button type="submit" class="w-full md:w-auto px-12 py-4 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 uppercase tracking-widest">
+                        Lansează Trimiterea în Masă
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const textarea = document.getElementById('mass_message');
+                if (!textarea) return;
+                
+                const charCount = document.getElementById('char_count');
+                textarea.addEventListener('input', function() {
+                    const len = this.value.length;
+                    const smsCount = Math.ceil(len / 160) || 1;
+                    charCount.textContent = `${len} / ${smsCount * 160} caractere (${smsCount} SMS)`;
+                    
+                    if (len > 160) {
+                        charCount.classList.add('text-amber-500');
+                        charCount.classList.remove('text-slate-400');
+                    } else {
+                        charCount.classList.remove('text-amber-500');
+                        charCount.classList.add('text-slate-400');
+                    }
+                });
+            });
+        </script>
     </div>
 <?php endif; ?>

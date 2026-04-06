@@ -47,6 +47,7 @@ $router->add('POST', '/admin/sms/clear-queue', 'SuperAdminController@clearSmsQue
 $router->add('GET', '/admin/sms/trigger-alerts', 'SuperAdminController@triggerAlerts', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('POST', '/admin/sms/settings', 'SuperAdminController@updateSmsSettings', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('POST', '/admin/sms/template-update', 'SuperAdminController@updateSmsTemplate', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
+$router->add('POST', '/admin/sms/mass-send', 'SuperAdminController@sendMassSms', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 
 // Tenant Admin Routes
 $router->add('GET', '/tenant/dashboard', 'TenantController@dashboard', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
