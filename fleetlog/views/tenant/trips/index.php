@@ -4,18 +4,19 @@
 
 <!-- Desktop View: Table -->
 <div class="hidden lg:block bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-    <table class="min-w-full divide-y divide-slate-200">
-        <thead class="bg-slate-50">
-            <tr>
-                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Driver</th>
-                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Vehicle</th>
-                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Type</th>
-                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Start Trip</th>
-                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">End Trip</th>
-                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Distance</th>
-                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
-            </tr>
-        </thead>
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Driver</th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Vehicle</th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Type</th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Start Trip</th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">End Trip</th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Distance</th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Status</th>
+                </tr>
+            </thead>
         <tbody class="bg-white divide-y divide-slate-200">
             <?php foreach ($trips as $trip): ?>
                 <tr class="hover:bg-slate-50 transition-colors">
@@ -49,7 +50,8 @@
                 </tr>
             <?php endforeach; ?>
         </tbody>
-    </table>
+        </table>
+    </div>
 </div>
 
 <!-- Mobile View: Cards -->

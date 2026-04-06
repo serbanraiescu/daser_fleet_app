@@ -7,6 +7,27 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         [x-cloak] { display: none !important; }
+        
+        /* Premium Custom Scrollbar */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Tablet & Small Desktop Scaling (1024px to 1440px) */
+        @media (max-width: 1440px) and (min-width: 1025px) {
+            html { font-size: 14px; }
+            .px-6 { padding-left: 1rem !important; padding-right: 1rem !important; }
+            .py-4 { padding-top: 0.75rem !important; padding-bottom: 0.75rem !important; }
+            .px-5 { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
+            .gap-8 { gap: 1rem !important; }
+        }
+
+        /* Ensure tables don't break containers and always allow scroll if needed */
+        .overflow-x-auto {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
     </style>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>

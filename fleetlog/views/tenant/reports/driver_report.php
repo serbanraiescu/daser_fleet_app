@@ -68,13 +68,15 @@
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="text-lg font-black text-slate-800"><?php echo number_format($d['total_km'] ?? 0); ?></span>
+                        <span class="text-lg font-black text-slate-800 whitespace-nowrap"><?php echo number_format($d['total_km'] ?? 0); ?></span>
                         <span class="text-xs text-slate-400 font-medium uppercase ml-1">KM</span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="text-sm font-bold text-slate-700"><?php echo number_format($d['total_liters'] ?? 0, 1); ?></span>
-                        <span class="text-[10px] text-slate-400 font-bold uppercase ml-1">Litri</span>
-                        <div class="text-[10px] text-slate-400 font-medium"><?php echo number_format($d['total_fuel_cost'] ?? 0, 2); ?> RON</div>
+                        <div class="whitespace-nowrap">
+                            <span class="text-sm font-bold text-slate-700"><?php echo number_format($d['total_liters'] ?? 0, 1); ?></span>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase ml-1">Litri</span>
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-medium whitespace-nowrap"><?php echo number_format($d['total_fuel_cost'] ?? 0, 2); ?> RON</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <?php 

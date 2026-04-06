@@ -81,58 +81,60 @@
 </div>
 
 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-    <table class="min-w-full divide-y divide-slate-200">
-        <thead class="bg-slate-50">
-            <tr>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Vehicul</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">KM Parcurși</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Curse</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Daune (Cost)</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Mentenanță/Extra</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Fuel Cost</th>
-                <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase">Consum Mediu</th>
-            </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-100">
-            <?php foreach ($vehicles as $v): ?>
-                <?php 
-                    $dist = ($v['end_km'] && $v['start_km']) ? ($v['end_km'] - $v['start_km']) : 0;
-                    $consumption = ($dist > 0 && $v['total_liters']) ? ($v['total_liters'] / $dist * 100) : null;
-                ?>
-                <tr class="hover:bg-slate-50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="font-bold text-slate-900"><?php echo $v['license_plate']; ?></div>
-                        <div class="text-xs text-slate-500"><?php echo $v['make'] . ' ' . $v['model']; ?></div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
-                        <?php echo number_format($dist); ?> KM
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
-                        <?php echo $v['trip_count']; ?> curse
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        <span class="font-bold text-slate-700"><?php echo $v['damage_count']; ?></span>
-                        <span class="text-xs text-red-500 font-bold">(<?php echo number_format($v['total_repair_cost'] ?? 0, 2); ?> RON)</span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-purple-600">
-                        <?php echo number_format($v['total_other_expenses'] ?? 0, 2); ?> RON
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-600">
-                        <?php echo number_format($v['total_fuel_cost'] ?? 0, 2); ?> RON
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right">
-                        <?php if ($consumption): ?>
-                            <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full font-bold text-xs">
-                                <?php echo number_format($consumption, 1); ?> L/100km
-                            </span>
-                        <?php else: ?>
-                            <span class="text-slate-300 text-xs italic">N/A</span>
-                        <?php endif; ?>
-                    </td>
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase whitespace-nowrap">Vehicul</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase whitespace-nowrap">KM Parcurși</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase whitespace-nowrap">Curse</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase whitespace-nowrap">Daune (Cost)</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase whitespace-nowrap">Mentenanță/Extra</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase whitespace-nowrap">Fuel Cost</th>
+                    <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase whitespace-nowrap">Consum Mediu</th>
                 </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                <?php foreach ($vehicles as $v): ?>
+                    <?php 
+                        $dist = ($v['end_km'] && $v['start_km']) ? ($v['end_km'] - $v['start_km']) : 0;
+                        $consumption = ($dist > 0 && $v['total_liters']) ? ($v['total_liters'] / $dist * 100) : null;
+                    ?>
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="font-bold text-slate-900"><?php echo $v['license_plate']; ?></div>
+                            <div class="text-xs text-slate-500"><?php echo $v['make'] . ' ' . $v['model']; ?></div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
+                            <?php echo number_format($dist); ?> KM
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                            <?php echo $v['trip_count']; ?> curse
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <span class="font-bold text-slate-700 whitespace-nowrap"><?php echo $v['damage_count']; ?></span>
+                            <span class="text-xs text-red-500 font-bold whitespace-nowrap">(<?php echo number_format($v['total_repair_cost'] ?? 0, 2); ?> RON)</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-purple-600">
+                            <?php echo number_format($v['total_other_expenses'] ?? 0, 2); ?> RON
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-600">
+                            <?php echo number_format($v['total_fuel_cost'] ?? 0, 2); ?> RON
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right">
+                            <?php if ($consumption): ?>
+                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full font-bold text-xs whitespace-nowrap">
+                                    <?php echo number_format($consumption, 1); ?> L/100km
+                                </span>
+                            <?php else: ?>
+                                <span class="text-slate-300 text-xs italic whitespace-nowrap">N/A</span>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <div class="mt-6 p-4 bg-amber-50 rounded-xl border border-amber-100 text-amber-800 text-sm">

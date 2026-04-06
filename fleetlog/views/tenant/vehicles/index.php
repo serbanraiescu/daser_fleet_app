@@ -102,18 +102,19 @@ $eqConfig = json_decode($tenant['equipment_config'] ?? '{}', true);
         </div>
 
         <!-- Desktop Table (Hidden on Mobile) -->
-        <table class="hidden md:table min-w-full divide-y divide-slate-200" id="vehiclesTable">
-            <thead class="bg-slate-50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Vehicle</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Plate</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">QR Code</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Odometer</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Expiries (Act/Ec)</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Inventar</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Status & Actions</th>
-                </tr>
-            </thead>
+        <div class="hidden md:block overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200" id="vehiclesTable">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Vehicle</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Plate</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">QR Code</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Odometer</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Expiries (Act/Ec)</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Inventar</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Status & Actions</th>
+                    </tr>
+                </thead>
             <tbody class="bg-white divide-y divide-slate-200">
                 <?php foreach ($vehicles as $vehicle): ?>
                     <tr class="hover:bg-slate-50 group transition-colors">
