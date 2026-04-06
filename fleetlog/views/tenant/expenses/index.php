@@ -77,32 +77,31 @@
     <!-- Right Column: Expense History (2/3 width) -->
     <div class="lg:col-span-2 space-y-6">
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <h2 class="text-lg font-bold text-slate-800">Expense History</h2>
-                <a href="/tenant/expenses/add" class="px-4 py-2 bg-blue-600 text-white text-sm font-bold rounded-lg hover:bg-blue-700 transition shadow-sm flex items-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                    Add Expense / Service
+            <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center bg-slate-50 gap-4">
+                <h2 class="text-lg font-bold text-slate-800">Istoric Cheltuieli</h2>
+                <a href="/tenant/expenses/add" class="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white text-sm font-black rounded-xl hover:bg-blue-700 transition shadow-lg hover:shadow-blue-500/20 flex items-center justify-center uppercase tracking-widest">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    Adaugă Cheltuială
                 </a>
             </div>
             
-            <div class="overflow-x-auto">
+            <!-- Desktop Table -->
+            <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-left text-sm text-slate-600">
-                    <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold border-b border-slate-200">
+                    <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-bold border-b border-slate-200 tracking-wider">
                         <tr>
-                            <th class="px-6 py-4">Date</th>
-                            <th class="px-6 py-4">Vehicle</th>
-                            <th class="px-6 py-4">Category</th>
-                            <th class="px-6 py-4">Description</th>
-                            <th class="px-6 py-4">Cost (RON)</th>
+                            <th class="px-6 py-4">Data</th>
+                            <th class="px-6 py-4">Vehicul</th>
+                            <th class="px-6 py-4">Categorie</th>
+                            <th class="px-6 py-4">Descriere</th>
+                            <th class="px-6 py-4 text-right">Cost (RON)</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         <?php if (empty($expenses)): ?>
                             <tr>
-                                <td colspan="5" class="px-6 py-8 text-center text-slate-500">
-                                    <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                                    <p>No expenses recorded yet.</p>
-                                    <p class="text-xs mt-1">Add an expense from the Manage Vehicles page.</p>
+                                <td colspan="5" class="px-6 py-12 text-center text-slate-400 italic">
+                                    Nu există cheltuieli înregistrate.
                                 </td>
                             </tr>
                         <?php else: ?>
@@ -114,28 +113,25 @@
                                 elseif ($expense['expense_type'] === 'consumable') $badgeColor = 'bg-green-100 text-green-700';
                             ?>
                                 <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="px-6 py-4 font-medium text-slate-800 whitespace-nowrap">
+                                    <td class="px-6 py-4 font-bold text-slate-800 whitespace-nowrap">
                                         <?php echo date('d M Y', strtotime($expense['expense_date'])); ?>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <div class="font-bold text-slate-800"><?php echo htmlspecialchars($expense['license_plate']); ?></div>
-                                        <div class="text-xs text-slate-500"><?php echo htmlspecialchars($expense['make'] . ' ' . $expense['model']); ?></div>
+                                        <div class="font-black text-slate-800"><?php echo htmlspecialchars($expense['license_plate']); ?></div>
+                                        <div class="text-xs text-slate-500"><?php echo htmlspecialchars($veh['make'] . ' ' . $veh['model']); ?></div>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <span class="px-2.5 py-1 text-xs font-bold rounded-lg <?php echo $badgeColor; ?> uppercase">
+                                        <span class="px-2.5 py-1 text-[10px] font-black rounded-lg <?php echo $badgeColor; ?> uppercase tracking-widest border border-current border-opacity-10">
                                             <?php echo htmlspecialchars($expense['expense_type']); ?>
                                         </span>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <div class="font-medium text-slate-800"><?php echo htmlspecialchars($expense['name']); ?></div>
+                                        <div class="font-bold text-slate-800"><?php echo htmlspecialchars($expense['name']); ?></div>
                                         <?php if ($expense['odometer_at_expense'] > 0): ?>
                                             <div class="text-xs text-slate-500 mt-0.5">@ <?php echo number_format($expense['odometer_at_expense']); ?> KM</div>
                                         <?php endif; ?>
-                                        <?php if (!empty($expense['notes'])): ?>
-                                            <div class="text-xs text-slate-400 mt-1 italic"><?php echo htmlspecialchars($expense['notes']); ?></div>
-                                        <?php endif; ?>
                                     </td>
-                                    <td class="px-6 py-4 font-bold text-slate-800 text-right">
+                                    <td class="px-6 py-4 font-black text-slate-900 text-right text-lg">
                                         <?php echo number_format($expense['cost'], 2); ?>
                                     </td>
                                 </tr>
@@ -143,6 +139,47 @@
                         <?php endif; ?>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Mobile Cards -->
+            <div class="md:hidden divide-y divide-slate-100">
+                <?php if (empty($expenses)): ?>
+                    <div class="px-6 py-12 text-center text-slate-400 italic">
+                        Nu există cheltuieli înregistrate.
+                    </div>
+                <?php else: ?>
+                    <?php foreach ($expenses as $expense): 
+                        $badgeColor = 'bg-slate-100 text-slate-700';
+                        if ($expense['expense_type'] === 'maintenance') $badgeColor = 'bg-blue-100 text-blue-700';
+                        elseif ($expense['expense_type'] === 'insurance') $badgeColor = 'bg-purple-100 text-purple-700';
+                        elseif ($expense['expense_type'] === 'tax') $badgeColor = 'bg-red-100 text-red-700';
+                        elseif ($expense['expense_type'] === 'consumable') $badgeColor = 'bg-green-100 text-green-700';
+                    ?>
+                        <div class="p-4 space-y-3">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest"><?php echo date('d M Y', strtotime($expense['expense_date'])); ?></div>
+                                    <div class="font-black text-slate-800"><?php echo htmlspecialchars($expense['license_plate']); ?></div>
+                                </div>
+                                <span class="px-2 py-1 text-[9px] font-black rounded-lg <?php echo $badgeColor; ?> uppercase tracking-widest border border-current border-opacity-10">
+                                    <?php echo htmlspecialchars($expense['expense_type']); ?>
+                                </span>
+                            </div>
+                            
+                            <div class="flex justify-between items-end">
+                                <div>
+                                    <div class="text-sm font-bold text-slate-700"><?php echo htmlspecialchars($expense['name']); ?></div>
+                                    <?php if ($expense['odometer_at_expense'] > 0): ?>
+                                        <div class="text-xs text-slate-400 mt-0.5">La km: <?php echo number_format($expense['odometer_at_expense']); ?></div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-lg font-black text-slate-900"><?php echo number_format($expense['cost'], 2); ?> <span class="text-xs text-slate-400">RON</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </div>
     </div>
