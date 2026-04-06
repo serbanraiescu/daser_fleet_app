@@ -165,4 +165,17 @@ return [
     'signature_company' => 'Reprezentant Companie',
     'protocol_history' => 'Istoric Procese-Verbale',
     'new_handover' => 'Predare Nouă',
+
+    // Trip Types
+    'type_naveta' => 'Navetă',
+    'type_curse' => 'Curse',
+    'type_livrare_speciala' => 'Livrare Specială',
+    'type_service' => 'Service (Cursă)',
+    'type_alte' => 'Altele',
+
+    // Reports
+    'driver_report_details' => 'Detalii Activitate Șofer',
+    'km_by_type' => 'KM pe Tip Cursă',
+    'trip_history' => 'Istoric Foi de Parcurs',
+    'view_details' => 'Vezi Detalii',
 ];

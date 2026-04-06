@@ -127,6 +127,66 @@ class ReportController extends BaseController
         ]);
     }
 
+    public function driverDetails(int $id): void
+    {
+        $tenantId = Auth::tenantId();
+        $period = $_GET['period'] ?? 'monthly';
+        $month = $_GET['month'] ?? date('m');
+        $year = $_GET['year'] ?? date('Y');
+        
+        $dateFilter = $this->getDateFilter($period, $month, $year);
+        $endDate = $this->getEndDate($period, $month, $year);
+
+        // 1. Driver Info
+        $driver = DB::fetch("SELECT id, name, email, phone FROM users WHERE id = ? AND tenant_id = ? AND role = 'driver'", [$id, $tenantId]);
+        if (!$driver) {
+            $this->redirect('/tenant/reports/driver');
+        }
+
+        // 2. Summary Stats
+        $stats = DB::fetch("
+            SELECT 
+                SUM(end_km - start_km) as total_km,
+                COUNT(*) as trip_count,
+                (SELECT SUM(liters) FROM fuelings WHERE user_id = ? AND tenant_id = ? AND created_at >= ? AND created_at < ?) as total_liters,
+                (SELECT SUM(total_price) FROM fuelings WHERE user_id = ? AND tenant_id = ? AND created_at >= ? AND created_at < ?) as total_fuel_cost
+            FROM trips 
+            WHERE driver_id = ? AND tenant_id = ? AND start_time >= ? AND start_time < ? AND status = 'closed'
+        ", [
+            $id, $tenantId, $dateFilter, $endDate,
+            $id, $tenantId, $dateFilter, $endDate,
+            $id, $tenantId, $dateFilter, $endDate
+        ]);
+
+        // 3. KM by Type
+        $kmByType = DB::fetchAll("
+            SELECT type, SUM(end_km - start_km) as km 
+            FROM trips 
+            WHERE driver_id = ? AND tenant_id = ? AND start_time >= ? AND start_time < ? AND status = 'closed'
+            GROUP BY type
+        ", [$id, $tenantId, $dateFilter, $endDate]);
+
+        // 4. Trip History
+        $trips = DB::fetchAll("
+            SELECT t.*, v.license_plate 
+            FROM trips t
+            JOIN vehicles v ON t.vehicle_id = v.id
+            WHERE t.driver_id = ? AND t.tenant_id = ? AND t.start_time >= ? AND t.start_time < ?
+            ORDER BY t.start_time DESC
+        ", [$id, $tenantId, $dateFilter, $endDate]);
+
+        $this->render('tenant/reports/driver_details', [
+            'title' => 'Driver Performance: ' . $driver['name'],
+            'driver' => $driver,
+            'stats' => $stats,
+            'kmByType' => $kmByType,
+            'trips' => $trips,
+            'period' => $period,
+            'selected_month' => $month,
+            'selected_year' => $year
+        ]);
+    }
+
     public function driverReport(): void
     {
         $tenantId = Auth::tenantId();

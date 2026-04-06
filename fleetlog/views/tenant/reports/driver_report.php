@@ -53,6 +53,7 @@
                 <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Curse</th>
                 <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Daune</th>
                 <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase">Vehicule Diferite</th>
+                <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase">Acțiuni</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
@@ -61,7 +62,7 @@
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
                             <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs mr-3">
-                                <?php echo strtoupper(substr($d['name'], 0, 1)); ?>
+                                <?php echo strtoupper(substr($d['name'] ?? 'U', 0, 1)); ?>
                             </div>
                             <div class="font-bold text-slate-900"><?php echo $d['name']; ?></div>
                         </div>
@@ -92,13 +93,18 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                         <?php echo $d['trip_count']; ?> curse
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold <?php echo $d['damage_count'] > 0 ? 'text-red-600' : 'text-slate-400'; ?>">
-                        <?php echo $d['damage_count']; ?> daune
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold <?php echo ($d['damage_count'] ?? 0) > 0 ? 'text-red-600' : 'text-slate-400'; ?>">
+                        <?php echo $d['damage_count'] ?? 0; ?> daune
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right">
                         <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full font-bold text-xs">
                             <?php echo $d['vehicle_count']; ?> vehicule
                         </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right">
+                        <a href="/tenant/reports/driver/<?php echo $d['id']; ?>?period=<?php echo $period; ?>&month=<?php echo $selected_month; ?>&year=<?php echo $selected_year; ?>" class="text-[10px] font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-2 rounded-lg transition-all hover:shadow-md border border-indigo-100">
+                            <?php echo __('view_details'); ?>
+                        </a>
                     </td>
                 </tr>
             <?php endforeach; ?>
