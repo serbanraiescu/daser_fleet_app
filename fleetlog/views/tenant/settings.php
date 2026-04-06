@@ -118,17 +118,6 @@
                     </div>
                 </div>
 
-                <!-- Hidden form for testing the report -->
-                <form id="form-test-report" action="/tenant/settings/test-report" method="POST" class="hidden"></form>
-                
-                <script>
-                function testReport() {
-                    if (confirm('Vrei să primești un raport de test acum pe numărul de notificări?')) {
-                        document.getElementById('form-test-report').submit();
-                    }
-                }
-                </script>
-
                 <div>
                     <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Additional Notification Emails</label>
                     <textarea name="notification_emails" rows="3" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none font-medium" placeholder="manager@company.com, office@company.com"><?php echo \htmlspecialchars($tenant['notification_emails'] ?? ''); ?></textarea>
@@ -270,6 +259,17 @@
     </div>
 <!-- Main settings form ends here -->
 </form>
+
+<!-- Hidden form for testing the report outside main form -->
+<form id="form-test-report" action="/tenant/settings/test-report" method="POST" class="hidden"></form>
+
+<script>
+function testReport() {
+    if (confirm('Vrei să primești un raport de test acum pe numărul de notificări?')) {
+        document.getElementById('form-test-report').submit();
+    }
+}
+</script>
 
 <!-- Regeneration form moved outside main form to avoid nesting -->
 <form id="form-regenerate" action="/tenant/settings/regenerate-token" method="POST" onsubmit="return confirm('Ești sigur că vrei să generezi un nou link? Cel vechi nu va mai funcționa!')" class="hidden"></form>
