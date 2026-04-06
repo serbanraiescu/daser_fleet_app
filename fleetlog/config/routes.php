@@ -26,6 +26,7 @@ $router->add('GET', '/admin/tenants/edit/{id}', 'SuperAdminController@showEditTe
 $router->add('POST', '/admin/tenants/edit/{id}', 'SuperAdminController@updateTenant', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('GET', '/admin/tenants/anaf-fetch', 'SuperAdminController@ajaxFetchAnafData', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('GET', '/admin/tenants/delete/{id}', 'SuperAdminController@deleteTenant', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
+$router->add('GET', '/admin/tenants/test-report/{id}', 'SuperAdminController@testAdminReport', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('GET', '/admin/tenants/impersonate/{id}', 'SuperAdminController@impersonate', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('GET', '/admin/settings', 'SuperAdminController@settings', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
 $router->add('POST', '/admin/settings', 'SuperAdminController@updateSettings', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\SuperAdminMiddleware::class]);
