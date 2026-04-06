@@ -230,8 +230,8 @@ class EmailService
             SELECT f.*, v.license_plate 
             FROM fuelings f
             JOIN vehicles v ON f.vehicle_id = v.id
-            WHERE f.tenant_id = ? AND DATE(f.date) = ?
-            ORDER BY f.date ASC
+            WHERE f.tenant_id = ? AND DATE(f.created_at) = ?
+            ORDER BY f.created_at ASC
         ", [$tenantId, $date]);
 
         $driversCount = DB::fetch("SELECT COUNT(*) as count FROM users WHERE tenant_id = ? AND role = 'driver' AND active = 1 AND is_archived = 0", [$tenantId])['count'];
@@ -313,8 +313,8 @@ class EmailService
             SELECT 
                 COUNT(*) as total_trips,
                 SUM(distance) as total_km,
-                (SELECT SUM(liters) FROM fuelings WHERE tenant_id = ? AND DATE_FORMAT(date, '%Y-%m') = ?) as total_liters,
-                (SELECT SUM(total_price) FROM fuelings WHERE tenant_id = ? AND DATE_FORMAT(date, '%Y-%m') = ?) as total_fuel_cost
+                (SELECT SUM(liters) FROM fuelings WHERE tenant_id = ? AND DATE_FORMAT(created_at, '%Y-%m') = ?) as total_liters,
+                (SELECT SUM(total_price) FROM fuelings WHERE tenant_id = ? AND DATE_FORMAT(created_at, '%Y-%m') = ?) as total_fuel_cost
             FROM trips 
             WHERE tenant_id = ? AND DATE_FORMAT(start_time, '%Y-%m') = ?
         ", [$tenantId, $month, $tenantId, $month, $tenantId, $month]);
