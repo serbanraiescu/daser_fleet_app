@@ -61,4 +61,27 @@ class FuelingRepository extends BaseRepository
                             AND YEAR(f.created_at) = ?
                             ORDER BY f.created_at DESC", [$tenantId, $month, $year]);
     }
+    public function update(int $id, array $data): bool
+    {
+        $tenantId = Auth::tenantId();
+        if (empty($data)) return false;
+
+        $fields = [];
+        $params = [];
+        foreach ($data as $key => $value) {
+            $fields[] = "{$key} = :{$key}";
+            $params[$key] = $value;
+        }
+        $params['id'] = $id;
+        $params['tenant_id'] = $tenantId;
+
+        $sql = "UPDATE fuelings SET " . implode(', ', $fields) . " WHERE id = :id AND tenant_id = :tenant_id";
+        return DB::query($sql, $params)->rowCount() > 0;
+    }
+
+    public function getLatestForVehicle(int $vehicleId): ?array
+    {
+        $tenantId = Auth::tenantId();
+        return DB::fetch("SELECT * FROM fuelings WHERE vehicle_id = ? AND tenant_id = ? ORDER BY created_at DESC, id DESC LIMIT 1", [$vehicleId, $tenantId]);
+    }
 }

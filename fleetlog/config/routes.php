@@ -86,6 +86,13 @@ $router->add('POST', '/tenant/settings', 'TenantController@updateSettings', [\Fl
 $router->add('POST', '/tenant/settings/regenerate-token', 'TenantController@regenerateSignupToken', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('POST', '/tenant/settings/test-report', 'TenantController@testDailyReport', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 
+// Administrative Editing
+$router->add('GET', '/tenant/trips/edit/{id}', 'TenantController@showEditTrip', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('POST', '/tenant/trips/edit/{id}', 'TenantController@updateTrip', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('GET', '/tenant/trips/close/{id}', 'TenantController@closeTripAdmin', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('GET', '/tenant/fuelings/edit/{id}', 'TenantController@showEditFueling', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+$router->add('POST', '/tenant/fuelings/edit/{id}', 'TenantController@updateFueling', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
+
 $router->add('GET', '/tenant/expenses', 'TenantController@expenses', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('GET', '/tenant/expenses/add', 'TenantController@showAddExpenseGeneral', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);
 $router->add('POST', '/tenant/expenses/add', 'TenantController@storeExpenseGeneral', [\FleetLog\App\Middleware\AuthMiddleware::class, \FleetLog\App\Middleware\TenantStatusMiddleware::class]);

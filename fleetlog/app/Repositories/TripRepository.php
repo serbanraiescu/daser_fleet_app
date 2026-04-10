@@ -80,4 +80,31 @@ class TripRepository extends BaseRepository
 
         return $result;
     }
+    public function update(int $id, array $data): bool
+    {
+        $tenantId = Auth::tenantId();
+        
+        if (empty($data)) return false;
+
+        $fields = [];
+        $params = [];
+        
+        foreach ($data as $key => $value) {
+            $fields[] = "{$key} = :{$key}";
+            $params[$key] = $value;
+        }
+        
+        $params['id'] = $id;
+        $params['tenant_id'] = $tenantId;
+        
+        $sql = "UPDATE trips SET " . implode(', ', $fields) . " WHERE id = :id AND tenant_id = :tenant_id";
+        
+        return DB::query($sql, $params)->rowCount() > 0;
+    }
+
+    public function getLatestTripForVehicle(int $vehicleId): ?array
+    {
+        $tenantId = Auth::tenantId();
+        return DB::fetch("SELECT * FROM trips WHERE vehicle_id = ? AND tenant_id = ? ORDER BY start_time DESC, id DESC LIMIT 1", [$vehicleId, $tenantId]);
+    }
 }

@@ -64,6 +64,9 @@
                             Vezi Poza
                         </a>
                     <?php endif; ?>
+                    <a href="/tenant/fuelings/edit/<?php echo $log['id']; ?>" class="text-[10px] font-black uppercase text-slate-600 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
+                        Editează
+                    </a>
                 </div>
             </div>
         <?php endforeach; ?>
@@ -84,7 +87,7 @@
                     <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">Fuel Info</th>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">Total</th>
                     <th class="px-6 py-3 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">Full?</th>
-                    <th class="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">Receipt</th>
+                    <th class="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">Actions</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-slate-200">
@@ -115,14 +118,15 @@
                                 <span class="px-2 py-1 bg-slate-100 text-slate-400 text-[10px] font-bold uppercase rounded">-</span>
                             <?php endif; ?>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-3">
                             <?php if ($log['receipt_photo']): ?>
-                                <a href="/<?php echo $log['receipt_photo']; ?>" target="_blank" class="text-blue-600 hover:text-blue-900 font-medium underline">
-                                    View Photo
+                                <a href="/<?php echo $log['receipt_photo']; ?>" target="_blank" class="text-blue-600 hover:text-blue-900 font-bold text-xs uppercase underline">
+                                    Photo
                                 </a>
-                            <?php else: ?>
-                                <span class="text-slate-300 text-xs italic whitespace-nowrap">No photo</span>
                             <?php endif; ?>
+                            <a href="/tenant/fuelings/edit/<?php echo $log['id']; ?>" class="text-slate-600 hover:text-slate-900 font-bold text-xs uppercase bg-slate-50 px-2 py-1 rounded border border-slate-100">
+                                Edit
+                            </a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

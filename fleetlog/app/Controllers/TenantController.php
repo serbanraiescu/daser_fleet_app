@@ -1135,4 +1135,125 @@ class TenantController extends BaseController
             'summary' => $summary
         ]);
     }
+
+    public function showEditTrip(int $id): void
+    {
+        $tripRepo = new \FleetLog\App\Repositories\TripRepository();
+        $trip = $tripRepo->find($id);
+        
+        if (!$trip) {
+            $this->redirect('/tenant/trips?error=trip_not_found');
+        }
+
+        $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
+        $vehicles = $vehicleRepo->getActiveByTenant(Auth::tenantId());
+
+        $this->render('tenant/trips/edit', [
+            'title' => 'Edit Trip Log',
+            'trip' => $trip,
+            'vehicles' => $vehicles
+        ]);
+    }
+
+    public function updateTrip(int $id): void
+    {
+        $tripRepo = new \FleetLog\App\Repositories\TripRepository();
+        $trip = $tripRepo->find($id);
+        
+        if (!$trip) {
+            $this->redirect('/tenant/trips?error=trip_not_found');
+        }
+
+        $data = [
+            'start_km' => (int)$_POST['start_km'],
+            'end_km' => $_POST['end_km'] !== '' ? (int)$_POST['end_km'] : null,
+            'start_time' => $_POST['start_time'],
+            'end_time' => $_POST['end_time'] !== '' ? $_POST['end_time'] : null,
+            'type' => $_POST['type'],
+            'notes' => $_POST['notes'],
+            'status' => $_POST['status']
+        ];
+
+        if ($tripRepo->update($id, $data)) {
+            // Odometer Sync: If this was the latest trip for the vehicle, update vehicle's current_odometer
+            if ($data['status'] === 'closed' && $data['end_km'] !== null) {
+                $latest = $tripRepo->getLatestTripForVehicle($trip['vehicle_id']);
+                if ($latest && (int)$latest['id'] === $id) {
+                    $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
+                    $vehicleRepo->updateOdometer($trip['vehicle_id'], $data['end_km']);
+                }
+            }
+            $this->redirect('/tenant/trips?success=updated');
+        } else {
+            $this->redirect('/tenant/trips?error=update_failed');
+        }
+    }
+
+    public function closeTripAdmin(int $id): void
+    {
+        $tripRepo = new \FleetLog\App\Repositories\TripRepository();
+        $trip = $tripRepo->find($id);
+        
+        if (!$trip || $trip['status'] !== 'open') {
+            $this->redirect('/tenant/trips?error=not_open');
+        }
+
+        $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
+        $vehicle = $vehicleRepo->find($trip['vehicle_id']);
+        
+        // Use vehicle's current odometer as default close KM
+        $endKm = $vehicle['current_odometer'];
+        $endTime = date('Y-m-d H:i:s');
+
+        if ($tripRepo->closeTrip($id, $endKm, $endTime, "Closed by Admin")) {
+            $this->redirect('/tenant/trips?success=closed');
+        } else {
+            $this->redirect('/tenant/trips?error=close_failed');
+        }
+    }
+
+    public function showEditFueling(int $id): void
+    {
+        $fuelingRepo = new \FleetLog\App\Repositories\FuelingRepository();
+        $fueling = $fuelingRepo->find($id);
+        
+        if (!$fueling) {
+            $this->redirect('/tenant/fuelings?error=fueling_not_found');
+        }
+
+        $this->render('tenant/fuelings/edit', [
+            'title' => 'Edit Fueling Record',
+            'fueling' => $fueling
+        ]);
+    }
+
+    public function updateFueling(int $id): void
+    {
+        $fuelingRepo = new \FleetLog\App\Repositories\FuelingRepository();
+        $fueling = $fuelingRepo->find($id);
+        
+        if (!$fueling) {
+            $this->redirect('/tenant/fuelings?error=fueling_not_found');
+        }
+
+        $data = [
+            'liters' => (float)$_POST['liters'],
+            'total_price' => (float)$_POST['total_price'],
+            'odometer' => (int)$_POST['odometer'],
+            'is_full' => isset($_POST['is_full']) ? 1 : 0,
+            'created_at' => $_POST['created_at']
+        ];
+
+        if ($fuelingRepo->update($id, $data)) {
+            // Odometer Sync: If this was the latest fueling
+            $latest = $fuelingRepo->getLatestForVehicle($fueling['vehicle_id']);
+            if ($latest && (int)$latest['id'] === $id) {
+                $vehicleRepo = new \FleetLog\App\Repositories\VehicleRepository();
+                $vehicleRepo->updateOdometer($fueling['vehicle_id'], $data['odometer']);
+            }
+            $this->redirect('/tenant/fuelings?success=updated');
+        } else {
+            $this->redirect('/tenant/fuelings?error=update_failed');
+        }
+    }
 }

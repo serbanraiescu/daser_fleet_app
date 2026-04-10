@@ -15,6 +15,7 @@
                     <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">End Trip</th>
                     <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Distance</th>
                     <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Actions</th>
                 </tr>
             </thead>
         <tbody class="bg-white divide-y divide-slate-200">
@@ -46,6 +47,18 @@
                         <span class="px-3 py-1 inline-flex text-[10px] font-black uppercase tracking-widest leading-5 rounded-full <?php echo $trip['status'] === 'open' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-800'; ?>">
                             <?php echo ucfirst($trip['status']); ?>
                         </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                        <a href="/tenant/trips/edit/<?php echo $trip['id']; ?>" class="text-blue-600 hover:text-blue-900 inline-flex items-center text-xs font-bold uppercase tracking-wider">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                            Edit
+                        </a>
+                        <?php if ($trip['status'] === 'open'): ?>
+                        <a href="/tenant/trips/close/<?php echo $trip['id']; ?>" onclick="return confirm('Dorești să închizi această cursă cu kilometrajul actual al vehiculului?')" class="text-orange-600 hover:text-orange-900 inline-flex items-center text-xs font-bold uppercase tracking-wider">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                            Close
+                        </a>
+                        <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -97,6 +110,17 @@
                         <?php echo $trip['end_km'] ? ($trip['end_km'] - $trip['start_km']) . ' KM' : '-'; ?>
                     </div>
                 </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-2 gap-2">
+                <a href="/tenant/trips/edit/<?php echo $trip['id']; ?>" class="flex-1 text-center py-2 text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 rounded-lg border border-blue-100">
+                    Editează
+                </a>
+                <?php if ($trip['status'] === 'open'): ?>
+                <a href="/tenant/trips/close/<?php echo $trip['id']; ?>" onclick="return confirm('Închide cursa?')" class="flex-1 text-center py-2 text-[10px] font-black uppercase tracking-widest text-orange-600 bg-orange-50 rounded-lg border border-orange-100">
+                    Închide
+                </a>
+                <?php endif; ?>
             </div>
         </div>
     <?php endforeach; ?>
