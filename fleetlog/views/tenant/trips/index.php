@@ -43,6 +43,27 @@
             </div>
         </div>
     </div>
+
+    <?php if (!empty($pendingDays)): ?>
+        <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-2xl shadow-sm flex items-start space-x-3 transition-all animate-pulse">
+            <div class="flex-shrink-0 pt-0.5">
+                <svg class="h-5 w-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+            </div>
+            <div>
+                <h3 class="text-sm font-black text-orange-800 uppercase tracking-widest">Atenție: Curse uitate deschise!</h3>
+                <div class="mt-1 text-xs font-bold text-orange-700">
+                    Sunt curse care nu au fost închise în următoarele zile: 
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        <?php foreach ($pendingDays as $day): ?>
+                            <a href="?date=<?php echo $day; ?>" class="px-2 py-1 bg-orange-100 border border-orange-200 rounded text-[10px] font-black hover:bg-orange-200 transition-colors">
+                                <?php echo date('d.m.Y', strtotime($day)); ?>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
 </div>
 
 <!-- Desktop View: Table -->

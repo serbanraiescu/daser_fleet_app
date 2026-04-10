@@ -250,11 +250,20 @@ class TenantController extends BaseController
             }
         }
 
+        // Check for open trips from PREVIOUS days
+        $pendingDays = DB::fetchAll("
+            SELECT DISTINCT DATE(start_time) as date 
+            FROM trips 
+            WHERE tenant_id = ? AND DATE(start_time) < ? AND status = 'open'
+            ORDER BY date ASC
+        ", [$tenantId, $selectedDate]);
+
         $this->render('tenant/trips/index', [
             'title' => 'Fleet Trip Logs',
             'trips' => $trips,
             'selectedDate' => $selectedDate,
-            'stats' => $stats
+            'stats' => $stats,
+            'pendingDays' => array_column($pendingDays, 'date')
         ]);
     }
 
