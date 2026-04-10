@@ -223,18 +223,38 @@ class TenantController extends BaseController
     public function trips(): void
     {
         $tenantId = Auth::tenantId();
+        $selectedDate = $_GET['date'] ?? date('Y-m-d');
+        
         $trips = DB::fetchAll("
             SELECT t.*, u.name as driver_name, v.license_plate 
             FROM trips t
             LEFT JOIN users u ON t.driver_id = u.id
             LEFT JOIN vehicles v ON t.vehicle_id = v.id
-            WHERE t.tenant_id = ?
+            WHERE t.tenant_id = ? AND DATE(t.start_time) = ?
             ORDER BY t.start_time DESC
-        ", [$tenantId]);
+        ", [$tenantId, $selectedDate]);
+
+        // Calculate mini-report stats for the selected day
+        $stats = [
+            'total_trips' => count($trips),
+            'open_trips' => 0,
+            'total_km' => 0
+        ];
+
+        foreach ($trips as $t) {
+            if ($t['status'] === 'open') {
+                $stats['open_trips']++;
+            }
+            if ($t['end_km'] !== null) {
+                $stats['total_km'] += ($t['end_km'] - $t['start_km']);
+            }
+        }
 
         $this->render('tenant/trips/index', [
             'title' => 'Fleet Trip Logs',
-            'trips' => $trips
+            'trips' => $trips,
+            'selectedDate' => $selectedDate,
+            'stats' => $stats
         ]);
     }
 

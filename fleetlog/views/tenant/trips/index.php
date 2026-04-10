@@ -1,9 +1,52 @@
-<div class="mb-6 flex justify-between items-center px-4 md:px-0">
-    <h1 class="text-2xl font-bold text-slate-800">Foi de parcurs (Trip Logs)</h1>
+<div class="mb-6 space-y-4 px-4 md:px-0">
+    <div class="flex flex-wrap justify-between items-center gap-4">
+        <h1 class="text-2xl font-black text-slate-800 italic uppercase tracking-tighter">Foi de parcurs</h1>
+        
+        <form method="GET" class="flex items-center gap-2 bg-white p-2 rounded-xl border border-slate-200 shadow-sm focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
+            <span class="pl-2">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            </span>
+            <input type="date" name="date" value="<?php echo $selectedDate; ?>" onchange="this.form.submit()"
+                   class="text-sm border-none focus:ring-0 text-slate-600 font-black bg-transparent">
+        </form>
+    </div>
+
+    <!-- Mini Report Dashboard -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+            </div>
+            <div>
+                <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Kilometri</div>
+                <div class="text-xl font-black text-slate-800"><?php echo number_format($stats['total_km'], 1); ?> <span class="text-xs font-normal">KM</span></div>
+            </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-orange-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <div>
+                <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Curse Deschise</div>
+                <div class="text-xl font-black text-slate-800"><?php echo $stats['open_trips']; ?></div>
+            </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2 2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+            </div>
+            <div>
+                <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Curse Zi</div>
+                <div class="text-xl font-black text-slate-800"><?php echo $stats['total_trips']; ?></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Desktop View: Table -->
-<div class="hidden lg:block bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+<div class="hidden lg:block bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mx-4 md:mx-0">
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-slate-200">
             <thead class="bg-slate-50">
@@ -18,51 +61,51 @@
                     <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Actions</th>
                 </tr>
             </thead>
-        <tbody class="bg-white divide-y divide-slate-200">
-            <?php foreach ($trips as $trip): ?>
-                <tr class="hover:bg-slate-50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-bold text-slate-900"><?php echo $trip['driver_name'] ?? 'Unknown'; ?></div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="text-sm text-slate-600 font-mono font-bold bg-slate-100 px-2 py-1 rounded border border-slate-200"><?php echo $trip['license_plate'] ?? 'Unknown'; ?></span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 py-1 text-[10px] font-black uppercase tracking-widest rounded bg-slate-100 text-slate-500 border border-slate-200">
-                            <?php echo $trip['type'] ?? 'ALTE'; ?>
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-500">
-                        <div class="text-slate-400"><?php echo $trip['start_time']; ?></div>
-                        <div class="font-black text-slate-700 text-sm"><?php echo number_format($trip['start_km']); ?> KM</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-500">
-                        <div class="text-slate-400"><?php echo $trip['end_time'] ?? '-'; ?></div>
-                        <div class="font-black text-slate-700 text-sm"><?php echo $trip['end_km'] ? number_format($trip['end_km']) . ' KM' : '-'; ?></div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-black text-blue-600">
-                        <?php echo $trip['end_km'] ? ($trip['end_km'] - $trip['start_km']) . ' KM' : '-'; ?>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-3 py-1 inline-flex text-[10px] font-black uppercase tracking-widest leading-5 rounded-full <?php echo $trip['status'] === 'open' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-800'; ?>">
-                            <?php echo ucfirst($trip['status']); ?>
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                        <a href="/tenant/trips/edit/<?php echo $trip['id']; ?>" class="text-blue-600 hover:text-blue-900 inline-flex items-center text-xs font-bold uppercase tracking-wider">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                            Edit
-                        </a>
-                        <?php if ($trip['status'] === 'open'): ?>
-                        <a href="/tenant/trips/close/<?php echo $trip['id']; ?>" onclick="return confirm('Dorești să închizi această cursă cu kilometrajul actual al vehiculului?')" class="text-orange-600 hover:text-orange-900 inline-flex items-center text-xs font-bold uppercase tracking-wider">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                            Close
-                        </a>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
+            <tbody class="bg-white divide-y divide-slate-200">
+                <?php foreach ($trips as $trip): ?>
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-bold text-slate-900"><?php echo $trip['driver_name'] ?? 'Unknown'; ?></div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm text-slate-600 font-mono font-bold bg-slate-100 px-2 py-1 rounded border border-slate-200"><?php echo $trip['license_plate'] ?? 'Unknown'; ?></span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-[10px] font-black uppercase tracking-widest rounded bg-slate-100 text-slate-500 border border-slate-200">
+                                <?php echo $trip['type'] ?? 'ALTE'; ?>
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-500">
+                            <div class="text-slate-400"><?php echo date('H:i', strtotime($trip['start_time'])); ?></div>
+                            <div class="font-black text-slate-700 text-sm"><?php echo number_format($trip['start_km']); ?> KM</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-500">
+                            <div class="text-slate-400"><?php echo $trip['end_time'] ? date('H:i', strtotime($trip['end_time'])) : '-'; ?></div>
+                            <div class="font-black text-slate-700 text-sm"><?php echo $trip['end_km'] ? number_format($trip['end_km']) . ' KM' : '-'; ?></div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-black text-blue-600">
+                            <?php echo $trip['end_km'] ? ($trip['end_km'] - $trip['start_km']) . ' KM' : '-'; ?>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-3 py-1 inline-flex text-[10px] font-black uppercase tracking-widest leading-5 rounded-full <?php echo $trip['status'] === 'open' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-800'; ?>">
+                                <?php echo ucfirst($trip['status']); ?>
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                            <a href="/tenant/trips/edit/<?php echo $trip['id']; ?>" class="text-blue-600 hover:text-blue-900 inline-flex items-center text-xs font-bold uppercase tracking-wider">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                Edit
+                            </a>
+                            <?php if ($trip['status'] === 'open'): ?>
+                            <a href="/tenant/trips/close/<?php echo $trip['id']; ?>" onclick="return confirm('Dorești să închizi această cursă cu kilometrajul actual al vehiculului?')" class="text-orange-600 hover:text-orange-900 inline-flex items-center text-xs font-bold uppercase tracking-wider">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                Close
+                            </a>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
         </table>
     </div>
 </div>
@@ -126,8 +169,8 @@
     <?php endforeach; ?>
 
     <?php if (empty($trips)): ?>
-        <div class="py-12 bg-white rounded-2xl border border-dashed border-slate-300 text-center text-slate-400 italic">
-            Nu există foi de parcurs înregistrate.
+        <div class="py-12 bg-white rounded-2xl border border-dashed border-slate-300 text-center text-slate-400 italic mx-4">
+            Nu există foi de parcurs înregistrate pentru această zi.
         </div>
     <?php endif; ?>
 </div>
