@@ -30,6 +30,15 @@ EnvLoader::load(__DIR__ . '/fleetlog/.env');
 $migrationRunner = new MigrationRunner();
 $migrationRunner->run();
 
+// Apply Global System Timezone
+try {
+    $systemTimezone = \FleetLog\Core\DB::getSetting('system_timezone', 'Europe/Bucharest');
+    date_default_timezone_set($systemTimezone);
+} catch (\Throwable $e) {
+    // Fallback to default if DB not ready or setting missing
+    date_default_timezone_set('Europe/Bucharest');
+}
+
 $appEnv = $_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? 'production';
 if ($appEnv !== 'local' && !file_exists(__DIR__ . '/fleetlog/storage/installed.lock')) {
     if (!is_dir(__DIR__ . '/fleetlog/storage')) {

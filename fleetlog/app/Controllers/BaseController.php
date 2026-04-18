@@ -12,13 +12,19 @@ abstract class BaseController
     {
         $tenantId = Auth::tenantId();
         $lang = 'ro'; // Default
-        $timezone = 'Europe/Bucharest'; // Default
+        
+        // Use system timezone as base default
+        $systemTimezone = DB::getSetting('system_timezone', 'Europe/Bucharest');
+        $timezone = $systemTimezone;
 
         if ($tenantId !== null) {
             // Fetch both language and timezone
             $tenant = DB::fetch("SELECT language, timezone FROM tenants WHERE id = ?", [$tenantId]);
             $lang = $tenant['language'] ?? 'ro';
-            $timezone = $tenant['timezone'] ?? 'Europe/Bucharest';
+            // Only override if tenant has a specific timezone set, otherwise keep system default
+            if (!empty($tenant['timezone'])) {
+                $timezone = $tenant['timezone'];
+            }
         }
 
         // Apply PHP Timezone

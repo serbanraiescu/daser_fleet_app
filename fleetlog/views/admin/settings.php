@@ -52,10 +52,90 @@
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 3.472A2 2 0 0116.183 12H7.817a2 2 0 01-1.95-1.528L5 7m5 4v6m4-6v6M1 10V4a1 1 0 011-1h20a1 1 0 011 1v6a1 1 0 01-1 1H2a1 1 0 01-1-1z"></path></svg>
             Maintenance & Cleanup
         </button>
+        <button @click="activeTab = 'general'" 
+                :class="activeTab === 'general' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'"
+                class="px-6 py-2.5 rounded-xl font-bold transition-all flex items-center">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+            General Settings
+        </button>
     </div>
 
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         
+        <!-- GENERAL SETTINGS TAB -->
+        <div x-show="activeTab === 'general'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="p-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-slate-100">
+                <div class="lg:col-span-2 pr-0 lg:pr-8">
+                    <form action="/admin/settings" method="POST" class="space-y-8">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800 mb-2 flex items-center">
+                                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mr-4">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                                System Time & Localization
+                            </h2>
+                            <p class="text-slate-500 mb-8 ml-14">Configure the global time settings for the Master application. This affects SMS scheduling and reports.</p>
+                            
+                            <div class="ml-14 space-y-6">
+                                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-sm">
+                                    <label class="block text-sm font-bold text-slate-700 mb-3">System Timezone</label>
+                                    <select name="settings[system_timezone]" class="w-full px-5 py-4 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none transition-all bg-white font-bold text-slate-700">
+                                        <?php 
+                                        $timezones = [
+                                            'Europe/Bucharest' => 'România (EET/EEST)',
+                                            'UTC' => 'Coordinated Universal Time (UTC)',
+                                            'Europe/London' => 'London, United Kingdom',
+                                            'Europe/Berlin' => 'Berlin, Germany',
+                                            'Europe/Paris' => 'Paris, France',
+                                            'Europe/Rome' => 'Rome, Italy',
+                                            'Europe/Madrid' => 'Madrid, Spain'
+                                        ];
+                                        foreach ($timezones as $tz => $label): 
+                                        ?>
+                                            <option value="<?php echo $tz; ?>" <?php echo ($settings['system_timezone'] ?? 'Europe/Bucharest') === $tz ? 'selected' : ''; ?>>
+                                                <?php echo $label; ?> (<?php echo $tz; ?>)
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <div class="mt-4 p-4 rounded-xl bg-blue-50 border border-blue-100 flex items-center">
+                                        <svg class="w-5 h-5 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        <span class="text-xs text-blue-700 font-medium">Ora setată aici va fi utilizată ca referință pentru toate modulele Master App.</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex justify-end">
+                                    <button type="submit" class="px-10 py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all shadow-md active:scale-95 flex items-center">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                                        Save General Settings
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="lg:col-span-1 p-8 bg-slate-50">
+                    <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-6">Master Server Status</h3>
+                    
+                    <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Current Server Time</div>
+                            <div class="text-2xl font-black text-slate-800 font-mono"><?php echo date('H:i:s'); ?></div>
+                            <div class="text-xs text-slate-500 mt-1"><?php echo date('d M Y'); ?></div>
+                        </div>
+                        
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">PHP Environment</div>
+                            <div class="flex items-center text-sm font-bold text-slate-700">
+                                <div class="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
+                                PHP <?php echo PHP_VERSION; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- EMAIL TAB -->
         <div x-show="activeTab === 'email'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
             <div class="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-slate-100">
