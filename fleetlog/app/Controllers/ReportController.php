@@ -197,9 +197,9 @@ class ReportController extends BaseController
         $dateFilter = $this->getDateFilter($period, $month, $year);
         $endDate = $this->getEndDate($period, $month, $year);
 
-        $drivers = DB::fetchAll("
+        $driversData = DB::fetchAll("
             SELECT 
-                u.id, u.name,
+                u.id, u.name, u.is_archived,
                 (SELECT SUM(end_km - start_km) FROM trips WHERE driver_id = u.id AND tenant_id = ? AND start_time >= ? AND start_time < ? AND status = 'closed') as total_km,
                 (SELECT COUNT(*) FROM trips WHERE driver_id = u.id AND tenant_id = ? AND start_time >= ? AND start_time < ?) as trip_count,
                 (SELECT COUNT(DISTINCT vehicle_id) FROM trips WHERE driver_id = u.id AND tenant_id = ? AND start_time >= ? AND start_time < ?) as vehicle_count,
@@ -218,9 +218,13 @@ class ReportController extends BaseController
             $tenantId
         ]);
 
+        $activeDrivers = array_filter($driversData, fn($d) => !($d['is_archived'] ?? 0));
+        $archivedDrivers = array_filter($driversData, fn($d) => ($d['is_archived'] ?? 0));
+
         $this->render('tenant/reports/driver_report', [
             'title' => 'Driver Activity Report',
-            'drivers' => $drivers,
+            'activeDrivers' => $activeDrivers,
+            'archivedDrivers' => $archivedDrivers,
             'period' => $period,
             'selected_month' => $month,
             'selected_year' => $year
