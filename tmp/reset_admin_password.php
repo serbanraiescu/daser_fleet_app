@@ -39,8 +39,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         try {
             $hash = password_hash($newPass, PASSWORD_BCRYPT);
-            DB::query("UPDATE users SET password = ? WHERE id = ? AND role = 'super_admin'", [$hash, $userId]);
-            $message = "✅ Parola a fost resetată cu succes pentru utilizatorul cu ID: $userId. Poți șterge acum acest fișier.";
+            // Reset password AND make sure account is active
+            DB::query("UPDATE users SET password = ?, active = 1 WHERE id = ? AND role = 'super_admin'", [$hash, $userId]);
+            $message = "✅ Parola a fost resetată și contul activat pentru utilizatorul cu ID: $userId. Poți șterge acum acest fișier.";
         } catch (\Throwable $e) {
             $error = "Eroare la resetare: " . $e->getMessage();
         }
